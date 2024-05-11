@@ -1,11 +1,18 @@
 ---
-title: "ISSS608"
+title: "Welcome to my first Quarto website"
+date-modified: "last-modified"
 ---
 
-This is a Quarto website.
+This is my first Quarto website.
 
-To learn more about Quarto websites visit <https://quarto.org/docs/websites>.
+The picture below shows my brain working at 100% learning about visual analytics.
 
-```{r}
-1 + 1
-```
+![](images/Mindblown.jpg)
+
+Some recommended readings for this course:
+
+1.  [R for Data Science, 2nd Edition](https://r4ds.hadley.nz/)
+2.  [R for Visual Analytics](https://r4va.netlify.app/)
+3.  [Text Mining with R](https://www.tidytextmining.com/)
+
+To learn more about Quarto websites visit https://quarto.org/docs/websites.

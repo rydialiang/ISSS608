@@ -2,9 +2,9 @@
   {
     "objectID": "index.html",
     "href": "index.html",
-    "title": "ISSS608",
+    "title": "Welcome to my first Quarto website",
     "section": "",
-    "text": "This is a Quarto website.\nTo learn more about Quarto websites visit https://quarto.org/docs/websites.\n\n1 + 1\n\n[1] 2"
+    "text": "This is my first Quarto website.\nThe picture below shows my brain working at 100% learning about visual analytics.\n\nSome recommended readings for this course:\n\nR for Data Science, 2nd Edition\nR for Visual Analytics\nText Mining with R\n\nTo learn more about Quarto websites visit https://quarto.org/docs/websites."
   },
   {
     "objectID": "about.html",

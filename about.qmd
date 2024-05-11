@@ -1,9 +1,47 @@
 ---
-title: "About"
+title: "About this site"
 ---
 
-About this site
+This site is created as part my course work in [Visual Analytics](https://isss608-ay2023-24apr.netlify.app/) taught by [Professor Kam TS](https://github.com/tskam). Through this module, I hope to improve my data visualisation skill.
+
+Skills of a Data Scientists and my progress thus far:
 
 ```{r}
-1 + 1
+#| echo: False
+# My Data
+skill_scores <- data.frame(
+    row.names = c("Rydia"),
+    Mathematics = 9,
+    Predictive_modeling = 5,
+    Coding = 1,
+    Machine_learning = 0,
+    Neural_networks = 0,
+    Database_management = 0,
+    Cloud_computing = 0,
+    Communication = 7,
+    Data_visualisation = 3,
+    Critical_thinking = 7
+)
+
+library(fmsb)
+
+# Define the variable ranges: maximum and minimum
+max_min <- data.frame(
+    Mathematics = c(10,0),
+    Predictive_modeling = c(10,0),
+    Coding = c(10,0),
+    Machine_learning = c(10,0),
+    Neural_networks = c(10,0),
+    Database_management = c(10,0),
+    Cloud_computing = c(10,0),
+    Communication = c(10,0),
+    Data_visualisation = c(10,0),
+    Critical_thinking = c(10,0)
+)
+rownames(max_min) <- c("Max", "Min")
+
+df <- rbind(max_min, skill_scores)
+
+ry_data <- df[c("Max", "Min", "Rydia"), ]
+radarchart(ry_data, vlcex = 0.5)
 ```
