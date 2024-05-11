@@ -1,0 +1,120 @@
+---
+title: "Hands-on Ex 1"
+author: "Liang Xiuhao Rydia"
+date: "April 13, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+```{r}
+
+# load tidyverse from pacman
+pacman::p_load(tidyverse)
+
+# load exam data using readr, part of tidyverse package
+exam_data <- read_csv("data/Exam_data.csv")
+
+# R base Histogram
+hist(exam_data$MATHS)
+
+# ggplot histogram
+ggplot(data=exam_data, aes(x = MATHS)) +
+  geom_histogram(bins=10, 
+                 boundary = 100,
+                 color="black", 
+                 fill="grey") +
+  ggtitle("Distribution of Maths scores")
+
+# If the dataset is not already a data.frame, it will be converted to one by fortify().
+ggplot(data=exam_data, 
+       aes(x= MATHS))
+
+# Bar Chart
+ggplot(data=exam_data, 
+       aes(x=RACE)) +
+  geom_bar()
+
+# Dotplot / scale_y_continuous to turn off y-axis
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_dotplot(binwidth=2.5,         
+               dotsize = 0.5) +      
+  scale_y_continuous(NULL,           
+                     breaks = NULL)  
+
+# Histogram, changing geom() 
+ggplot(data=exam_data, 
+       aes(x = MATHS)) +
+  geom_histogram(bins=20,
+                 color="black",
+                 fill='light blue') 
+
+# Histogram, changing aes()
+# This approach can be used to colour, fill and alpha of the geometric.
+ggplot(data=exam_data, 
+       aes(x = MATHS,
+           fill = GENDER)) +
+  geom_histogram(bins = 20,
+                 color = "grey30") 
+
+# Kernel Density Estimate (KDE), changing aes()
+ggplot(data=exam_data, 
+       aes(x = MATHS,
+           color = GENDER)) +
+  geom_density()   
+
+# Boxplot, notches to determine if median differs
+ggplot(data=exam_data, 
+       aes(y = MATHS,       
+           x= GENDER)) +    
+  geom_boxplot(notch=T) 
+
+# Violin plot - comparing multiple data distributions
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_violin()
+
+# geom_point - scatterplot
+ggplot(data=exam_data, 
+       aes(x= MATHS, 
+           y=ENGLISH)) +
+  geom_point()            
+
+# Combining geom objects
+ggplot(data=exam_data, 
+       aes(y = MATHS, 
+           x= GENDER)) +
+  geom_boxplot() +                    
+  geom_point(position="jitter", 
+             size = 0.5)        
+
+# Using stat_summary(), use fun="mean", fun.y has deprecated
+ggplot(data=exam_data, 
+       aes(y = MATHS, x= GENDER)) +
+  geom_boxplot() +
+  stat_summary(geom = "point",       
+               fun="mean",         
+               colour ="red",        
+               size=4)  
+
+# Using stat in geom_point(), use fun instead of fun.y
+ggplot(data=exam_data, 
+       aes(y = MATHS, x= GENDER)) +
+  geom_boxplot() +
+  geom_point(stat="summary",        
+             fun="mean",           
+             colour ="red",          
+             size=4) 
+
+# geom_smooth() for best fit curve on scatterplot, default method = loess
+ggplot(data=exam_data, 
+       aes(x= MATHS, y=ENGLISH)) +
+  geom_point() +
+  geom_smooth(linewidth=0.5)
+
+```
