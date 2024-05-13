@@ -308,6 +308,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#by" id="toc-by" class="nav-link" data-scroll-target="#by"><strong>3.5.6 <code>.by</code></strong></a></li>
   <li><a href="#exercises-2" id="toc-exercises-2" class="nav-link" data-scroll-target="#exercises-2"><strong>3.5.7 Exercises</strong></a></li>
   </ul></li>
+  <li><a href="#case-study-aggregates-and-sample-size" id="toc-case-study-aggregates-and-sample-size" class="nav-link" data-scroll-target="#case-study-aggregates-and-sample-size"><strong>3.6 Case study: aggregates and sample size</strong></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -1790,14 +1791,188 @@ $ time_hour      &lt;dttm&gt; 2013-01-01 05:00:00, 2013-01-01 05:00:00, 2013-01-
 </div>
 </div>
 <ol start="2" type="1">
-<li><p>Find the flights that are most delayed upon departure from each destination.</p></li>
+<li>Find the flights that are most delayed upon departure from each destination.</li>
+</ol>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb117"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb117-1"><a href="#cb117-1" aria-hidden="true" tabindex="-1"></a>flights <span class="sc">|&gt;</span> </span>
+<span id="cb117-2"><a href="#cb117-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(dest) <span class="sc">|&gt;</span> </span>
+<span id="cb117-3"><a href="#cb117-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">slice_max</span>(dep_delay) <span class="sc">|&gt;</span> </span>
+<span id="cb117-4"><a href="#cb117-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(<span class="fu">desc</span>(dep_delay))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 105 × 19
+# Groups:   dest [105]
+    year month   day dep_time sched_dep_time dep_delay arr_time sched_arr_time
+   &lt;int&gt; &lt;int&gt; &lt;int&gt;    &lt;int&gt;          &lt;int&gt;     &lt;dbl&gt;    &lt;int&gt;          &lt;int&gt;
+ 1  2013     1     9      641            900      1301     1242           1530
+ 2  2013     6    15     1432           1935      1137     1607           2120
+ 3  2013     1    10     1121           1635      1126     1239           1810
+ 4  2013     9    20     1139           1845      1014     1457           2210
+ 5  2013     7    22      845           1600      1005     1044           1815
+ 6  2013     4    10     1100           1900       960     1342           2211
+ 7  2013     3    17     2321            810       911      135           1020
+ 8  2013     6    27      959           1900       899     1236           2226
+ 9  2013     7    22     2257            759       898      121           1026
+10  2013    12     5      756           1700       896     1058           2020
+# ℹ 95 more rows
+# ℹ 11 more variables: arr_delay &lt;dbl&gt;, carrier &lt;chr&gt;, flight &lt;int&gt;,
+#   tailnum &lt;chr&gt;, origin &lt;chr&gt;, dest &lt;chr&gt;, air_time &lt;dbl&gt;, distance &lt;dbl&gt;,
+#   hour &lt;dbl&gt;, minute &lt;dbl&gt;, time_hour &lt;dttm&gt;</code></pre>
+</div>
+</div>
+<ol start="3" type="1">
 <li><p>How do delays vary over the course of the day. Illustrate your answer with a plot.</p></li>
 <li><p>What happens if you supply a negative <code>n</code> to <a href="https://dplyr.tidyverse.org/reference/slice.html"><code>slice_min()</code></a> and friends?</p></li>
 <li><p>Explain what <a href="https://dplyr.tidyverse.org/reference/count.html"><code>count()</code></a> does in terms of the dplyr verbs you just learned. What does the <code>sort</code> argument to <a href="https://dplyr.tidyverse.org/reference/count.html"><code>count()</code></a> do?</p></li>
 </ol>
-
-
+<div class="cell">
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(</span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">x =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">5</span>,</span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">y =</span> <span class="fu">c</span>(<span class="st">"a"</span>, <span class="st">"b"</span>, <span class="st">"a"</span>, <span class="st">"a"</span>, <span class="st">"b"</span>),</span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">z =</span> <span class="fu">c</span>(<span class="st">"K"</span>, <span class="st">"K"</span>, <span class="st">"L"</span>, <span class="st">"L"</span>, <span class="st">"K"</span>)</span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 3
+# Groups:   y [2]
+      x y     z    
+  &lt;int&gt; &lt;chr&gt; &lt;chr&gt;
+1     1 a     K    
+2     2 b     K    
+3     3 a     L    
+4     4 a     L    
+5     5 b     K    </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb122"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb122-1"><a href="#cb122-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb122-2"><a href="#cb122-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(y)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 3
+      x y     z    
+  &lt;int&gt; &lt;chr&gt; &lt;chr&gt;
+1     1 a     K    
+2     3 a     L    
+3     4 a     L    
+4     2 b     K    
+5     5 b     K    </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb124"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb124-1"><a href="#cb124-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb124-2"><a href="#cb124-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(y) <span class="sc">|&gt;</span></span>
+<span id="cb124-3"><a href="#cb124-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_x =</span> <span class="fu">mean</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 2
+  y     mean_x
+  &lt;chr&gt;  &lt;dbl&gt;
+1 a       2.67
+2 b       3.5 </code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb126"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb126-1"><a href="#cb126-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb126-2"><a href="#cb126-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(y, z) <span class="sc">|&gt;</span></span>
+<span id="cb126-3"><a href="#cb126-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_x =</span> <span class="fu">mean</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+# Groups:   y [2]
+  y     z     mean_x
+  &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt;
+1 a     K        1  
+2 a     L        3.5
+3 b     K        3.5</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb128"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb128-1"><a href="#cb128-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb128-2"><a href="#cb128-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(y, z) <span class="sc">|&gt;</span></span>
+<span id="cb128-3"><a href="#cb128-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_x =</span> <span class="fu">mean</span>(x), <span class="at">.groups =</span> <span class="st">"drop"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+  y     z     mean_x
+  &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt;
+1 a     K        1  
+2 a     L        3.5
+3 b     K        3.5</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb130"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb130-1"><a href="#cb130-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb130-2"><a href="#cb130-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(y, z) <span class="sc">|&gt;</span></span>
+<span id="cb130-3"><a href="#cb130-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">mean_x =</span> <span class="fu">mean</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 3 × 3
+# Groups:   y [2]
+  y     z     mean_x
+  &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt;
+1 a     K        1  
+2 a     L        3.5
+3 b     K        3.5</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb132"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb132-1"><a href="#cb132-1" aria-hidden="true" tabindex="-1"></a>df <span class="sc">|&gt;</span></span>
+<span id="cb132-2"><a href="#cb132-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(y, z) <span class="sc">|&gt;</span></span>
+<span id="cb132-3"><a href="#cb132-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mean_x =</span> <span class="fu">mean</span>(x))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 5 × 4
+# Groups:   y, z [3]
+      x y     z     mean_x
+  &lt;int&gt; &lt;chr&gt; &lt;chr&gt;  &lt;dbl&gt;
+1     1 a     K        1  
+2     2 b     K        3.5
+3     3 a     L        3.5
+4     4 a     L        3.5
+5     5 b     K        3.5</code></pre>
+</div>
+</div>
 </section>
+</section>
+<section id="case-study-aggregates-and-sample-size" class="level2">
+<h2 class="anchored" data-anchor-id="case-study-aggregates-and-sample-size"><strong>3.6 Case study: aggregates and sample size</strong></h2>
+<p>Whenever you do any aggregation, it’s always a good idea to include a count (<a href="https://dplyr.tidyverse.org/reference/context.html"><code>n()</code></a>). That way, you can ensure that you’re not drawing conclusions based on very small amounts of data. We’ll demonstrate this with some baseball data from the <strong>Lahman</strong> package. Specifically, we will compare what proportion of times a player gets a hit (<code>H</code>) vs.&nbsp;the number of times they try to put the ball in play (<code>AB</code>):</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb134"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb134-1"><a href="#cb134-1" aria-hidden="true" tabindex="-1"></a>batters <span class="ot">&lt;-</span> Lahman<span class="sc">::</span>Batting <span class="sc">|&gt;</span> </span>
+<span id="cb134-2"><a href="#cb134-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(playerID) <span class="sc">|&gt;</span> </span>
+<span id="cb134-3"><a href="#cb134-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(</span>
+<span id="cb134-4"><a href="#cb134-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">performance =</span> <span class="fu">sum</span>(H, <span class="at">na.rm =</span> <span class="cn">TRUE</span>) <span class="sc">/</span> <span class="fu">sum</span>(AB, <span class="at">na.rm =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb134-5"><a href="#cb134-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">n =</span> <span class="fu">sum</span>(AB, <span class="at">na.rm =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb134-6"><a href="#cb134-6" aria-hidden="true" tabindex="-1"></a>  )</span>
+<span id="cb134-7"><a href="#cb134-7" aria-hidden="true" tabindex="-1"></a>batters</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 20,469 × 3
+   playerID  performance     n
+   &lt;chr&gt;           &lt;dbl&gt; &lt;int&gt;
+ 1 aardsda01      0          4
+ 2 aaronha01      0.305  12364
+ 3 aaronto01      0.229    944
+ 4 aasedo01       0          5
+ 5 abadan01       0.0952    21
+ 6 abadfe01       0.111      9
+ 7 abadijo01      0.224     49
+ 8 abbated01      0.254   3044
+ 9 abbeybe01      0.169    225
+10 abbeych01      0.281   1756
+# ℹ 20,459 more rows</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb136"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb136-1"><a href="#cb136-1" aria-hidden="true" tabindex="-1"></a>batters <span class="sc">|&gt;</span> </span>
+<span id="cb136-2"><a href="#cb136-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(n <span class="sc">&gt;</span> <span class="dv">100</span>) <span class="sc">|&gt;</span> </span>
+<span id="cb136-3"><a href="#cb136-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> n, <span class="at">y =</span> performance)) <span class="sc">+</span></span>
+<span id="cb136-4"><a href="#cb136-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">alpha =</span> <span class="dv">1</span> <span class="sc">/</span> <span class="dv">10</span>) <span class="sc">+</span> </span>
+<span id="cb136-5"><a href="#cb136-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">se =</span> <span class="cn">FALSE</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Self-Practice_02_files/figure-html/unnamed-chunk-67-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+
+
 </section>
 </section>
 

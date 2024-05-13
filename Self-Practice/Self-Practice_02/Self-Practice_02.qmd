@@ -575,8 +575,83 @@ flights |>
 
 2.  Find the flights that are most delayed upon departure from each destination.
 
+```{r}
+flights |> 
+  group_by(dest) |> 
+  slice_max(dep_delay) |> 
+  arrange(desc(dep_delay))
+```
+
 3.  How do delays vary over the course of the day. Illustrate your answer with a plot.
 
 4.  What happens if you supply a negative `n` to [`slice_min()`](https://dplyr.tidyverse.org/reference/slice.html) and friends?
 
 5.  Explain what [`count()`](https://dplyr.tidyverse.org/reference/count.html) does in terms of the dplyr verbs you just learned. What does the `sort` argument to [`count()`](https://dplyr.tidyverse.org/reference/count.html) do?
+
+```{r}
+df <- tibble(
+  x = 1:5,
+  y = c("a", "b", "a", "a", "b"),
+  z = c("K", "K", "L", "L", "K")
+)
+```
+
+```{r}
+df |>
+  group_by(y)
+```
+
+```{r}
+df |>
+  arrange(y)
+```
+
+```{r}
+df |>
+  group_by(y) |>
+  summarize(mean_x = mean(x))
+```
+
+```{r}
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x))
+```
+
+```{r}
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x), .groups = "drop")
+```
+
+```{r}
+df |>
+  group_by(y, z) |>
+  summarize(mean_x = mean(x))
+
+df |>
+  group_by(y, z) |>
+  mutate(mean_x = mean(x))
+```
+
+## **3.6 Case study: aggregates and sample size**
+
+Whenever you do any aggregation, it’s always a good idea to include a count ([`n()`](https://dplyr.tidyverse.org/reference/context.html)). That way, you can ensure that you’re not drawing conclusions based on very small amounts of data. We’ll demonstrate this with some baseball data from the **Lahman** package. Specifically, we will compare what proportion of times a player gets a hit (`H`) vs. the number of times they try to put the ball in play (`AB`):
+
+```{r}
+batters <- Lahman::Batting |> 
+  group_by(playerID) |> 
+  summarize(
+    performance = sum(H, na.rm = TRUE) / sum(AB, na.rm = TRUE),
+    n = sum(AB, na.rm = TRUE)
+  )
+batters
+```
+
+```{r}
+batters |> 
+  filter(n > 100) |> 
+  ggplot(aes(x = n, y = performance)) +
+  geom_point(alpha = 1 / 10) + 
+  geom_smooth(se = FALSE)
+```
