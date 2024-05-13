@@ -1,0 +1,220 @@
+---
+title: "Self Practice 4: R for Data Science"
+author: "Rydia"
+date: "May 13, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# **7  Data import**
+
+## **7.1 Introduction**
+
+Working with data provided by R packages is a great way to learn data science tools, but you want to apply what you’ve learned to your own data at some point. In this chapter, you’ll learn the basics of reading data files into R.
+
+Specifically, this chapter will focus on reading plain-text rectangular files. We’ll start with practical advice for handling features like column names, types, and missing data. You will then learn about reading data from multiple files at once and writing data from R to a file. Finally, you’ll learn how to handcraft data frames in R.
+
+### **7.1.1 Prerequisites**
+
+In this chapter, you’ll learn how to load flat files in R with the **readr** package, which is part of the core tidyverse.
+
+```{r}
+library(tidyverse)
+```
+
+## **7.2 Reading data from a file**
+
+To begin, we’ll focus on the most common rectangular data file type: CSV, which is short for comma-separated values. Here is what a simple CSV file looks like. The first row, commonly called the header row, gives the column names, and the following six rows provide the data. The columns are separated, aka delimited, by commas.
+
+```{r}
+students <- read_csv("data/students.csv")
+students
+```
+
+```{r}
+students <- read_csv("https://pos.it/r4ds-students-csv")
+students
+```
+
+### **7.2.1 Practical advice**
+
+Once you read data in, the first step usually involves transforming it in some way to make it easier to work with in the rest of your analysis. Let’s take another look at the `students` data with that in mind.
+
+```{r}
+students <- read_csv("data/students.csv", na = c("N/A", ""))
+students
+```
+
+An alternative approach is to use janitor::clean_names() to use some heuristics to turn them all into snake case at once.
+
+```{r}
+students |> janitor::clean_names()
+```
+
+Another common task after reading in data is to consider variable types. For example, meal_plan is a categorical variable with a known set of possible values, which in R should be represented as a factor:
+
+```{r}
+students |>
+  janitor::clean_names() |>
+  mutate(meal_plan = factor(meal_plan))
+```
+
+Note that the values in the `meal_plan` variable have stayed the same, but the type of variable denoted underneath the variable name has changed from character (`<chr>`) to factor (`<fct>`). You’ll learn more about factors in [Chapter 16](https://r4ds.hadley.nz/factors).
+
+Before you analyze these data, you’ll probably want to fix the `age` and `id` columns. Currently, `age` is a character variable because one of the observations is typed out as `five` instead of a numeric `5`. We discuss the details of fixing this issue in [Chapter 20](https://r4ds.hadley.nz/spreadsheets).
+
+```{r}
+students <- students |>
+  janitor::clean_names() |>
+  mutate(
+    meal_plan = factor(meal_plan),
+    age = parse_number(if_else(age == "five", "5", age))
+  )
+
+students
+```
+
+### **7.2.2 Other arguments**
+
+There are a couple of other important arguments that we need to mention, and they’ll be easier to demonstrate if we first show you a handy trick: [`read_csv()`](https://readr.tidyverse.org/reference/read_delim.html) can read text strings that you’ve created and formatted like a CSV file:
+
+```{r}
+read_csv(
+  "a,b,c
+  1,2,3
+  4,5,6"
+)
+```
+
+Usually, [`read_csv()`](https://readr.tidyverse.org/reference/read_delim.html) uses the first line of the data for the column names, which is a very common convention. But it’s not uncommon for a few lines of metadata to be included at the top of the file. You can use `skip = n` to skip the first `n` lines or use `comment = "#"` to drop all lines that start with (e.g.) `#`:
+
+```{r}
+read_csv(
+  "The first line of metadata
+  The second line of metadata
+  x,y,z
+  1,2,3",
+  skip = 2
+)
+```
+
+```{r}
+read_csv(
+  "# A comment I want to skip
+  x,y,z
+  1,2,3",
+  comment = "#"
+)
+```
+
+In other cases, the data might not have column names. You can use `col_names = FALSE` to tell [`read_csv()`](https://readr.tidyverse.org/reference/read_delim.html) not to treat the first row as headings and instead label them sequentially from `X1` to `Xn`:
+
+```{r}
+read_csv(
+  "1,2,3
+  4,5,6",
+  col_names = FALSE
+)
+```
+
+Alternatively, you can pass `col_names` a character vector which will be used as the column names:
+
+```{r}
+read_csv(
+  "1,2,3
+  4,5,6",
+  col_names = c("x", "y", "z")
+)
+```
+
+These arguments are all you need to know to read the majority of CSV files that you’ll encounter in practice. (For the rest, you’ll need to carefully inspect your `.csv` file and read the documentation for [`read_csv()`](https://readr.tidyverse.org/reference/read_delim.html)’s many other arguments.)
+
+### **7.2.3 Other file types**
+
+Once you’ve mastered [`read_csv()`](https://readr.tidyverse.org/reference/read_delim.html), using readr’s other functions is straightforward; it’s just a matter of knowing which function to reach for:
+
+-   [`read_csv2()`](https://readr.tidyverse.org/reference/read_delim.html) reads semicolon-separated files. These use `;` instead of `,` to separate fields and are common in countries that use `,` as the decimal marker.
+
+-   [`read_tsv()`](https://readr.tidyverse.org/reference/read_delim.html) reads tab-delimited files.
+
+-   [`read_delim()`](https://readr.tidyverse.org/reference/read_delim.html) reads in files with any delimiter, attempting to automatically guess the delimiter if you don’t specify it.
+
+-   [`read_fwf()`](https://readr.tidyverse.org/reference/read_fwf.html) reads fixed-width files. You can specify fields by their widths with [`fwf_widths()`](https://readr.tidyverse.org/reference/read_fwf.html) or by their positions with [`fwf_positions()`](https://readr.tidyverse.org/reference/read_fwf.html).
+
+-   [`read_table()`](https://readr.tidyverse.org/reference/read_table.html) reads a common variation of fixed-width files where columns are separated by white space.
+
+-   [`read_log()`](https://readr.tidyverse.org/reference/read_log.html) reads Apache-style log files.
+
+### **7.3.3 Column types**
+
+readr provides a total of nine column types for you to use:
+
+-   [`col_logical()`](https://readr.tidyverse.org/reference/parse_atomic.html) and [`col_double()`](https://readr.tidyverse.org/reference/parse_atomic.html) read logicals and real numbers. They’re relatively rarely needed (except as above), since readr will usually guess them for you.
+
+-   [`col_integer()`](https://readr.tidyverse.org/reference/parse_atomic.html) reads integers. We seldom distinguish integers and doubles in this book because they’re functionally equivalent, but reading integers explicitly can occasionally be useful because they occupy half the memory of doubles.
+
+-   [`col_character()`](https://readr.tidyverse.org/reference/parse_atomic.html) reads strings. This can be useful to specify explicitly when you have a column that is a numeric identifier, i.e., long series of digits that identifies an object but doesn’t make sense to apply mathematical operations to. Examples include phone numbers, social security numbers, credit card numbers, etc.
+
+-   [`col_factor()`](https://readr.tidyverse.org/reference/parse_factor.html), [`col_date()`](https://readr.tidyverse.org/reference/parse_datetime.html), and [`col_datetime()`](https://readr.tidyverse.org/reference/parse_datetime.html) create factors, dates, and date-times respectively; you’ll learn more about those when we get to those data types in [Chapter 16](https://r4ds.hadley.nz/factors) and [Chapter 17](https://r4ds.hadley.nz/datetimes).
+
+-   [`col_number()`](https://readr.tidyverse.org/reference/parse_number.html) is a permissive numeric parser that will ignore non-numeric components, and is particularly useful for currencies. You’ll learn more about it in [Chapter 13](https://r4ds.hadley.nz/numbers).
+
+-   [`col_skip()`](https://readr.tidyverse.org/reference/col_skip.html) skips a column so it’s not included in the result, which can be useful for speeding up reading the data if you have a large CSV file and you only want to use some of the columns.
+
+## **7.4 Reading data from multiple files**
+
+Sometimes your data is split across multiple files instead of being contained in a single file. For example, you might have sales data for multiple months, with each month’s data in a separate file: `01-sales.csv` for January, `02-sales.csv` for February, and `03-sales.csv` for March. With [`read_csv()`](https://readr.tidyverse.org/reference/read_delim.html) you can read these data in at once and stack them on top of each other in a single data frame.
+
+```{r}
+sales_files <- c(
+  "https://pos.it/r4ds-01-sales",
+  "https://pos.it/r4ds-02-sales",
+  "https://pos.it/r4ds-03-sales"
+)
+read_csv(sales_files, id = "file")
+```
+
+The `id` argument adds a new column called `file` to the resulting data frame that identifies the file the data come from. This is especially helpful in circumstances where the files you’re reading in do not have an identifying column that can help you trace the observations back to their original sources.
+
+If you have many files you want to read in, it can get cumbersome to write out their names as a list. Instead, you can use the base [`list.files()`](https://rdrr.io/r/base/list.files.html) function to find the files for you by matching a pattern in the file names. You’ll learn more about these patterns in [Chapter 15](https://r4ds.hadley.nz/regexps).
+
+## **7.5 Writing to a file**
+
+readr also comes with two useful functions for writing data back to disk: [`write_csv()`](https://readr.tidyverse.org/reference/write_delim.html) and [`write_tsv()`](https://readr.tidyverse.org/reference/write_delim.html). The most important arguments to these functions are `x` (the data frame to save) and `file` (the location to save it). You can also specify how missing values are written with `na`, and if you want to `append` to an existing file.
+
+```{r}
+write_csv(students, "data/students1.csv")
+```
+
+Now let’s read that csv file back in. Note that the variable type information that you just set up is lost when you save to CSV because you’re starting over with reading from a plain text file again:
+
+```{r}
+students <- read_csv("data/students1.csv")
+students
+```
+
+This makes CSVs a little unreliable for caching interim results—you need to recreate the column specification every time you load in. There are two main alternatives:
+
+1.  [`write_rds()`](https://readr.tidyverse.org/reference/read_rds.html) and [`read_rds()`](https://readr.tidyverse.org/reference/read_rds.html) are uniform wrappers around the base functions [`readRDS()`](https://rdrr.io/r/base/readRDS.html) and [`saveRDS()`](https://rdrr.io/r/base/readRDS.html). These store data in R’s custom binary format called RDS. This means that when you reload the object, you are loading the *exact same* R object that you stored.
+
+```{r}
+students <- students |>
+  janitor::clean_names() |>
+  mutate(meal_plan = factor(meal_plan))
+```
+
+```{r}
+write_rds(students, "data/students1.rds")
+```
+
+```{r}
+read_rds("data/students1.rds")
+```
+
+2.  The arrow package allows you to read and write parquet files, a fast binary file format that can be shared across programming languages. We’ll return to arrow in more depth in [Chapter 22](https://r4ds.hadley.nz/arrow).
+
+
