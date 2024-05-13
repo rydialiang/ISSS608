@@ -66,9 +66,9 @@ website:
           - text: "Self Practice 1"
             href: Self-Practice/Self-Practice_01/Self-Practice_01.qmd
           - text: "Self Practice 2"
-            href: Self-Practice/Self-Practice_01/Self-Practice_02.qmd           
+            href: Self-Practice/Self-Practice_02/Self-Practice_02.qmd           
           - text: "Self Practice 3"
-            href: Self-Practice/Self-Practice_01/Self-Practice_01.qmd
+            href: Self-Practice/Self-Practice_03/Self-Practice_03.qmd
 format:
   html:
     theme: cosmos
