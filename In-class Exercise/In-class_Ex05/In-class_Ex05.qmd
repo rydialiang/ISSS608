@@ -60,8 +60,7 @@ mc1_data <- fromJSON("data/mc1.json")
 
 
 ```{r}
-mc2_data <- fromJSON("data/mc2
-                     .json")
+mc2_data <- fromJSON("data/mc2.json")
 ```
 
 For creating graph model:
