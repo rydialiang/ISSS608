@@ -1,0 +1,484 @@
+---
+title: "Take-home Ex 01"
+author: "Liang Xiuhao Rydia"
+date: "April 15, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+# **Building Elegant and yet Informative Data Visualisation**
+
+For the identification of sub-market, you can navigate straight to [**2.3.3 Identifying the sub-market**](https://va24-ry.netlify.app/take-home%20exercise/take-home_ex01/take-home_ex01#identifying-the-sub-markets)
+
+For the final product, you can navigate straight to [**3.0 Data Visualisation**](https://va24-ry.netlify.app/take-home%20exercise/take-home_ex01/take-home_ex01#data-visualisation).
+
+If not, you can proceed to enjoy reading the step by step thought process for this visualisation.
+
+## 1.0 Overview
+
+### 1.1 Setting the scene
+
+There are two major residential property market in Singapore, namely public and private housing. Public housing aims to meet the basic need of the general public with monthly household income less than or equal to S\$14,000. For families with monthly household income more than S\$14,000, they need to turn to the private residential market.
+
+### 1.2 The Task
+
+Assuming the role of a graphical editor of a media company, you are requested to prepare minimum two and maximum three data visualisation to reveal the ***private residential market*** and **sub-markets of Singapore** for the 1st quarter of 2024.
+
+## 2.0 Set Up
+
+### 2.1 Loading the packages into R
+
+T he `pac::p_load()` function to load the required R packages in the working environment. The following packages are used in this set up:
+
+-   ggthemes: Extra themes, geoms, and scales for ggplot2.
+-   tidyverse: A collection of core packages designed for data science, used extensively for data preparation and wrangling.
+-   ggridges: a ggplot2 extension specially designed for plotting ridgeline plots
+-   colorspace:
+-   ggiraph: for making ‘ggplot’ graphics interactive.
+-   plotly: R library for plotting interactive statistical graphs.
+-   patchwork: specially designed for combining separate ggplot2 graphs into a single figure.
+-   lubridate: for easy and fast parsing of Date / Time
+-   ggrepel: an R package provides geoms for ggplot2 to repel overlapping text labels.
+-   ggdist: a ggplot2 extension specially design for visualising distribution and uncertainty
+
+```{r}
+# load tidyverse from pacman
+pacman::p_load(tidyverse,dplyr,ggridges,
+               ggthemes,colorspace,ggiraph,
+               plotly,patchwork,lubridate, 
+               ggrepel,ggdist)
+```
+
+### 2.2 Importing the data sets
+
+Five sets of data are provided for this exercise:
+
+1.  2023 Quarter 1 Residential Transaction: ResidentialTransaction20240308160536.csv
+2.  2023 Quarter 2 Residential Transaction: ResidentialTransaction20240308160736.csv
+3.  2023 Quarter 3 Residential Transaction: ResidentialTransaction20240308161009.csv
+4.  2023 Quarter 4 Residential Transaction: ResidentialTransaction20240308161109.csv
+5.  2024 Quarter 1 Residential Transaction: ResidentialTransaction20240414220633.csv
+
+All five sets of data consists of past transactions between Q1 of 2023 to Q1 of 2024, with 21 variables that will be explored in detail after the data sets are imported.
+
+```{r}
+# load transaction data using readr, part of tidyverse package
+data.23Q1 <- read_csv("data/ResidentialTransaction20240308160536.csv")
+data.23Q2 <- read_csv("data/ResidentialTransaction20240308160736.csv")
+data.23Q3 <- read_csv("data/ResidentialTransaction20240308161009.csv")
+data.23Q4 <- read_csv("data/ResidentialTransaction20240308161109.csv")
+data.24Q1 <- read_csv("data/ResidentialTransaction20240414220633.csv")
+```
+
+To add new column `Quarter` into each of the csv file.
+
+```{r}
+data.23Q1$Quarter <- rep('23Q1',nrow(data.23Q1))
+data.23Q2$Quarter <- rep('23Q2',nrow(data.23Q2))
+data.23Q3$Quarter <- rep('23Q3',nrow(data.23Q3))
+data.23Q4$Quarter <- rep('23Q4',nrow(data.23Q4))
+data.24Q1$Quarter <- rep('24Q1',nrow(data.24Q1))
+```
+
+Combining all the data set into one
+
+```{r}
+df <- rbind(data.23Q1,data.23Q2,data.23Q3,data.23Q4,data.24Q1)
+```
+
+To have a basic understanding of all 22 variables, `glimpse()` is used with 2024 Q1 data. We can see that there are 21 columns, with the following data types:
+
+-   doubles: `Transacted Price ($)`, `Area (SQFT)`, `Unit Price ($ PSF)`, `Area (SQM)`, `Unit Price ($ PSM)`, `Number of Units`
+
+-   characters: the rest of the 16 variables, including `Quarter`
+
+Interestingly, `Nett Price` is classified as characters, as it contains `-` character, although the rest of the columns should return doubles like `Transacted Price ($)`
+
+::: panel-tabset
+## The Code
+
+```{r}
+#| eval: False
+# have a basic understanding for all 22 variables
+glimpse(df)
+```
+
+## The Output
+
+```{r}
+#| echo: False
+# have a basic understanding for all 22 variables
+glimpse(df)
+```
+:::
+
+### 2.3 Understanding the data
+
+On top of the data types that is automatically assigned by R to help the program know how to process it, we can split the data into 4 types of data category to help ourselves for future analytics application. You can refer to the FAQ, Data Dictionary and Methodology in [URA website](https://www.ura.gov.sg/reis/dataDictionary).
+
+| Variable                      | Type                               | Appropriate Scale | Remarks                                                      |
+|-------------------------------|------------------------------------|-------------------|--------------------------------------------------------------|
+| `Project Name`                | Qualitative / Nominal              | Discrete          |                                                              |
+| `Transacted Price ($)`        | Quantitative/ Numerical Continuous | Continuous        |                                                              |
+| `Area (SQFT)`                 | Quantitative/ Numerical Continuous | Continuous        |                                                              |
+| `Unit Price ($ PSF)`          | Quantitative/ Numerical Continuous | Continuous        |                                                              |
+| `Sales Date`                  | Date / Ordinal                     | Discrete          |                                                              |
+| `Address`                     | Qualitative / Nominal              | Discrete          |                                                              |
+| `Type of Sale`                | Qualitative / Nominal              | Discrete          |                                                              |
+| `Type of Area`                | Qualitative / Nominal              | Discrete          |                                                              |
+| `Area (SQM)`                  | Quantitative/ Numerical Continuous | Continuous        |                                                              |
+| `Unit Price ($ PSF)`          | Quantitative/ Numerical Continuous | Continuous        |                                                              |
+| `Nett Price($)`               | Quantitative/ Numerical Continuous | Continuous        |                                                              |
+| `Property Type`               | Qualitative/ Nominal               | Discrete          |                                                              |
+| `Number of Units`             | Quantitative/ Numerical Discrete   | Discrete          |                                                              |
+| `Tenure`                      | Nominal + Date / Ordinal           | None + Discrete   | Mixture of remaining lease date and tenure type and duration |
+| `Completion Date`             | Nominal + Date / Ordinal           | None + Discrete   | Mixture of "Uncomplete" status and completion date.          |
+| `Purchaser Address Indicator` | Qualitative / Nominal              | Discrete          |                                                              |
+| `Postal Code`                 | Qualitative / Nominal              | Discrete          |                                                              |
+| `Postal District`             | Qualitative / Nominal              | Discrete          |                                                              |
+| `Postal Sector`               | Qualitative / Nominal              | Discrete          |                                                              |
+| `Planning Region`             | Qualitative / Nominal              | Discrete          |                                                              |
+| `Planning Area`               | Qualitative / Nominal              | Discrete          |                                                              |
+| `Quarter`                     | Date / Ordinal                     | Discrete          | Created for ease of data analysis                            |
+
+[**Notes**]{.underline}
+
+1.  Contextually, some of the variables could be classified under ordinal. For example, I can choose to fill in the order for `Purchaser Address Indicator` as `Private` category is higher order than `HDB` category. The context is purchaser that address is `Private` is likely to be a person with higher Social Economic Status (SES) compared to a purchaser with `HDB` as address. Same could be applied to `Postal Code`, `Postal District`, `Postal Sector`, `Planning Region` and `Planning Area`.
+2.  Special Case: `Tenure` is still a character data type as of now. If we choose to use this column for analysis, we do need to do data preparation on this. `Tenure` date could also be classified under continuous data for more granularity. This variable will be a mixture of nominal data type with categories like "Freehold", and also quantitative data type using its `Tenure` date.
+3.  `Nett Price($)` is still a character data type as of now. If we choose to use this column for analysis, we do need to do data preparation on this.
+4.  Special Case: `Completion Date` is classified as character, but a quick look at the data `df`, we will realise that this variable is a mix of quantitative and qualitative data type of `Uncomplete` and actual date of completion, which could be converted and analyse as doubles.
+
+[**For simplicity of data analysis**]{.underline}
+
+1\. `Transacted Price ($)` and `Nett Price($)` are similar. In this analysis, we will use `Transacted Price ($)` for simplicity, as `Nett Price($)` has fair amount of missing data, and it is prices after deducting the value of the indirect discounts or benefits, and not representative for all transactions.
+
+2.  `Area (SQFT)` and `Area (SQM)`, and `Unit Price ($ PSF)` and `Unit Price ($ PSM)` are similar measures in different unit. We will use `Area (SQFT)` and `Unit Price ($ PSF)`
+
+Next we look at the basic statistics of the current data using `summary()`
+
+::: panel-tabset
+### The Output
+
+```{r}
+#| echo: False
+# data summary
+summary(df)
+```
+
+### The Code
+
+```{r}
+#| eval: False
+# data summary
+summary(df)
+```
+:::
+
+From the continuous data above, we can conclude that there is a possibility of extreme outliers. The `Number of Units` has a max of 60, while the 3rd Quartile is 1.000. Let's examine the data by sorting it in descending order using `arrange(desc())` and take a look at data with `Number of Units`, as it greatly affect the analysis of `Transaction Price ($)`.
+
+```{r}
+df %>%
+  filter(`Number of Units` > 1) %>%
+  arrange(desc(`Number of Units`)) 
+```
+
+We have 12 rows that have transactions containing more than 1 unit sold, and a check on the `Address` shows that there are 5 sales that are en bloc cases which should be remove from the analysis. These en bloc cases are likely sales to companies for purpose of redevelopment rather than individual purchasers. See this [link](https://www.businesstimes.com.sg/companies-markets/meyer-park-sold-uol-singapore-land-group-jv-s39218-million-third-en-bloc-attempt) on the Meyer Park en bloc transaction. Otherwise, those 7 cases of transactions with more than one unit sold should be included as are likely the cases of purchase of multiple units or the purchase of multiple adjacent plots of land.
+
+### 2.3.1 Removing the en bloc sales (irrelevant data)
+
+For the follow code chunk, we aim to remove all the enbloc sales, including the 5 transactions that we have found in section 2.3. While we have no idea if there are more than 5 cases of en bloc sales, the follow code chunk will effectively remove all the rows with the string "ENBLOC" in `Address` column.
+
+```{r}
+df.c <- df %>%
+  filter(!grepl('ENBLOC', df$Address))
+df.c
+```
+
+In the df.c tibble, it showed that 5 rows had been removed. Now there is only 26,801 rows instead of the original 26,806 rows in the initial df. This confirm that there are only 5 en bloc sales in the data frame.
+
+### 2.3.2 Treatment for multiple units Transactions
+
+After removing the 5 en bloc sales, we are still left with 7 transactions that has between 2 to 4 units sold per transaction. This has caused the `Transacted Price ($)` to be greatly inflated. In dealing with this, we can (1) choose to divide the `Transacted Price ($)` by the number of units sold, or (2) remove them from the analysis. In this analysis, we will be using method (2), to remove these transactions from the data set for further analysis. The reason to do so is that we cannot determine at this stage that each unit in the sales are equally priced, or whether each unit has the same `Area` size.
+
+```{r}
+df.c <- df.c %>%
+  filter(`Number of Units` <= 1)
+```
+
+### 2.3.3 Identifying the sub-markets
+
+**Land vs. Strata**
+
+To lend some background context, you can refer to this link: [Landed vs. Strata Landed](https://plbinsights.com/landed-vs-strata-landed-whats-the-difference-how-have-they-performed-in-recent-years/#:~:text=According%20to%20the%20URA%20website,as%20a%20pure%20landed%20property.) Basically, `Strata` means you only owns the property build on this land, but do not own the land itself. `Land` means you own the land and have more freedom and responsibility in terms of the constructions etc. The application of this knowledge for analysis is that `Strata` and `Land` classification can be identify as the sub-markets as owning a piece of land is likely to be more expensive for the purchaser compared to `Strata` title.
+
+The plot below shows the 10 sub-markets in Singapore private housing market.
+
+**Land**
+
+1.  Apartment
+2.  Detached House
+3.  Semi-Detached House
+4.  Terrace House
+
+**Strata**
+
+1.  Apartment
+2.  Condominium
+3.  Detached House
+4.  Executive Condominium
+5.  Semi-Detached House
+6.  Terrace House
+
+::: panel-tabset
+## The Plot
+
+```{r}
+#| echo: False
+df.c %>%
+  select(`Transacted Price ($)`, `Type of Area`, `Property Type`) %>%
+  group_by(`Property Type`, `Type of Area`) %>%
+  summarise(`Median Transaction Price ($)` = median(`Transacted Price ($)`, .groups = 'drop')) %>%
+  ggplot(aes(x = `Property Type`, 
+             y = `Median Transaction Price ($)`, 
+             color = `Type of Area`)) +  # Adding color aesthetic based on Type of Area
+  geom_point() +
+  theme_economist() +
+  theme(axis.text.x = element_text(size = 8, angle = 90, vjust = 0.5, hjust=1)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(color = "Type of Area")
+```
+
+## The Code
+
+```{r}
+#| eval: False
+df.c %>%
+  select(`Transacted Price ($)`, `Type of Area`, `Property Type`) %>%
+  group_by(`Property Type`, `Type of Area`) %>%
+  summarise(`Median Transaction Price ($)` = median(`Transacted Price ($)`, .groups = 'drop')) %>%
+  ggplot(aes(x = `Property Type`, 
+             y = `Median Transaction Price ($)`, 
+             color = `Type of Area`)) +  # Adding color aesthetic based on Type of Area
+  geom_point() +
+  theme_economist() +
+  theme(axis.text.x = element_text(size = 8, angle = 90, vjust = 0.5, hjust=1)) +
+  scale_y_continuous(labels = scales::comma) +
+  labs(color = "Type of Area")
+```
+:::
+
+**Conclusion**
+
+From the Median Transacted Price plot above, we observe that the 10 sub-markets are distinct in pricing, with `Land` `Type of Area` generally priced a lot higher than `Strata`, especially in the `Apartment` and `Detached House` categories.
+
+## 3.0 Data Visualisation
+
+### 3.1.1 Selection of Sub-markets
+
+In this section, we would want to focus on the Apartment(Strata) Condominium and Executive Condominium sub-market in Singapore, out of the 10 sub-markets identified in section 2.3.3. As stated in section [1.1 Setting the scene](https://va24-ry.netlify.app/take-home%20exercise/take-home_ex01/take-home_ex01#setting-the-scene), for families with monthly household income more than S\$14,000, they need to turn to the private residential market. However, due limited number of plots to be shown, we will take Condominium as example for the illustrations
+
+Assumptions and considerations for the selecting the sub-markets to visualise:
+
+1.  **Affordability** - According to the this [article](https://www.propertyguru.com.sg/property-guides/the-different-types-of-housing-in-singapore-9916), apartment(Strata), Executive Condominium and Condominium are the next most affordable type of private housing if the family is not eligible to purchase public housing. This corroborate with the Median Transaction Price plot above.
+
+2.  **Target Audience** - The target audience for this graphics will be the public who would like to consider housing option in the private residential market. The target audience are those who's family household are above the limits and would like to look for relatively affordable housing option in the private residential market as mentioned above in point 1.
+
+3.  **Information Required** - Pricing, Location, Types of Sales, Unit Price, Size of Property
+
+## 3.2 The Plots
+
+### 3.2.1 The Pricing across Planning Regions
+
+**Plot 1: Pricing for non-freehold Condominium**
+
+This first plot focus on Condominium that are not of Freehold Tenure. Compared to freehold property, these non-freehold Condominiums are relatively lower price. The plot below shows the distribution of `Transacted Price ($)` in the five `Planning Region` in Singapore, and reveal the median price of each region varies from 1 to 2 million, with North Region with a tighter spread at a lower price than the other four regions. The Central Region has the highest median at 2 million, with a widest spread. The 4th quantile of the Central Region consists of `Transacted Price ($)` between 2.5 to just after 9 million. This shows that the Condominiums with Lease are more affordable in the North and East Region in Singapore, with North East and West Region next, and finally the most expensive Condominium would be the ones found in Central Region.
+
+::: panel-tabset
+## The Plot
+
+```{r}
+#| echo: False
+df.c %>%
+  filter(`Type of Area` == 'Strata',`Property Type` == 'Condominium', `Quarter` == '24Q1', `Tenure`!= 'Freehold') %>%
+  ggplot(aes(x = `Transacted Price ($)`,
+           y = `Planning Region`,
+           fill = factor(stat(quantile))
+           )) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    calc_ecdf = TRUE,
+    quantiles = 4,
+    quantile_lines = TRUE) +
+  scale_fill_viridis_d(name = "Quartiles",
+                       option = "A") +
+  scale_x_continuous(name = "Transacted Price in million ($)",
+    labels = c(0,1,2,3,4,5,6,7,8,9,10), 
+    breaks = c(0,1000000,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000)) +
+  theme_economist() + 
+  ggtitle("24Q1 Non-Freehold Condo Transacted Price by Planning Region") +
+  theme(plot.title = element_text(size=12))
+```
+
+## The Code
+
+```{r}
+#| eval: False
+df.c %>%
+  filter(`Type of Area` == 'Strata',`Property Type` == 'Condominium', `Quarter` == '24Q1', `Tenure`!= 'Freehold') %>%
+  ggplot(aes(x = `Transacted Price ($)`,
+           y = `Planning Region`,
+           fill = factor(stat(quantile))
+           )) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    calc_ecdf = TRUE,
+    quantiles = 4,
+    quantile_lines = TRUE) +
+  scale_fill_viridis_d(name = "Quartiles",
+                       option = "A") +
+  scale_x_continuous(name = "Transacted Price in million ($)",
+    labels = c(0,1,2,3,4,5,6,7,8,9,10), 
+    breaks = c(0,1000000,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000)) +
+  theme_economist() + 
+  ggtitle("24Q1 Non-Freehold Condo Transacted Price by Planning Region") +
+  theme(plot.title = element_text(size=12))
+```
+:::
+
+### 3.2.2 The Median Unit Price (\$ PSF) in Past 5 Quarters
+
+**Plot 2: Mean and Median Unit Price for non-freehold Condominium**
+
+Plot 2 focus on the mean and median `Unit Price ($ PSF)` for the non-freehold Condominium in the Central Region. The Mean `Unit Price ($ PSF)` is represented by the red dot in each of the violin plot and boxplot. While we see a slight rise in the mean and median `Unit Price ($ PSF)` in 23Q2, where there are more transactions with `Unit Price ($ PSF)` in the \$2,500 range, represented by the bulge at the top of the violin plot. For the rest of the quarters, the mean and median `Unit Price ($ PSF)` hovers around the range of \$2,000. Despite the mean and median are at \$2,000 for the 24Q1, there is also a sizable transaction of `Unit Price ($ PSF)` of \$3,000 happening in 24Q1, as represented by the slight bulge at the top of the violin plot.
+
+::: panel-tabset
+## The Plot
+
+```{r}
+#| echo: False
+quarter_means <- df.c %>%
+  filter(`Property Type` == 'Condominium',`Planning Region` == "Central Region", `Tenure`!= 'Freehold') %>%
+  group_by(Quarter) %>%
+  summarise(mean_uprice = mean(`Unit Price ($ PSF)`))
+
+df.c %>%
+  filter(`Property Type` == 'Condominium', `Planning Region` == "Central Region",`Tenure`!= 'Freehold') %>%
+  ggplot(aes(y=`Unit Price ($ PSF)`,
+           x=`Quarter`)
+       )+
+  geom_violin() +
+  geom_boxplot(width = .20,
+               outlier.shape = NA) +
+  geom_point(data = quarter_means, 
+             aes(y = mean_uprice), 
+             color = "red", 
+             size = 3) +
+    scale_y_continuous(labels = scales::comma) +
+  theme_economist() +
+  ggtitle("Condominium Unit Price ($ PSF) for Central Region") 
+```
+
+## The Code
+
+```{r}
+#| eval: False
+quarter_means <- df.c %>%
+  filter(`Property Type` == 'Condominium',`Planning Region` == "Central Region", `Tenure`!= 'Freehold') %>%
+  group_by(Quarter) %>%
+  summarise(mean_uprice = mean(`Unit Price ($ PSF)`))
+
+df.c %>%
+  filter(`Property Type` == 'Condominium', `Planning Region` == "Central Region",`Tenure`!= 'Freehold') %>%
+  ggplot(aes(y=`Unit Price ($ PSF)`,
+           x=`Quarter`)
+       )+
+  geom_violin() +
+  geom_boxplot(width = .20,
+               outlier.shape = NA) +
+  geom_point(data = quarter_means, 
+             aes(y = mean_uprice), 
+             color = "red", 
+             size = 3) +
+    scale_y_continuous(labels = scales::comma) +
+  theme_economist() +
+  ggtitle("Condominium Unit Price ($ PSF) for Central Region") 
+```
+:::
+
+### 3.2.3 Purchaser Address Indicator
+
+**Plot 3: Purchaser Address Indicator for non-freehold Condominium**
+
+Plot 3 focus on the top and bottom 5% of the different types of purchasers for non-freehold Condominium in the Central Region. We assume that the N.A type are purchasers who do not own any property in Singapore. The top 5% of the Private category purchase units priced at \$4.5-\$9 million. For HDB and N.A categories, the top 5% are purchasing units that is priced between \$3 to 4 million. Both bottom 5% Private and HDB categories purchase unit of \$1 million, while the bottom 5% N.A category are buying unit just above \$1 million. The plausible reason is that purchaser in N.A. category may want to buy a unit for their own stay since they do not own any other properties. Hence, they are paying slightly more for a larger unit relative to other two types of purchasers, who might be buying studio units for rental income.
+
+::: panel-tabset
+## The Plot
+
+```{r}
+#| echo: False
+df.c %>%
+  filter(`Property Type` == 'Condominium', `Quarter` == '24Q1', `Planning Region` == "Central Region", `Tenure` != 'Freehold') %>%
+  ggplot(aes(x = `Transacted Price ($)`, 
+           y = `Purchaser Address Indicator`, 
+           fill = factor(stat(quantile))
+           )) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    calc_ecdf = TRUE, 
+    quantiles = c(0.05, 0.95)
+    ) +
+  scale_fill_manual(
+    name = "Percentage of Total",
+    values = c("#FF00FFA0", "#FFE4E1A0", "#0000ffA0"),
+    labels = c("Bottom 5%", "5-95%", "Top 5%")
+  ) +
+  theme_ridges()+
+  theme_economist() +
+  theme(plot.title = element_text(size=12)) +
+  scale_x_continuous(name = "Transacted Price in million ($)",
+    labels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15), 
+    breaks = c(0,1000000,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000,11000000, 12000000, 13000000, 14000000, 15000000)) + 
+  ggtitle("Central Region Condominium: Purchaser Address Indicator for 24Q1")
+```
+
+## The Code
+
+```{r}
+#| eval: False
+df.c %>%
+  filter(`Property Type` == 'Condominium', `Quarter` == '24Q1', `Planning Region` == "Central Region", `Tenure` != 'Freehold') %>%
+  ggplot(aes(x = `Transacted Price ($)`, 
+           y = `Purchaser Address Indicator`, 
+           fill = factor(stat(quantile))
+           )) +
+  stat_density_ridges(
+    geom = "density_ridges_gradient",
+    calc_ecdf = TRUE, 
+    quantiles = c(0.05, 0.95)
+    ) +
+  scale_fill_manual(
+    name = "Percentage of Total",
+    values = c("#FF00FFA0", "#FFE4E1A0", "#0000ffA0"),
+    labels = c("Bottom 5%", "5-95%", "Top 5%")
+  ) +
+  theme_ridges()+
+  theme_economist() +
+  theme(plot.title = element_text(size=12)) +
+  scale_x_continuous(name = "Transacted Price in million ($)",
+    labels = c(0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15), 
+    breaks = c(0,1000000,2000000,3000000,4000000,5000000,6000000,7000000,8000000,9000000,10000000,11000000, 12000000, 13000000, 14000000, 15000000)) + 
+  ggtitle("Central Region Condominium: Purchaser Address Indicator 24Q1")
+```
+:::
+
+## 4.0 References
+
+1\. T.S. Kam, R for Visual Analytics [Chapter 9](https://r4va.netlify.app/chap09) for visualisation of Ridgeline plots with quantile lines.
+
+2\. Claus O. Wilke, Fundamentals of Data Visualization [Chapter 2](https://clauswilke.com/dataviz/aesthetic-mapping.html) for understanding and classification of variables.
+
+3\. Stack Overflow, ["Filter rows which contain a certain string"](https://stackoverflow.com/questions/22850026/filter-rows-which-contain-a-certain-string) for removing en bloc sales from the data frame.

@@ -1,0 +1,438 @@
+---
+title: "Self Practice 1: R for Data Science"
+author: "Rydia"
+date: "May 10, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+## 1 Data visualization
+
+```{r}
+pacman::p_load(tidyverse, patchwork)
+```
+
+```{r}
+library(styler)
+```
+
+
+```{r}
+library(palmerpenguins)
+library(ggthemes)
+```
+
+```{r}
+palmerpenguins::penguins
+```
+
+```{r}
+glimpse(penguins)
+```
+
+?penguins
+
+```{r}
+ggplot(penguins, 
+       aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = species)) +
+  geom_smooth(method=lm) +
+  labs(title = "Body mass and flipper length",
+       subtitle = "Dimensions for Adelie, Chinstrap, and Gentoo Penguins",
+       x = "Flipper length (mm)", y = "Body masss (g)",
+       color = "Species", shape = "Species") +
+  scale_color_colorblind()
+```
+
+### Exercises
+
+1.  How many rows are in penguins? How many columns?
+
+    -   344 rows, 8 columns
+
+2.  What does the bill_depth_mm variable in the penguins data frame describe? Read the help for ?penguins to find out.
+
+    -   a number denoting bill depth (millimeters)
+
+3.  Make a scatterplot of bill_depth_mm vs. bill_length_mm. That is, make a scatterplot with bill_depth_mm on the y-axis and bill_length_mm on the x-axis. Describe the relationship between these two variables.
+
+```{r}
+ggplot(penguins,
+       aes(x = bill_length_mm, y = bill_depth_mm,
+          color = species, shape = species)) +
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+```         
+-   bill depth increases as bill length increases for all threee species. 
+```
+
+4.  What happens if you make a scatterplot of species vs. bill_depth_mm? What might be a better choice of geom?
+
+    -   Boxplot would be a better choice for a categorical variable vs a continuous variable.
+
+```{r}
+ggplot(penguins,
+       aes(x = species, y = bill_depth_mm)) +
+  geom_boxplot()
+```
+
+5.  Why does the following give an error and how would you fix it?
+
+    -   To add aes argument for first layer (ggplot)
+
+```{r}
+ggplot(data = penguins, 
+       aes(x = bill_depth_mm, y = body_mass_g,
+           color = species, shape = species)) + 
+  geom_point() +
+  geom_smooth(method = "lm")
+```
+
+6.  What does the `na.rm` argument do in [`geom_point()`](https://ggplot2.tidyverse.org/reference/geom_point.html)? What is the default value of the argument? Create a scatterplot where you successfully use this argument set to `TRUE`.
+
+    - it means remove the data points that are "N.A". No more error message
+    
+```{r}
+ggplot(data = penguins, 
+       aes(x = bill_depth_mm, y = body_mass_g,
+           color = species, shape = species)) + 
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm")
+```
+
+
+7.  Add the following caption to the plot you made in the previous exercise: “Data come from the palmerpenguins package.” Hint: Take a look at the documentation for [`labs()`](https://ggplot2.tidyverse.org/reference/labs.html).
+
+```{r}
+ggplot(data = penguins, 
+       aes(x = bill_depth_mm, y = body_mass_g,
+           color = species, shape = species)) + 
+  geom_point(na.rm = TRUE) +
+  geom_smooth(method = "lm") +
+  labs(title = "Bill depth and Body mass",
+       subtitle = "Data come from the palmerpenguins package")
+```
+
+
+
+
+8.  Recreate the following visualization. What aesthetic should `bill_depth_mm` be mapped to? And should it be mapped at the global level or at the geom level?
+
+```{r}
+
+
+ggplot(penguins,
+       aes(x = flipper_length_mm, y = body_mass_g,
+           color = bill_depth_mm)) +
+  geom_point() +
+  geom_smooth()
+```
+
+
+9.  Check this output.
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g, color = island)
+) +
+  geom_point() +
+  geom_smooth(se = FALSE)
+```
+
+10. Will these two graphs look different? Why/why not? 
+
+    -   Same. Mapping is the same. 
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(x = flipper_length_mm, y = body_mass_g)
+) +
+  geom_point() +
+  geom_smooth()
+
+ggplot() +
+  geom_point(
+    data = penguins,
+    mapping = aes(x = flipper_length_mm, y = body_mass_g)
+  ) +
+  geom_smooth(
+    data = penguins,
+    mapping = aes(x = flipper_length_mm, y = body_mass_g)
+  )
+```
+
+## 1.3 ggplot2 calls (use of pipe |>)
+
+```{r}
+penguins |> 
+  ggplot(aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point()
+```
+
+## 1.4 Visualizing distributions
+
+```{r}
+ggplot(penguins, 
+       aes(x = fct_infreq(species))) +
+  geom_bar()
+```
+::: callout-tip
+1.  `fct_infreq()` - by number of observations with each level, largest first
+2.  `fct_inorder()` - by order of first appearance
+3.  `fct_inseq()` - by numberical value of level
+:::
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_histogram(binwidth = 200)
+```
+
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g)) +
+  geom_density()
+```
+
+
+### 1.4.3 Exercises
+1.  Make a bar plot of species of penguins, where you assign species to the y aesthetic. How is this plot different?
+
+```{r}
+ggplot(penguins, 
+aes(y = fct_infreq(species))) +
+geom_bar()
+```
+2.  How are the following two plots different? Which aesthetic, color or fill, is more useful for changing the color of bars?
+
+    -   color is applied as the outline of the bar, while fill is applied to the whole bar. 
+
+```{r}
+ggplot(penguins, aes(x = species)) +
+  geom_bar(color = "red")
+```
+
+```{r}
+ggplot(penguins, aes(x = species)) +
+  geom_bar(fill = "red")
+```
+
+3.  What does the bins argument in geom_histogram() do?
+
+    -   it sets the size/range of the bar of a category.
+    
+4.  Make a histogram of the carat variable in the diamonds dataset that is available when you load the tidyverse package. Experiment with different binwidths. What binwidth reveals the most interesting patterns?
+
+```{r}
+diamonds
+```
+```{r}
+p1 <- ggplot(diamonds,
+aes(x = carat)) +
+geom_histogram(binwidth = 0.01) +
+labs(title = "carat with 0.01 binwidth")
+```
+
+```{r}
+p2 <- ggplot(diamonds,
+aes(x = carat)) +
+geom_histogram(binwidth = 0.05) +
+labs(title = "carat with 0.05 binwidth")
+```
+
+```{r}
+p3 <- ggplot(diamonds,
+aes(x = carat)) +
+geom_histogram(binwidth = 0.1) +
+labs(title = "carat with 0.1 binwidth")
+```
+
+```{r}
+p1/p2/p3
+```
+
+## 1.5 Visualising relationship
+
+### 1.5.1 A numerical and a categorical variable
+To visualize the relationship between a numerical and a categorical variable we can use side-by-side box plots. A **boxplot** is a type of visual shorthand for measures of position (percentiles) that describe a distribution. It is also useful for identifying potential outliers
+
+```{r}
+ggplot(penguins, aes(x = species, y = body_mass_g)) +
+  geom_boxplot()
+```
+
+```{r}
+ggplot(penguins, aes(x = body_mass_g, color = species, fill = species)) +
+  geom_density(linewidth = 0.75, alpha = 0.2)
+```
+
+### 1.5.2 Two categorical variables
+We can use stacked bar plots to visualize the relationship between two categorical variables. For example, the following two stacked bar plots both display the relationship between island and species, or specifically, visualizing the distribution of species within each island.
+
+The first plot shows the frequencies of each species of penguins on each island. The plot of frequencies shows that there are equal numbers of Adelies on each island. But we don’t have a good sense of the percentage balance within each island.
+
+```{r}
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar()
+```
+
+The second plot, a relative frequency plot created by setting position = "fill" in the geom, is more useful for comparing species distributions across islands since it’s not affected by the unequal numbers of penguins across the islands. Using this plot we can see that Gentoo penguins all live on Biscoe island and make up roughly 75% of the penguins on that island, Chinstrap all live on Dream island and make up roughly 50% of the penguins on that island, and Adelie live on all three islands and make up all of the penguins on Torgersen.
+
+```{r}
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill") +
+  labs(y = "Percentage of Species on same Island")
+```
+::: callout-tip   
+Use `position = "fill"` argument in `geom_` for a relative frequency plot.
+:::
+
+### 1.5.3 Two numerical variables
+So far you’ve learned about scatterplots (created with geom_point()) and smooth curves (created with geom_smooth()) for visualizing the relationship between two numerical variables. A scatterplot is probably the most commonly used plot for visualizing the relationship between two numerical variables.
+
+```{r}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = island))
+```
+
+### 1.5.4 Three or more variables
+As we saw in Section 1.2.4, we can incorporate more variables into a plot by mapping them to additional aesthetics. For example, in the following scatterplot the colors of points represent species and the shapes of points represent islands.
+
+```{r}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = island))
+```
+
+However adding too many aesthetic mappings to a plot makes it cluttered and difficult to make sense of. Another way, which is particularly useful for categorical variables, is to split your plot into facets, subplots that each display one subset of the data.
+
+To facet your plot by a single variable, use `facet_wrap()`. The first argument of `facet_wrap()` is a formula, which you create with ~ followed by a variable name. The variable that you pass to `facet_wrap()` should be **categorical**.
+
+
+```{r}
+ggplot(penguins, aes(x = flipper_length_mm, y = body_mass_g)) +
+  geom_point(aes(color = species, shape = species)) +
+  facet_wrap(~island)
+```
+
+### 1.5.5 Exercises
+1.  The mpg data frame that is bundled with the ggplot2 package contains 234 observations collected by the US Environmental Protection Agency on 38 car models. Which variables in mpg are categorical? Which variables are numerical? (Hint: Type ?mpg to read the documentation for the dataset.) How can you see this information when you run mpg?
+
+```{r}
+glimpse(mpg)
+```
+
+2.  Make a scatterplot of hwy vs. displ using the mpg data frame. Next, map a third, numerical variable to color, then size, then both color and size, then shape. How do these aesthetics behave differently for categorical vs. numerical variables?
+
+
+```{r}
+ggplot(mpg,aes(x = hwy, y = displ)) +
+geom_point()
+```
+```{r}
+ggplot(mpg,aes(x = hwy, y = displ, color = cyl)) +
+geom_point()
+```
+
+```{r}
+ggplot(mpg,
+      aes(x = hwy, y = displ, 
+          color = cyl, size = cty,
+          )) +
+geom_point() 
+```
+```{r}
+ggplot(mpg,
+      aes(x = hwy, y = displ, 
+          color = cyl, size = cty, shape = trans,
+          )) +
+geom_point() 
+```
+
+
+3.  In the scatterplot of hwy vs. displ, what happens if you map a third variable to linewidth?
+
+```{r}
+ggplot(mpg,aes(x = hwy, y = displ, size = cyl)) +
+geom_point()
+```
+
+4.  What happens if you map the same variable to multiple aesthetics?
+
+    -   Too confusing.
+
+5.  Make a scatterplot of bill_depth_mm vs. bill_length_mm and color the points by species. What does adding coloring by species reveal about the relationship between these two variables? What about faceting by species?
+
+```{r}
+ggplot(penguins, aes(x = bill_depth_mm, 
+                    y = bill_length_mm,
+                    color = species)) +
+  geom_point() +
+  facet_wrap(~species)
+```
+
+
+Why does the following yield two separate legends? How would you fix it to combine the two legends?
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = bill_length_mm, y = bill_depth_mm, 
+    color = species, shape = species
+  )
+) +
+  geom_point() +
+  labs(color = "Species")
+```
+
+
+```{r}
+ggplot(
+  data = penguins,
+  mapping = aes(
+    x = bill_length_mm, y = bill_depth_mm, 
+    color = species, shape = species)) +
+  geom_point() +
+  labs()
+```
+
+
+```{r}
+ggplot(penguins)
+```
+
+7.  Create the two following stacked bar plots. Which question can you answer with the first one? Which question can you answer with the second one?
+
+
+    -   Can answer, what species are found in each island.
+
+```{r}
+ggplot(penguins, aes(x = island, fill = species)) +
+  geom_bar(position = "fill")
+```
+    -   second plot can answer, what percentage of each species is found in each island?
+
+```{r}
+ggplot(penguins, aes(x = species, fill = island)) +
+  geom_bar(position = "fill")
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
