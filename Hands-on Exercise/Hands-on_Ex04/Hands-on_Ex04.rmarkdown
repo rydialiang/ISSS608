@@ -280,7 +280,7 @@ plot(check_c)
 
 In the code chunk, [*check_normality()*](https://easystats.github.io/performance/reference/check_normality.html) of [**performance**](https://easystats.github.io/performance/) package.
 
-The `year` is is excluded 
+The `year` is is excluded
 
 
 ```{r}
@@ -333,8 +333,6 @@ plot(parameters(model1))
 ```{r}
 t1 <- parameters(model1)
 ```
-
-
 
 
 ### **10.6.8 Visualising Regression Parameters: *ggcoefstats()* methods**
