@@ -1,0 +1,66 @@
+---
+title: "In-class Ex 5: Visualising Text"
+author: "Liang Xiuhao Rydia"
+date: "May 11, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+## Visualising and Analysing Text Data
+
+## 1.0 Getting Started
+
+```{r}
+pacman::p_load(tidyverse,readtext,
+               quanteda,tidytext,
+               jsonlite,igraph)
+```
+
+-   Read about [`quanteda`](https://quanteda.io/)
+
+### 1.1 Loading the all the articles into a single file
+
+Using `readtext()` to convert many articles into a data table, consisting of article name in first column and article:
+
+```{r}
+text_data <- readtext(paste0("data/articles",
+                             "/*"))
+```
+
+```{r}
+usenet_words <- text_data %>%
+  unnest_tokens(word, text) %>%
+  filter(str_detect(word, "[a-z']$"),
+         !word %in% stop_words$word)
+```
+
+```{r}
+usenet_words |> 
+  count (word, sort = TRUE)
+```
+
+```{r}
+text_data_splitted <- text_data |> 
+  separate_wider_delim("doc_id",
+                       delim = "__0__",
+                       names = c("X","Y"),
+                       too_few = "align_end")
+```
+
+## 1.2 Using `jsonlite` package
+
+-   easy to glean the insight from the data through looking at the details of the data. - see time series difference
+
+```{r}
+mc1_data <- fromJSON("data/mc1.json")
+```
+
+```{r}
+mc2_data <- fromJSON("data/mc2.json")
+```
+
+For creating graph model: - [igraph](https://igraph.org/)
