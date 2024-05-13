@@ -7,7 +7,7 @@ This is my first Quarto website.
 
 The picture below shows my brain working at 100% learning about visual analytics.
 
-![](images/Mindblown.jpg)
+![](images/clipboard-942559924.png)
 
 Some recommended readings for this course:
 
