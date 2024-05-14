@@ -512,5 +512,126 @@ g <- GAStech_graph %>%
   scale_edge_width(range = c(0.1, 5)) +
   geom_node_point(aes(colour = community))  
 
-g + theme_graph()
+g + theme_graph() +
+  theme(legend.position = 'right',
+        legend.justification = 'center',
+        legend.box = 'vertical',
+        legend.key.size = unit(0.5, 'cm'), 
+        legend.text = element_text(size = 8), 
+        legend.title = element_text(size = 8))
 ```
+
+## **27.8 Building Interactive Network Graph with visNetwork**
+
+-   [visNetwork()](http://datastorm-open.github.io/visNetwork/) is a R package for network visualization, using [vis.js](http://visjs.org/) javascript library.
+
+-   *visNetwork()* function uses a nodes list and edges list to create an interactive graph.
+
+    -   The nodes list must include an “id” column, and the edge list must have “from” and “to” columns.
+
+    -   The function also plots the labels for the nodes, using the names of the actors from the “label” column in the node list.
+
+-   The resulting graph is fun to play around with.
+
+    -   You can move the nodes and the graph will use an algorithm to keep the nodes properly spaced.
+
+    -   You can also zoom in and out on the plot and move it around to re-center it.
+
+### **27.8.1 Data preparation**
+
+Before we can plot the interactive network graph, we need to prepare the data model by using the code chunk below.
+
+```{r}
+GAStech_edges_aggregated <- GAStech_edges %>%
+  left_join(GAStech_nodes, by = c("sourceLabel" = "label")) %>%
+  rename(from = id) %>%
+  left_join(GAStech_nodes, by = c("targetLabel" = "label")) %>%
+  rename(to = id) %>%
+  filter(MainSubject == "Work related") %>%
+  group_by(from, to) %>%
+    summarise(weight = n()) %>%
+  filter(from!=to) %>%
+  filter(weight > 1) %>%
+  ungroup()
+```
+
+### **27.8.2 Plotting the first interactive network graph**
+
+The code chunk below will be used to plot an interactive network graph by using the data prepared.
+
+```{r}
+visNetwork(GAStech_nodes, 
+           GAStech_edges_aggregated)
+```
+
+### **27.8.3 Working with layout**
+
+In the code chunk below, Fruchterman and Reingold layout is used.
+
+```{r}
+visNetwork(GAStech_nodes,
+           GAStech_edges_aggregated) %>%
+  visIgraphLayout(layout = "layout_with_fr") 
+```
+
+Visit [Igraph](http://datastorm-open.github.io/visNetwork/igraph.html) to find out more about *visIgraphLayout*’s argument.
+
+### **27.8.4 Working with visual attributes - Nodes**
+
+visNetwork() looks for a field called “group” in the nodes object and colour the nodes according to the values of the group field.
+
+The code chunk below rename Department field to group.
+
+```{r}
+GAStech_nodes <- GAStech_nodes %>%
+  rename(group = Department) 
+```
+
+When we rerun the code chunk below, visNetwork shades the nodes by assigning unique colour to each category in the *group* field.
+
+```{r}
+visNetwork(GAStech_nodes,
+           GAStech_edges_aggregated) %>%
+  visIgraphLayout(layout = "layout_with_fr") %>%
+  visLegend() %>%
+  visLayout(randomSeed = 123)
+```
+
+### **27.8.5 Working with visual attributes - Edges**
+
+In the code run below *visEdges()* is used to symbolise the edges.\
+- The argument *arrows* is used to define where to place the arrow.\
+- The *smooth* argument is used to plot the edges using a smooth curve.
+
+```{r}
+visNetwork(GAStech_nodes,
+           GAStech_edges_aggregated) %>%
+  visIgraphLayout(layout = "layout_with_fr") %>%
+  visEdges(arrows = "to",
+           smooth = list(enabled = TRUE, 
+                         type = "curvedCW")) %>%
+  visLegend() %>%
+  visLayout(randomSeed = 123)
+```
+
+Visit [Option](http://datastorm-open.github.io/visNetwork/edges.html) to find out more about visEdges’s argument.
+
+### **27.8.6 Interactivity**
+
+In the code chunk below, *visOptions()* is used to incorporate interactivity features in the data visualisation.
+
+-   The argument *highlightNearest* highlights nearest when clicking a node.
+
+-   The argument *nodesIdSelection* adds an id node selection creating an HTML select element.
+
+```{r}
+visNetwork(GAStech_nodes,
+           GAStech_edges_aggregated) %>%
+  visIgraphLayout(layout = "layout_with_fr") %>%
+  visOptions(highlightNearest = TRUE,
+             nodesIdSelection = TRUE) %>%
+  visLegend() %>%
+  visLayout(randomSeed = 123)
+```
+
+Visit [Option](http://datastorm-open.github.io/visNetwork/options.html) to find out more about visOption’s argument.
