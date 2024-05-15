@@ -37,7 +37,7 @@ FishEye analysts need your help to perform geographic and temporal analysis of t
 ```{r}
 pacman::p_load(tidyverse, jsonlite, DT, lubridate,
                igraph, tidygraph, ggraph, 
-               visNetwork)
+               visNetwork, sf)
 ```
 
 ## 1.2 Loading the Data
@@ -47,10 +47,27 @@ Loading the .json data using `jsonlite` package.
 ```{r}
 mc2 <- fromJSON("data/MC2/mc2.json")
 ```
-
 mc2 is a directed multigraph, consists of nodes dataframe and links dataframe.
 
 ```{r}
+oceanus_map <- read_sf("data/MC2/Oceanus Information/Oceanus Geography.geojson")
+```
+
+```{r}
+ggplot(oceanus_map) +
+  geom_sf(color = "black",
+          ) +
+  theme_void() +
+  geom_sf_text(aes(label = Name), size = 2,
+               vjust = 1.5)
+```
+
+
+
+
+
+```{r}
+#| eval: FALSE
 mc2
 ```
 
