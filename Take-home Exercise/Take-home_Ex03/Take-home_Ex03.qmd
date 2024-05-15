@@ -47,12 +47,14 @@ Loading the .json data using `jsonlite` package.
 ```{r}
 mc2 <- fromJSON("data/MC2/mc2.json")
 ```
+
 mc2 is a directed multigraph, consists of nodes dataframe and links dataframe.
 
 ```{r}
 oceanus_map <- read_sf("data/MC2/Oceanus Information/Oceanus Geography.geojson")
 ```
 
+Loading the oceanus map:
 ```{r}
 ggplot(oceanus_map) +
   geom_sf(color = "black",
@@ -62,16 +64,10 @@ ggplot(oceanus_map) +
                vjust = 1.5)
 ```
 
-
-
-
-
 ```{r}
 #| eval: FALSE
 mc2
 ```
-
-## 1.3 Extracting the nodes and links dataframes
 
 ## 1.3 Extracting the tibbles for nodes and links
 
@@ -120,9 +116,6 @@ mc2_links_raw <- mc2_links_raw |>
 mc2_links_raw
 ```
 
-
-
-
 ```{r}
 unique_nodes_type <- mc2_nodes_raw |>  distinct(type)
 unique_nodes_type
@@ -146,61 +139,6 @@ In this section, we will extract the required column for the following graphs:
 
 ### 1.5.1 Vessel Movements
 
-For vessel movements, we require the node/links types as such:
-
--   Entity.Vessel:
-    -   Entity.Vessel.FishingVessel,
-    -   Entity.Vessel.Other ,
-    -   Entity.Vessel.Ferry.Passenger,
-    -   Entity.Vessel.CargoVessel,
-    -   Entity.Vessel.Ferry.Cargo,
-    -   Entity.Vessel.Research,
-    -   Entity.Vessel.Tour
--   Entity.Location:
-    -   Entity.Location.Region,
-    -   Entity.Location.City,
-    -   Entity.Location.Point
--   Event.TransponderPing:
-    -   Event.TransportEvent.TransponderPing
-
-For the Node Type, we will preserve the following fields:
-
--   Entity.Vessel: Description of the vessel
-
-    -   Name
-
-    -   company: Company that owns the vessel
-
-    -   flag_country: Country the vessel is licensed in
-
-    -   length_overall: meters length of the vessel
-
-    -   tonnage: Gross tonnage of the vessel
-
-
--   Entity.Location: Description of a geographic location
-
-    -   Name
-
-    -   Activities: List of common activities in the region
-
-    -   Description: Textual description
-
-    -   fish_species_present: List of fish common found in that area
-
-    -   kind: High-level grouping (city/preserve/etc.)
-
-
-For the Edge Types, we will preserve the following fields:
-
--   Event.TransponderPing: Links a vessel to a location via OVLS
-
-    -   time: Start time of the visit
-
-    -   dwell: How long was the vessel in this location
-
-
-
 ```{r}
 vessel_mvmt_vessel_nodes <- mc2_nodes_raw |> 
   filter(str_detect(type,c("Vessel"))) 
@@ -209,12 +147,12 @@ vessel_mvmt_vessel_nodes <- mc2_nodes_raw |>
 ```{r}
 vessel_mvmt_vessel_nodes
 ```
+
 ```{r}
 vessel_mvmt_location_nodes <- mc2_nodes_raw |> 
   filter(str_detect(type,c("Location"))) 
 vessel_mvmt_location_nodes 
 ```
-
 
 ```{r}
 vessel_mvmt_links <- mc2_links_raw |> 
@@ -238,6 +176,7 @@ harbor_report_links <- mc2_links_raw |>
   filter(type == "Event.HarborReport")
 harbor_report_links
 ```
+
 ### 1.5.3 Harbor Import Records
 
 ```{r}
@@ -245,11 +184,13 @@ import_location_nodes <- mc2_nodes_raw |>
   filter(str_detect(type,c("Location")))
 import_location_nodes 
 ```
+
 ```{r}
 import_commodity_nodes <- mc2_nodes_raw |> 
   filter(str_detect(type,c("Commodity")))
 import_commodity_nodes 
 ```
+
 ```{r}
 import_delivery_nodes <- mc2_nodes_raw |> 
   filter(str_detect(type,c("Document")))
@@ -272,13 +213,15 @@ FishEye analysts have long wanted to better understand the flow of commercially 
 unique_nodes_type <- vessel_mvmt_vessel_nodes |>  distinct(type)
 unique_nodes_type
 ```
+
 ```{r}
 fishing_vessels <- vessel_mvmt_vessel_nodes |> 
   filter(type == "Entity.Vessel.FishingVessel") |> 
   distinct(id)
 fishing_vessels
 ```
-There is a total of 178 Fishing vessels in Oceanus. 
+
+There is a total of 178 Fishing vessels in Oceanus.
 
 ## 2.2 Fishing ground locations
 
@@ -293,11 +236,14 @@ non_fishing_ground <- import_location_nodes |>
 ```
 
 There are three fishing grounds:
-1.  Cod Table
-2.  Wrasse Beds
-3.  Tuna Shelf
 
-Fishing outside these fishing grounds are considered illegal fishing. 
+1\. Cod Table
+
+2\. Wrasse Beds
+
+3\. Tuna Shelf
+
+Fishing outside these fishing grounds are considered illegal fishing.
 
 ```{r}
 cargo_vessels <- vessel_mvmt_vessel_nodes |> 
@@ -305,6 +251,7 @@ cargo_vessels <- vessel_mvmt_vessel_nodes |>
   arrange(desc(tonnage))
 cargo_vessels
 ```
+
 There are 100 cargo vessels, with tonnage ranging from 2,100 to 76,300.
 
 ## 2.3 Which fishing vessels frequent the fishing sites
@@ -318,6 +265,7 @@ vessel_mvmt_links |>
 ```
 
 ## 2.4 Which fishing vessels frequent the non-fishing sites
+
 ```{r}
 vessel_mvmt_links |> 
   filter(source %in% c("Ghoti Preserve","Nemo Reef", "Don Limpet Preserve")) |> 
@@ -325,5 +273,10 @@ vessel_mvmt_links |>
   summarise(n = n()) |> 
   arrange(desc(n))
 ```
+
+
+
+
+
 
 
