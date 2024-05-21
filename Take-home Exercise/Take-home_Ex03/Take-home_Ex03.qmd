@@ -1,5 +1,6 @@
 ---
 title: "Take Home Exercise 3"
+author: "Rydia"
 date: "May 13, 2024"
 date-modified: "last-modified"
 execute:
@@ -54,6 +55,7 @@ oceanus_map <- read_sf("data/MC2/Oceanus Information/Oceanus Geography.geojson")
 ```
 
 Loading the oceanus map:
+
 ```{r}
 ggplot(oceanus_map) +
   geom_sf(color = "black",
@@ -273,13 +275,11 @@ vessel_mvmt_links |>
   arrange(desc(n))
 ```
 
-
-___________________
+------------------------------------------------------------------------
 
 ```{r}
 mc2_data <- fromJSON("data/MC2/mc2.json")
 ```
-
 
 ```{r}
 mc2_edges <-
@@ -293,8 +293,3 @@ mc2_edges <-
   filter(source!=target) %>%
   ungroup
 ```
-
-
-
-
-

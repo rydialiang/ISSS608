@@ -1,5 +1,5 @@
 ---
-title: "In-class Ex 06""
+title: "In-class Ex 06"
 author: "Liang Xiuhao Rydia"
 date: "May 18, 2024"
 date-modified: "last-modified"
@@ -23,7 +23,7 @@ pacman::p_load(tidyverse, stringi,
 bible <- readr::read_lines("http://www.gutenberg.org/cache/epub/10/pg10.txt")
 ```
 
-To tidy the text, we need to know where does it start and end. 
+To tidy the text, we need to know where does it start and end.
 
 ```{r}
 # collapse all into one string
@@ -38,7 +38,6 @@ end_v <- stri_locate_last_fixed(bible, "Amen.")[2]
 bible <- stri_sub(bible, start_v, end_v)
 ```
 
-
 ```{r}
 # In the file, every book in the bible is preceded by five newlines,
   # which we use to split our string into a vector where each element is a book.
@@ -49,8 +48,6 @@ books <- stri_split_regex(bible, "\n{5}") %>%
 
 ```
 
-
-
 ```{r}
 # Because of the structure of the text in the file:
   # Replacing double or more newlines with two newlines, and a single newline with space.
@@ -59,7 +56,6 @@ books <- str_replace_all(books, "\n{2,}", "NEW_PARAGRAPH") %>%
     str_replace_all("NEW_PARAGRAPH", "\n\n")
 books <- books[3:68]  # The two first elements are not books
 ```
-
 
 ```{r}
 # Identifying new chapters within each book and split the text into chapters.
@@ -108,14 +104,16 @@ KJB <- prepare_data(dataset = bible_df,
                     columns_doc_info = c("Testament", "Book"))
 ```
 
-- text field = text we want to analyse
+-   text field = text we want to analyse
 
 Make sure you check the class of the object. The below should show "corporaexplorerobject".
 
 ```{r}
 class(KJB)
 ```
+
 ```{r}
+#| eval: False
 explore(KJB)
 ```
 
@@ -131,11 +129,13 @@ mc3_data <- fromJSON("data/MC3.json")
 ```
 
 This data is a list, not a dataframe.
+
 ```{r}
 class(mc3_data)
 ```
 
 Use distinct to remove duplicate
+
 ```{r}
 mc3_edges <-
   as_tibble(mc3_data$links) %>%
@@ -148,7 +148,9 @@ mc3_edges <-
   filter(source!=target) %>%
   ungroup
 ```
+
 ### clean edge file
+
 ```{r}
 mc3_nodes <- as_tibble(mc3_data$nodes) %>% 
   mutate(country = as.character(country),
@@ -164,6 +166,7 @@ skim(mc3_edges)
 ```
 
 ### Add the columns back in after cleaning
+
 ```{r}
 id1 <- mc3_edges %>% 
   select(source) %>% 
@@ -187,8 +190,6 @@ mc3_graph <- tbl_graph(nodes = mc3_nodes1,
                                                          closeness_centrality = centrality_closeness())
 ```
 
-
-
 ```{r}
 mc3_graph %>% 
   filter(betweenness_centrality >= 300000) %>% 
@@ -200,7 +201,4 @@ ggraph(layout = "fr") +
     alpha = 0.5)) +
   scale_size_continuous(range=c(1,10)) +
   theme_graph()
-  ))
 ```
-
-
