@@ -1,6 +1,5 @@
 ---
 title: "Take Home Exercise 3"
-author: "Rydia"
 date: "May 13, 2024"
 date-modified: "last-modified"
 execute:
@@ -275,6 +274,25 @@ vessel_mvmt_links |>
 ```
 
 
+___________________
+
+```{r}
+mc2_data <- fromJSON("data/MC2/mc2.json")
+```
+
+
+```{r}
+mc2_edges <-
+  as_tibble(mc2_data$links) %>%
+  distinct() %>%
+  mutate(source = as.character(source),
+         target = as.character(target),
+         type = as.character(type)) %>%
+  group_by(source, target, type) %>%
+  summarise(weights = n()) %>%
+  filter(source!=target) %>%
+  ungroup
+```
 
 
 
