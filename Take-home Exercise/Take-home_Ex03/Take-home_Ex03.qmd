@@ -234,23 +234,7 @@ transaction_edges <- mc2_edges_raw %>%
   filter(type == "Event.Transaction")
 ```
 
-```{r}
-id1 <- transaction_edges %>% 
-  select(source) %>% 
-  rename(id = source)
 
-id2 <- transaction_edges %>% 
-  select(target) %>% 
-  rename(id = target)
-
-delivery_nodes1 <- rbind(id1,id2) %>% 
-  distinct() %>% 
-  left_join(delivery_nodes,
-            unmatched = "drop")
-```
-```{r}
-delivery_nodes1 
-```
 
 
 
