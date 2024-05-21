@@ -144,10 +144,27 @@ mc2_edges_agg <-
 
 FishEye analysts have long wanted to better understand the flow of commercially caught fish through Oceanus’s many ports.
 
+```{r}
+transaction_edges <- mc2_edges_raw %>% 
+  filter(type == "Event.Transaction")
+```
+
+
+```{r}
+transaction_edges_agg <-
+  transaction_edges  %>%
+  distinct() %>%
+  group_by(source, target, type) %>%
+  summarise(weights = n()) %>%
+  filter(source!=target) %>% 
+  ungroup
+```
+
 
 ```{r}
 fishing_vessels_nodes <- mc2_nodes_raw %>% 
   filter(type == "Entity.Vessel.FishingVessel")
+fishing_vessels_nodes 
 ```
 
 There is a total of 178 Fishing vessels in Oceanus.
@@ -183,61 +200,13 @@ cargo_vessels
 
 There are 100 cargo vessels, with tonnage ranging from 2,100 to 76,300.
 
-## 2.3 Which fishing vessels frequent the fishing sites
+## 2.3 The flow of cargo
+
+Finding out which commodity goes to which ports.
 
 ```{r}
-mc2_edges_raw |> 
-  filter(source %in% c("Cod Table","Wrasse Beds","Tuna Shelf")) |> 
-  group_by(target, source) |> 
-  summarise(n = n()) |> 
-  arrange(desc(n))
-```
-
-## 2.4 Which fishing vessels frequent the non-fishing sites
-
-```{r}
-mc2_edges_raw  %>%  
-  filter(source %in% c("Ghoti Preserve","Nemo Reef", "Don Limpet Preserve")) %>% 
-  group_by(target, source) %>%  
-  summarise(n = n()) %>% 
-  arrange(desc(n))
-```
-
-## 2.5 The flow of cargo
-
-```{r}
-transponder_ping_edge_agg <- mc2_edges_agg %>% 
-  filter(type == "Event.TransportEvent.TransponderPing")
-```
-
-```{r}
-transponder_ping_edge_agg %>% 
-  filter(str_detect(target, "cargo")) %>%
-  group_by(target) %>% 
-  ggplot(aes(x = target, y = source)) +
-  geom_point(aes(size = weights, color = weights)) +
-  theme(axis.text.x = element_text(angle = 45, hjust = 1))
-
-```
-```{r}
-cargo_nodes <- mc2_nodes_raw %>% 
-  filter(type == "Entity.Vessel.CargoVessel")
-```
-
-```{r}
-delivery_nodes <- mc2_nodes_raw %>% 
-  filter(type == "Entity.Document.DeliveryReport")
-```
-
-```{r}
-transaction_edges <- mc2_edges_raw %>% 
-  filter(type == "Event.Transaction")
-```
-
-Finding out which cargo goes to which ports
-
-```{r}
-cargo_port_list <- transaction_edges %>% 
+cargo_port_list <- mc2_edges_raw %>% 
+  filter(type == "Event.Transaction") %>% 
   select(source,target) %>% 
   filter(target %in% c("City of Haacklee",
                        "City of Lomark",
@@ -246,7 +215,8 @@ cargo_port_list <- transaction_edges %>%
                        "City of South Paackland",
                        "City of Port Grove"))
 
-cargo_commodity_list <- transaction_edges %>%
+cargo_commodity_list <- mc2_edges_raw %>% 
+  filter(type == "Event.Transaction") %>% 
   select(source,target) %>% 
   filter(!target %in% c("City of Haacklee",
                        "City of Lomark",
@@ -258,7 +228,66 @@ cargo_commodity_list <- transaction_edges %>%
 
 cargo_list <- cargo_port_list %>% 
   left_join(cargo_commodity_list) %>%
-  left_join(transaction_edges)
+  left_join(transaction_edges) %>% 
+  select(source, target, commodity, date) %>% 
+  rename(cargo = source, city = target)
+
+```
+```{r}
+delivery_nodes <- mc2_nodes_raw %>% 
+  filter(type == "Entity.Document.DeliveryReport")
+```
+
+
+
+Adding quantity (qty_ton) to cargos
+```{r}
+cargo_list <- delivery_nodes %>% 
+  select(id,qty_tons) %>% 
+  rename(cargo = id) %>% 
+  left_join(cargo_list)
+```
+
+```{r}
+location <- mc2_nodes_raw %>% 
+  filter(kind %in% c("Fishing Ground", "Ecological Preserve")) %>% 
+  select(id, kind, fish_species_present)
+```
+
+
+
+
+
+
+
+
+```{r}
+transponder_ping_edge <- mc2_edges_raw %>% 
+  filter(type == "Event.TransportEvent.TransponderPing")
+```
+
+Finding the vessel that enters the city same day as the cargo
+```{r}
+fishing_vessel_list <- fishing_vessels_nodes %>% 
+  select(id) 
+
+fishing_vessel_list <- as.list(fishing_vessel_list)
+
+vessel_city_list <- transponder_ping_edge %>% 
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
+  filter(source %in% c("City of Haacklee",
+                       "City of Lomark",
+                       "City of Himark",
+                       "City of Paackland",
+                       "City of South Paackland",
+                       "City of Port Grove")) %>% 
+  filter(dwell > 0) %>% 
+  mutate(time = substr(time,1,10)) %>% 
+  mutate(time = ymd(`_date_added`)) %>% 
+  select(source, target, time) %>% 
+  distinct() %>% 
+  rename(date = time, target = source, id = target)
+
 ```
 
 
@@ -272,6 +301,20 @@ Develop visualizations that illustrate the inappropriate behavior of SouthSeafoo
 ## 3.1 Illegal fishing by SouthSeafood Express Corp
 
 SouthSeafood Express Corp operates two fishing vessels by the id of "snappersnatcher7be" and "roachrobberdb6".
+
+
+
+```{r}
+transponder_ping_edge_agg <-
+  transponder_ping_edge %>%
+  distinct() %>%
+  group_by(source, target, type) %>%
+  summarise(weights = n()) %>%
+  filter(source!=target) %>% 
+  ungroup
+```
+
+
 
 ```{r}
 transponder_ping_edge_agg %>% 
