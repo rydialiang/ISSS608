@@ -45,7 +45,7 @@ pacman::p_load(tidyverse, jsonlite, DT, lubridate,
 Loading the .json data using `jsonlite` package.
 
 ```{r}
-mc2 <- fromJSON("data/MC2/mc2.json")
+mc2_data <- fromJSON("data/MC2/mc2.json")
 ```
 
 mc2 is a directed multigraph, consists of nodes dataframe and links dataframe.
@@ -65,19 +65,14 @@ ggplot(oceanus_map) +
                vjust = 1.5)
 ```
 
-```{r}
-#| eval: FALSE
-mc2
-```
-
 ## 1.3 Extracting the tibbles for nodes and links
 
 ```{r}
-mc2_nodes_raw <- as_tibble(mc2$nodes)
+mc2_nodes_raw <- as_tibble(mc2_data$nodes)
 ```
 
 ```{r}
-mc2_links_raw <- as_tibble(mc2$links)
+mc2_edges_raw <- as_tibble(mc2_data$links)
 ```
 
 ## 1.4 Checking for missing values in data
@@ -87,7 +82,7 @@ colSums(is.na(mc2_nodes_raw))
 ```
 
 ```{r}
-colSums(is.na(mc2_links_raw))
+colSums(is.na(mc2_edges_raw))
 ```
 
 ## 1.5 Parsing the time with lubridate
@@ -101,21 +96,20 @@ mc2_nodes_raw <- mc2_nodes_raw |>
   mutate(`_last_edited_date` = substr(`_last_edited_date`,1,10)) |> 
   mutate(`_last_edited_date` = ymd(`_last_edited_date`)) |> 
   mutate(date = ymd(date))
-mc2_nodes_raw
 ```
 
 ```{r}
 
-mc2_links_raw <- mc2_links_raw |>
-  mutate(`_date_added` = substr(`_date_added`,1,10)) |> 
-  mutate(`_date_added` = ymd(`_date_added`)) |> 
-  mutate(`_last_edited_date`= substr(`_last_edited_date`,1,10)) |> 
-  mutate(`_last_edited_date` = ymd(`_last_edited_date`)) 
-
-mc2_links_raw <- mc2_links_raw |> 
-    mutate(time = ymd_hms(time))
-mc2_links_raw
+mc2_edges_raw <- mc2_edges_raw %>% 
+  mutate(`_date_added` = substr(`_date_added`,1,10)) %>% 
+  mutate(`_date_added` = ymd(`_date_added`)) %>% 
+  mutate(`_last_edited_date`= substr(`_last_edited_date`,1,10)) %>% 
+  mutate(`_last_edited_date` = ymd(`_last_edited_date`)) %>% 
+  mutate(time = ymd_hms(time))
+    
 ```
+
+**Understanding the Data**
 
 ```{r}
 unique_nodes_type <- mc2_nodes_raw |>  distinct(type)
@@ -123,86 +117,26 @@ unique_nodes_type
 ```
 
 ```{r}
-
-unique_links_type <- mc2_links_raw |>  distinct(type)
-unique_links_type
+unique_edges_type <- mc2_edges_raw |>  distinct(type)
+unique_edges_type
 ```
 
-## 1.5 Extracting the required columns for each graph
-
-In this section, we will extract the required column for the following graphs:
-
-1.  Vessel Movements
-
-2.  Harbor Reports
-
-3.  Harbor Import Records
-
-### 1.5.1 Vessel Movements
+## 1.6 Aggregating weight for edges
+To get aggregated weight for the edges by unique source, target and type.
 
 ```{r}
-vessel_mvmt_vessel_nodes <- mc2_nodes_raw |> 
-  filter(str_detect(type,c("Vessel"))) 
+mc2_edges_agg <-
+  mc2_edges_raw %>%
+  distinct() %>%
+  mutate(source = as.character(source),
+         target = as.character(target),
+         type = as.character(type)) %>%
+  group_by(source, target, type) %>%
+  summarise(weights = n()) %>%
+  filter(source!=target) 
+  ungroup
 ```
 
-```{r}
-vessel_mvmt_vessel_nodes
-```
-
-```{r}
-vessel_mvmt_location_nodes <- mc2_nodes_raw |> 
-  filter(str_detect(type,c("Location"))) 
-vessel_mvmt_location_nodes 
-```
-
-```{r}
-vessel_mvmt_links <- mc2_links_raw |> 
-  filter(type == "Event.TransportEvent.TransponderPing") 
-```
-
-```{r}
-vessel_mvmt_links
-```
-
-### 1.5.2 Harbor Report
-
-```{r}
-harbor_report_nodes <- mc2_nodes_raw |> 
-  filter(str_detect(type,c("Vessel|Location")))
-harbor_report_nodes
-```
-
-```{r}
-harbor_report_links <- mc2_links_raw |> 
-  filter(type == "Event.HarborReport")
-harbor_report_links
-```
-
-### 1.5.3 Harbor Import Records
-
-```{r}
-import_location_nodes <- mc2_nodes_raw |> 
-  filter(str_detect(type,c("Location")))
-import_location_nodes 
-```
-
-```{r}
-import_commodity_nodes <- mc2_nodes_raw |> 
-  filter(str_detect(type,c("Commodity")))
-import_commodity_nodes 
-```
-
-```{r}
-import_delivery_nodes <- mc2_nodes_raw |> 
-  filter(str_detect(type,c("Document")))
-import_delivery_nodes 
-```
-
-```{r}
-import_links <- mc2_links_raw |> 
-  filter(type == "Event.Transaction")
-import_links
-```
 
 ## 2.0 Task 1
 
@@ -210,16 +144,10 @@ import_links
 
 FishEye analysts have long wanted to better understand the flow of commercially caught fish through Oceanus’s many ports.
 
-```{r}
-unique_nodes_type <- vessel_mvmt_vessel_nodes |>  distinct(type)
-unique_nodes_type
-```
 
 ```{r}
-fishing_vessels <- vessel_mvmt_vessel_nodes |> 
-  filter(type == "Entity.Vessel.FishingVessel") |> 
-  distinct(id)
-fishing_vessels
+fishing_vessels_nodes <- mc2_nodes_raw %>% 
+  filter(type == "Entity.Vessel.FishingVessel")
 ```
 
 There is a total of 178 Fishing vessels in Oceanus.
@@ -227,12 +155,12 @@ There is a total of 178 Fishing vessels in Oceanus.
 ## 2.2 Fishing ground locations
 
 ```{r}
-fishing_ground <- import_location_nodes |> 
+fishing_ground <- mc2_nodes_raw %>% 
   filter(kind == "Fishing Ground") 
 ```
 
 ```{r}
-non_fishing_ground <- import_location_nodes |> 
+non_fishing_ground <- mc2_nodes_raw %>%  
   filter(kind == "Ecological Preserve") 
 ```
 
@@ -247,8 +175,8 @@ There are three fishing grounds:
 Fishing outside these fishing grounds are considered illegal fishing.
 
 ```{r}
-cargo_vessels <- vessel_mvmt_vessel_nodes |> 
-  filter(type == "Entity.Vessel.CargoVessel") |> 
+cargo_vessels <- mc2_nodes_raw %>%  
+  filter(type == "Entity.Vessel.CargoVessel") %>% 
   arrange(desc(tonnage))
 cargo_vessels
 ```
@@ -258,7 +186,7 @@ There are 100 cargo vessels, with tonnage ranging from 2,100 to 76,300.
 ## 2.3 Which fishing vessels frequent the fishing sites
 
 ```{r}
-vessel_mvmt_links |> 
+mc2_edges_raw |> 
   filter(source %in% c("Cod Table","Wrasse Beds","Tuna Shelf")) |> 
   group_by(target, source) |> 
   summarise(n = n()) |> 
@@ -268,28 +196,199 @@ vessel_mvmt_links |>
 ## 2.4 Which fishing vessels frequent the non-fishing sites
 
 ```{r}
-vessel_mvmt_links |> 
-  filter(source %in% c("Ghoti Preserve","Nemo Reef", "Don Limpet Preserve")) |> 
-  group_by(target, source) |> 
-  summarise(n = n()) |> 
+mc2_edges_raw  %>%  
+  filter(source %in% c("Ghoti Preserve","Nemo Reef", "Don Limpet Preserve")) %>% 
+  group_by(target, source) %>%  
+  summarise(n = n()) %>% 
   arrange(desc(n))
 ```
 
-------------------------------------------------------------------------
+## 2.5 The flow of cargo
 
 ```{r}
-mc2_data <- fromJSON("data/MC2/mc2.json")
+transponder_ping_edge_agg <- mc2_edges_agg %>% 
+  filter(type == "Event.TransportEvent.TransponderPing")
 ```
 
 ```{r}
-mc2_edges <-
-  as_tibble(mc2_data$links) %>%
+transponder_ping_edge_agg %>% 
+  filter(str_detect(target, "cargo")) %>%
+  group_by(target) %>% 
+  ggplot(aes(x = target, y = source)) +
+  geom_point(aes(size = weights, color = weights)) +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+
+```
+```{r}
+cargo_nodes <- mc2_nodes_raw %>% 
+  filter(type == "Entity.Vessel.CargoVessel")
+```
+
+```{r}
+delivery_nodes <- mc2_nodes_raw %>% 
+  filter(type == "Entity.Document.DeliveryReport")
+```
+
+```{r}
+transaction_edges <- mc2_edges_raw %>% 
+  filter(type == "Event.Transaction")
+```
+
+```{r}
+id1 <- transaction_edges %>% 
+  select(source) %>% 
+  rename(id = source)
+
+id2 <- transaction_edges %>% 
+  select(target) %>% 
+  rename(id = target)
+
+delivery_nodes1 <- rbind(id1,id2) %>% 
+  distinct() %>% 
+  left_join(delivery_nodes,
+            unmatched = "drop")
+```
+```{r}
+delivery_nodes1 
+```
+
+
+
+
+## 3.0 Task 2
+
+Develop visualizations that illustrate the inappropriate behavior of SouthSeafood Express Corp vessels. How do their movement and catch contents compare to other fishing vessels? When and where did SouthSeafood Express Corp vessels perform their illegal fishing? How many different types of suspicious behaviors are observed? Use visual evidence to justify your conclusions.
+
+
+## 3.1 Illegal fishing by SouthSeafood Express Corp
+
+SouthSeafood Express Corp operates two fishing vessels by the id of "snappersnatcher7be" and "roachrobberdb6".
+
+```{r}
+transponder_ping_edge_agg %>% 
+  filter(target %in% c("snappersnatcher7be","roachrobberdb6")) %>%
+  group_by(target) %>% 
+  ggplot(aes(x=target, y=source,
+             size = weights)) +
+  geom_point()
+
+```
+```{r}
+southseafood_edge <- mc2_edges_raw %>% 
+  filter(type == "Event.TransportEvent.TransponderPing") %>% 
+  filter(target %in% c("snappersnatcher7be","roachrobberdb6")) %>% 
+  arrange(target,time)
+```
+
+
+```{r}
+ssf_edges_agg <-
+  southseafood_edge %>%
   distinct() %>%
-  mutate(source = as.character(source),
-         target = as.character(target),
-         type = as.character(type)) %>%
   group_by(source, target, type) %>%
   summarise(weights = n()) %>%
-  filter(source!=target) %>%
+  filter(source!=target) %>% 
   ungroup
 ```
+
+```{R}
+id1 <- ssf_edges_agg %>% 
+  select(source) %>% 
+  rename(id = source) 
+
+id2 <- ssf_edges_agg %>% 
+  select(target) %>% 
+  rename(id = target)
+
+mc2_nodes1 <- rbind(id1,id2) %>% 
+  distinct() 
+```
+
+
+```{r}
+ssf_graph <- tbl_graph(nodes = mc2_nodes1,
+                       edges = ssf_edges_agg,
+                       directed = TRUE)
+```
+
+```{r}
+# Add a color column to nodes
+ssf_graph <- ssf_graph %>%
+  activate(nodes) %>%
+  mutate(color = case_when(
+    id %in% c("snappersnatcher7be", "roachrobberdb6") ~ "blue",
+    TRUE ~ ""
+  ))
+
+# Create the plot
+ssf_graph %>% 
+  activate(edges) %>%
+  arrange(desc(weights)) %>% 
+  ggraph(layout = "fr") +
+  geom_edge_link(aes(color = "", 
+                     linewidth = weights)) +
+  geom_node_point(aes(color = color, size = 10)) + 
+  theme_graph() +
+  theme(
+    plot.background = element_rect(fill = "white", color = NA),
+    text = element_text(color = "black"))+
+  geom_node_text(aes(label = id), 
+                 repel = TRUE, 
+                 vjust = 1, 
+                 hjust = 1,
+                 size = 3)
+```
+
+
+## 4.0 Task 4
+
+**The Questions**:
+
+1.  How did fishing activity change after SouthSeafood Express Corp was caught? 
+
+2.  What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
+
+In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. We will use this timeline as the 
+
+The final activities of SouthSeafood's vessels are on 2035-05-16 (snappersnatcher7be) and  2035-05-16 (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-16. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
