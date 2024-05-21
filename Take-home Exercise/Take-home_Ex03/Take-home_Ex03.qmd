@@ -234,7 +234,32 @@ transaction_edges <- mc2_edges_raw %>%
   filter(type == "Event.Transaction")
 ```
 
+Finding out which cargo goes to which ports
 
+```{r}
+cargo_port_list <- transaction_edges %>% 
+  select(source,target) %>% 
+  filter(target %in% c("City of Haacklee",
+                       "City of Lomark",
+                       "City of Himark",
+                       "City of Paackland",
+                       "City of South Paackland",
+                       "City of Port Grove"))
+
+cargo_commodity_list <- transaction_edges %>%
+  select(source,target) %>% 
+  filter(!target %in% c("City of Haacklee",
+                       "City of Lomark",
+                       "City of Himark",
+                       "City of Paackland",
+                       "City of South Paackland",
+                       "City of Port Grove")) %>% 
+  rename(commodity = target)
+
+cargo_list <- cargo_port_list %>% 
+  left_join(cargo_commodity_list) %>%
+  left_join(transaction_edges)
+```
 
 
 
@@ -257,6 +282,7 @@ transponder_ping_edge_agg %>%
   geom_point()
 
 ```
+
 ```{r}
 southseafood_edge <- mc2_edges_raw %>% 
   filter(type == "Event.TransportEvent.TransponderPing") %>% 
