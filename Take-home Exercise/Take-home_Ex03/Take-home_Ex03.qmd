@@ -252,6 +252,7 @@ cargo_list <- delivery_nodes %>%
 location <- mc2_nodes_raw %>% 
   filter(kind %in% c("Fishing Ground", "Ecological Preserve")) %>% 
   select(id, kind, fish_species_present)
+
 ```
 
 
