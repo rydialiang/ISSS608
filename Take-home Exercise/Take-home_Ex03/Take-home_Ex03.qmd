@@ -248,16 +248,45 @@ cargo_list <- delivery_nodes %>%
   left_join(cargo_list)
 ```
 
-```{r}
-location <- mc2_nodes_raw %>% 
-  filter(kind %in% c("Fishing Ground", "Ecological Preserve")) %>% 
-  select(id, kind, fish_species_present)
 
+```{r}
+harbor_report <- mc2_edges_raw %>% 
+  filter(type == "Event.HarborReport") %>% 
+  select(source, target, date) %>% 
+  distinct() %>% 
+  rename(city = target, vessel = source)
 ```
 
+```{r}
+cargo_list <- cargo_list %>% 
+  left_join(harbor_report) %>% 
+  rename(vessel_hr = vessel)
+```
 
+```{r}
+colSums(is.na(cargo_list))
+```
+```{r}
+fishing_vessel_list <- fishing_vessels_nodes %>% 
+  select(id) 
 
+fishing_vessel_list <- as.list(fishing_vessel_list)
 
+transponder_location <- mc2_edges_raw %>% 
+  filter(type == "Event.TransportEvent.TransponderPing") %>%
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
+  select(source, target, time) %>% 
+  mutate(time = substr(time,1,10)) %>% 
+  mutate(time = ymd(time)) %>%
+  distinct() %>% 
+  rename(city = source, vessel_tp = target, date = time)
+```
+
+```{r}
+cargo_list <- cargo_list %>% 
+  mutate(date = ymd(date)) %>% 
+  left_join(transponder_location)
+```
 
 
 
