@@ -65,362 +65,194 @@ ggplot(oceanus_map) +
                vjust = 1.5)
 ```
 
-## 1.3 Extracting the tibbles for nodes and links
+## 1.3 **Wrangling and tidying edges**
+
+### 1.3.1 Extracting edges
+
+First, we extract only distinct edges from the tibble *links* data.frame of *mc2_data* and save it as a tibble data.frame called *mc2_edges*.
 
 ```{r}
-mc2_nodes_raw <- as_tibble(mc2_data$nodes)
+mc2_edges <- mc2_data$links %>% 
+  distinct()
 ```
+
+Next, `glimpse()` of dplyr will be used to reveal the structure of *mc2_edges* tibble data.table.
 
 ```{r}
-mc2_edges_raw <- as_tibble(mc2_data$links)
+glimpse(mc2_edges)
 ```
 
-## 1.4 Checking for missing values in data
+From the table above, we can identify some issues with the data:
+
+1.  The columns with date data type are all in character format.
+
+2.  Some columns have names that starts with "\_". These need to be rename to avoid coding issues.
+
+### 1.3.2 Correcting the date data type with `lubridate()`
 
 ```{r}
-colSums(is.na(mc2_nodes_raw))
+mc2_edges$time <- as_datetime(mc2_edges$time)
+mc2_edges$`_last_edited_date` <- as_datetime(mc2_edges$`_last_edited_date`)
+mc2_edges$`_date_added` <- as_datetime(mc2_edges$`_date_added`)
+mc2_edges$date <- as_datetime(mc2_edges$date)
 ```
+
+Next, glimpse() will be used to confirm if the process have been performed correctly.
 
 ```{r}
-colSums(is.na(mc2_edges_raw))
+glimpse(mc2_edges)
 ```
 
-## 1.5 Parsing the time with lubridate
+### 1.3.3 Changing field name
 
-As the `_date_added` and `_last_edited_date` contains a mixture of format, we first extract the date in "yyyy-mm-dd" format using `substr`.
+In the code chunk below, rename() of dplyr package is used to change the following fields.
 
 ```{r}
-mc2_nodes_raw <- mc2_nodes_raw |> 
-  mutate(`_date_added` = substr(`_date_added`,1,10)) |> 
-  mutate(`_date_added` = ymd(`_date_added`)) |> 
-  mutate(`_last_edited_date` = substr(`_last_edited_date`,1,10)) |> 
-  mutate(`_last_edited_date` = ymd(`_last_edited_date`)) |> 
-  mutate(date = ymd(date))
+mc2_edges <- mc2_edges %>%
+  rename("last_edited_by" = "_last_edited_by",
+         "date_added" = "_date_added",
+         "last_edited_date" = "_last_edited_date",
+         "raw_source" = "_raw_source",
+         "algorithm" = "_algorithm") 
 ```
+
+### 1.3.4 Splitting words in `type` column
+
+The code chunk below combined the following steps:
+
+1.  Splitting the words by "." - after observing that the format for type is as such: "Event.TransportEvent.TransponderPing"
+
+2.  The `max(lengths(word_list))` will be used to find the maximum number of elements in any split.
+
+3.  Apply function(x) to pad shorter splits with NA values to make them all the same length.
+
+4.  Create word_df and changing column names to event1 etc.
+
+5.  Convert word_df from matrix into tibble data.frame, and checks its class.
+
+6.  Append word_df to mc2_edges tibble data.frame.
+
+7.  Saving mc2_edges into R **rds** format as a physical file, so that there is no need to repeat the following code chunk to access a tidy mc2_edges tibble data frame.
 
 ```{r}
+word_list <- strsplit(mc2_edges$type, "\\.")
 
-mc2_edges_raw <- mc2_edges_raw %>% 
-  mutate(`_date_added` = substr(`_date_added`,1,10)) %>% 
-  mutate(`_date_added` = ymd(`_date_added`)) %>% 
-  mutate(`_last_edited_date`= substr(`_last_edited_date`,1,10)) %>% 
-  mutate(`_last_edited_date` = ymd(`_last_edited_date`)) %>% 
-  mutate(time = ymd_hms(time))
-    
+max_elements <- max(lengths(word_list))
+
+word_list_padded <- lapply(word_list, 
+function(x) c(x, rep(NA, max_elements - length(x))))
+
+word_df <- do.call(rbind, word_list_padded)
+colnames(word_df) <- paste0("event", 1:max_elements)
+
+word_df <- as_tibble(word_df) %>%
+  select(event2, event3)
+class(word_df)
+
+mc2_edges <- mc2_edges %>%
+  cbind(word_df)
+
+# prior to running this code, create an rds folder in data folder to ensure files are saved in the correct directory
+write_rds(mc2_edges, "data/rds/mc2_edges.rds")
+
 ```
 
-**Understanding the Data**
+## 1.4 **Wrangling and tidying nodes**
+
+### 1.4.1 Extracting nodes
+
+The code chunk below will be used to extract the nodes data.frame of mc2_data and parses it as a tibble data.frame called mc2_nodes.
 
 ```{r}
-unique_nodes_type <- mc2_nodes_raw |>  distinct(type)
-unique_nodes_type
+mc2_nodes <- as_tibble(mc2_data$nodes) %>%
+  distinct()
 ```
+
+Next, take a `glimpse()` to understand the data structure.
 
 ```{r}
-unique_edges_type <- mc2_edges_raw |>  distinct(type)
-unique_edges_type
+glimpse(mc2_nodes)
 ```
 
-## 1.6 Aggregating weight for edges
+From the table above, beside the date data type, inappropriate field name, and treatment for `type` column issues we discussed earlier, two additional data issues can be observed. They are:
 
-To get aggregated weight for the edges by unique source, target and type.
+-   The values in Activities and fish_species_present fields are in **list** data type, which will affect the ability to process and to analyse the data.
+
+-   Some values in the Activities field are not ready to be analyse without further tidying (i.e. removing c(““)).
+
+We will first repeat the steps similar steps to wrangling the mc2_edges, before proceeding to tackle the issues for Activities and fish_species_present field. 
+
+### 1.4.2 Correcting the date data type with `lubridate()`
+
+Correct the date data type and take a `glimpse()` to confirm changes.
+```{r}
+mc2_nodes$`_last_edited_date` <- as_datetime(mc2_nodes$`_last_edited_date`)
+mc2_nodes$`_date_added` <- as_datetime(mc2_nodes$`_date_added`)
+mc2_nodes$date <- as_datetime(mc2_nodes$date)
+glimpse(mc2_nodes)
+```
+
+### 1.4.3 Changing field name
+
+In the code chunk below, rename() of dplyr package is used to change the following fields.
 
 ```{r}
-mc2_edges_agg <-
-  mc2_edges_raw %>%
-  distinct() %>%
-  mutate(source = as.character(source),
-         target = as.character(target),
-         type = as.character(type)) %>%
-  group_by(source, target, type) %>%
-  summarise(weights = n()) %>%
-  filter(source!=target) 
-  ungroup
+mc2_nodes <- mc2_nodes %>%
+  rename("last_edited_by" = "_last_edited_by",
+         "date_added" = "_date_added",
+         "last_edited_date" = "_last_edited_date",
+         "raw_source" = "_raw_source",
+         "algorithm" = "_algorithm") 
 ```
 
-## 2.0 Task 1
+### 1.4.4 Splitting words in `type` column
 
-## 2.1 Flow of fishing vessels
-
-FishEye analysts have long wanted to better understand the flow of commercially caught fish through Oceanus’s many ports.
+Details on the code chunk can be found in section 1.3.4. After splitting the words in `type` column, a physical file for clean mc2_nodes is saved in the format of R **rds**. Instead of "event", we will replace the column naming as "Entity" for mc2_nodes.
 
 ```{r}
-transaction_edges <- mc2_edges_raw %>% 
-  filter(type == "Event.Transaction")
+word_list <- strsplit(mc2_nodes$type, "\\.")
+
+max_elements <- max(lengths(word_list))
+
+word_list_padded <- lapply(word_list, 
+function(x) c(x, rep(NA, max_elements - length(x))))
+
+word_df <- do.call(rbind, word_list_padded)
+colnames(word_df) <- paste0("entity", 1:max_elements)
+
+word_df <- as_tibble(word_df) %>%
+  select(entity2, entity3)
+class(word_df)
+
+mc2_nodes <- mc2_nodes %>%
+  cbind(word_df)
+
+# prior to running this code, create an rds folder in data folder to ensure files are saved in the correct directory
+write_rds(mc2_nodes, "data/rds/mc2_nodes.rds")
 ```
 
-```{r}
-transaction_edges_agg <-
-  transaction_edges  %>%
-  distinct() %>%
-  group_by(source, target, type) %>%
-  summarise(weights = n()) %>%
-  filter(source!=target) %>% 
-  ungroup
-```
 
-```{r}
-fishing_vessels_nodes <- mc2_nodes_raw %>% 
-  filter(type == "Entity.Vessel.FishingVessel")
-fishing_vessels_nodes 
-```
 
-There is a total of 178 Fishing vessels in Oceanus.
 
-## 2.2 Fishing ground locations
 
-```{r}
-fishing_ground <- mc2_nodes_raw %>% 
-  filter(kind == "Fishing Ground") 
-```
 
-```{r}
-non_fishing_ground <- mc2_nodes_raw %>%  
-  filter(kind == "Ecological Preserve") 
-```
 
-There are three fishing grounds:
 
-1\. Cod Table
 
-2\. Wrasse Beds
 
-3\. Tuna Shelf
 
-Fishing outside these fishing grounds are considered illegal fishing.
 
-```{r}
-cargo_vessels <- mc2_nodes_raw %>%  
-  filter(type == "Entity.Vessel.CargoVessel") %>% 
-  arrange(desc(tonnage))
-cargo_vessels
-```
 
-There are 100 cargo vessels, with tonnage ranging from 2,100 to 76,300.
 
-## 2.3 The flow of cargo
 
-Finding out which commodity goes to which ports.
 
-```{r}
-cargo_port_list <- mc2_edges_raw %>% 
-  filter(type == "Event.Transaction") %>% 
-  select(source,target) %>% 
-  filter(target %in% c("City of Haacklee",
-                       "City of Lomark",
-                       "City of Himark",
-                       "City of Paackland",
-                       "City of South Paackland",
-                       "City of Port Grove"))
 
-cargo_commodity_list <- mc2_edges_raw %>% 
-  filter(type == "Event.Transaction") %>% 
-  select(source,target) %>% 
-  filter(!target %in% c("City of Haacklee",
-                       "City of Lomark",
-                       "City of Himark",
-                       "City of Paackland",
-                       "City of South Paackland",
-                       "City of Port Grove")) %>% 
-  rename(commodity = target)
 
-cargo_list <- cargo_port_list %>% 
-  left_join(cargo_commodity_list) %>%
-  left_join(transaction_edges) %>% 
-  select(source, target, commodity, date) %>% 
-  rename(cargo = source, city = target)
 
-```
 
-```{r}
-delivery_nodes <- mc2_nodes_raw %>% 
-  filter(type == "Entity.Document.DeliveryReport")
-```
 
-Adding quantity (qty_ton) to cargos
 
-```{r}
-cargo_list <- delivery_nodes %>% 
-  select(id,qty_tons) %>% 
-  rename(cargo = id) %>% 
-  left_join(cargo_list)
-```
 
-```{r}
-harbor_report <- mc2_edges_raw %>% 
-  filter(type == "Event.HarborReport")
-```
 
-```{r}
-harbor_report <- mc2_edges_raw %>% 
-  filter(type == "Event.HarborReport") %>% 
-  select(source, target, date) %>% 
-  distinct() %>% 
-  rename(city = target, vessel = source)
-```
 
-```{r}
-cargo_list <- cargo_list %>% 
-  left_join(harbor_report) %>% 
-  rename(vessel_hr = vessel)
-```
 
-```{r}
-colSums(is.na(cargo_list))
-```
-
-```{r}
-fishing_vessel_list <- fishing_vessels_nodes %>% 
-  select(id) 
-
-fishing_vessel_list <- as.list(fishing_vessel_list)
-
-transponder_location <- mc2_edges_raw %>% 
-  filter(type == "Event.TransportEvent.TransponderPing") %>%
-  filter(target %in% unlist(fishing_vessel_list)) %>% 
-  select(source, target, time) %>% 
-  mutate(time = substr(time,1,10)) %>% 
-  mutate(time = ymd(time)) %>%
-  distinct() %>% 
-  rename(city = source, vessel_tp = target, date = time)
-```
-
-```{r}
-cargo_list <- cargo_list %>% 
-  mutate(date = ymd(date)) %>% 
-  left_join(transponder_location)
-```
-
-```{r}
-transponder_ping_edge <- mc2_edges_raw %>% 
-  filter(type == "Event.TransportEvent.TransponderPing")
-```
-
-Finding the vessel that enters the city same day as the cargo
-
-```{r}
-fishing_vessel_list <- fishing_vessels_nodes %>% 
-  select(id) 
-
-fishing_vessel_list <- as.list(fishing_vessel_list)
-
-vessel_city_list <- transponder_ping_edge %>% 
-  filter(target %in% unlist(fishing_vessel_list)) %>% 
-  filter(source %in% c("City of Haacklee",
-                       "City of Lomark",
-                       "City of Himark",
-                       "City of Paackland",
-                       "City of South Paackland",
-                       "City of Port Grove")) %>% 
-  filter(dwell > 0) %>% 
-  mutate(time = substr(time,1,10)) %>% 
-  mutate(time = ymd(`_date_added`)) %>% 
-  select(source, target, time) %>% 
-  distinct() %>% 
-  rename(date = time, target = source, id = target)
-
-```
-
-## 3.0 Task 2
-
-Develop visualizations that illustrate the inappropriate behavior of SouthSeafood Express Corp vessels. How do their movement and catch contents compare to other fishing vessels? When and where did SouthSeafood Express Corp vessels perform their illegal fishing? How many different types of suspicious behaviors are observed? Use visual evidence to justify your conclusions.
-
-## 3.1 Illegal fishing by SouthSeafood Express Corp
-
-SouthSeafood Express Corp operates two fishing vessels by the id of "snappersnatcher7be" and "roachrobberdb6".
-
-```{r}
-transponder_ping_edge_agg <-
-  transponder_ping_edge %>%
-  distinct() %>%
-  group_by(source, target, type) %>%
-  summarise(weights = n()) %>%
-  filter(source!=target) %>% 
-  ungroup
-```
-
-```{r}
-transponder_ping_edge_agg %>% 
-  filter(target %in% c("snappersnatcher7be","roachrobberdb6")) %>%
-  group_by(target) %>% 
-  ggplot(aes(x=target, y=source,
-             size = weights)) +
-  geom_point()
-
-```
-
-```{r}
-southseafood_edge <- mc2_edges_raw %>% 
-  filter(type == "Event.TransportEvent.TransponderPing") %>% 
-  filter(target %in% c("snappersnatcher7be","roachrobberdb6")) %>% 
-  arrange(target,time)
-```
-
-```{r}
-ssf_edges_agg <-
-  southseafood_edge %>%
-  distinct() %>%
-  group_by(source, target, type) %>%
-  summarise(weights = n()) %>%
-  filter(source!=target) %>% 
-  ungroup
-```
-
-```{R}
-id1 <- ssf_edges_agg %>% 
-  select(source) %>% 
-  rename(id = source) 
-
-id2 <- ssf_edges_agg %>% 
-  select(target) %>% 
-  rename(id = target)
-
-mc2_nodes1 <- rbind(id1,id2) %>% 
-  distinct() 
-```
-
-```{r}
-ssf_graph <- tbl_graph(nodes = mc2_nodes1,
-                       edges = ssf_edges_agg,
-                       directed = TRUE)
-```
-
-```{r}
-# Add a color column to nodes
-ssf_graph <- ssf_graph %>%
-  activate(nodes) %>%
-  mutate(color = case_when(
-    id %in% c("snappersnatcher7be", "roachrobberdb6") ~ "blue",
-    TRUE ~ ""
-  ))
-
-# Create the plot
-ssf_graph %>% 
-  activate(edges) %>%
-  arrange(desc(weights)) %>% 
-  ggraph(layout = "fr") +
-  geom_edge_link(aes(color = "", 
-                     linewidth = weights)) +
-  geom_node_point(aes(color = color, size = 10)) + 
-  theme_graph() +
-  theme(
-    plot.background = element_rect(fill = "white", color = NA),
-    text = element_text(color = "black"))+
-  geom_node_text(aes(label = id), 
-                 repel = TRUE, 
-                 vjust = 1, 
-                 hjust = 1,
-                 size = 3)
-```
-
-## 4.0 Task 4
-
-**The Questions**:
-
-1.  How did fishing activity change after SouthSeafood Express Corp was caught?
-
-2.  What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
-
-In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. We will use this timeline as the
-
-The final activities of SouthSeafood's vessels are on 2035-05-16 (snappersnatcher7be) and 2035-05-16 (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-16.
