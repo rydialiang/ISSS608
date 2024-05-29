@@ -185,9 +185,8 @@ This line defines a character vector `wkday_levels` that specifies a custom orde
 
     -   `wkday = factor(wkday, levels = wkday_levels)` converts the `wkday` column to a factor with levels ordered according to `wkday_levels`.
 
-    ```{=html}
     <!-- -->
-    ```
+
     -   `hour = factor(hour, levels = 0:23)` converts the `hour` column to a factor with levels from 0 to 23.
 
 Table below shows the tidy tibble table after processing.
@@ -214,7 +213,7 @@ theme_tufte(base_family = "Helvetica") +
 coord_equal() +
 scale_fill_gradient(name = "# of attacks",
                     low = "sky blue", 
-                    high = "dark blue") +
+                    high = "red") +
 labs(x = NULL, 
      y = NULL, 
      title = "Attacks by weekday and time of day") +
@@ -239,3 +238,181 @@ theme(axis.ticks = element_blank(),
 
 -   `scale_fill_gradient()` function is used to creates a two colour gradient (low-high).
 :::
+
+![](images/clipboard-189057982.png)
+
+Then we can simply group the count by hour and wkday and plot it, since we know that we have values for every combination there’s no need to further preprocess the data.
+
+### **17.4.6 Building Multiple Calendar Heatmaps**
+
+**Challenge:** Building multiple heatmaps for the top four countries with the highest number of attacks.
+
+![](images/clipboard-3271169812.png)
+
+### **17.4.7 Plotting Multiple Calendar Heatmaps**
+
+Step 1: Deriving attack by country object
+
+In order to identify the top 4 countries with the highest number of attacks, you are required to do the followings:
+
+-   count the number of attacks by country,
+
+-   calculate the percent of attackes by country, and
+
+-   save the results in a tibble data frame.
+
+```{r}
+attacks_by_country <- count(
+  attacks, source_country) %>%
+  mutate(percent = percent(n/sum(n))) %>%
+  arrange(desc(n))
+```
+
+Step 2: Preparing the tidy data frame
+
+In this step, you are required to extract the attack records of the top 4 countries from *attacks* data frame and save the data in a new tibble data frame (i.e. *top4_attacks*).
+
+```{r}
+top4 <- attacks_by_country$source_country[1:4]
+top4_attacks <- attacks %>%
+  filter(source_country %in% top4) %>%
+  count(source_country, wkday, hour) %>%
+  ungroup() %>%
+  mutate(source_country = factor(
+    source_country, levels = top4)) %>%
+  na.omit()
+```
+
+### **17.4.8 Plotting Multiple Calendar Heatmaps**
+
+Step 3: Plotting the Multiple Calender Heatmap by using ggplot2 package.
+
+```{r}
+ggplot(top4_attacks, 
+       aes(hour, 
+           wkday, 
+           fill = n)) + 
+  geom_tile(color = "white", 
+          size = 0.1) + 
+  theme_tufte(base_family = "Helvetica") + 
+  coord_equal() +
+  scale_fill_gradient(name = "# of attacks",
+                    low = "sky blue", 
+                    high = "red") +
+  facet_wrap(~source_country, ncol = 2) +
+  labs(x = NULL, y = NULL, 
+     title = "Attacks on top 4 countries by weekday and time of day") +
+  theme(axis.ticks = element_blank(),
+        axis.text.x = element_text(size = 7),
+        plot.title = element_text(hjust = 0.5),
+        legend.title = element_text(size = 8),
+        legend.text = element_text(size = 6) )
+```
+
+## **17.5 Plotting Cycle Plot**
+
+In this section, you will learn how to plot a cycle plot showing the time-series patterns and trend of visitor arrivals from Vietnam programmatically by using ggplot2 functions.
+
+![](images/clipboard-3132420236.png)
+
+### **17.5.1 Step 1: Data Import**
+
+For the purpose of this hands-on exercise, *arrivals_by_air.xlsx* will be used.
+
+The code chunk below imports *arrivals_by_air.xlsx* by using `read_excel()` of **readxl** package and save it as a tibble data frame called *air*.
+
+```{r}
+air <- read_excel("data/arrivals_by_air.xlsx")
+```
+
+### **7.5.2 Step 2: Deriving month and year fields**
+
+Next, two new fields called *month* and *year* are derived from *Month-Year* field.
+
+```{r}
+air$month <- factor(month(air$`Month-Year`),
+                    levels = 1:12,
+                    labels = month.abb,
+                    ordered = TRUE)
+air$year <- year(air$`Month-Year`)
+```
+
+### **17.5.3 Step 4: Extracting the target country**
+
+Next, the code chunk below is use to extract data for the target country (i.e. Vietnam)
+
+```{r}
+Vietnam <- air %>% 
+  select(`Vietnam`, 
+         month, 
+         year) %>%
+  filter(year >= 2010)
+```
+
+### **17.5.4 Step 5: Computing year average arrivals by month**
+
+The code chunk below uses `group_by()` and `summarise()` of **dplyr** to compute year average arrivals by month.
+
+```{r}
+hline.data <- Vietnam %>% 
+  group_by(month) %>%
+  summarise(avgvalue = mean(`Vietnam`))
+```
+
+### **17.5.5 Step 6: Plotting the cycle plot**
+
+The code chunk below is used to plot the cycle plot as shown in Slide 12/23.
+
+```{r}
+ggplot() +
+  geom_line(data = Vietnam,
+            aes(x = year,
+                y = `Vietnam`,
+                group = month),
+            color = "black") +
+  geom_hline(data = hline.data,
+             aes(yintercept = avgvalue),
+             linetype = 6,
+             color = "red",
+             size = 0.5) +
+  facet_grid(~month) +
+  labs(axis.text.x = element_blank(),
+       title = "Visitor arrivals from Vietnam by air, Jan 2010-Dec 2019") +
+  xlab("") +
+  ylab("No. of Visitors")
+```
+
+## **17.6 Plotting Slopegraph**
+
+In this section you will learn how to plot a [slopegraph](https://www.storytellingwithdata.com/blog/2020/7/27/what-is-a-slopegraph) by using R.
+
+Before getting start, make sure that **CGPfunctions** has been installed and loaded onto R environment. Then, refer to [Using newggslopegraph](https://cran.r-project.org/web/packages/CGPfunctions/vignettes/Using-newggslopegraph.html) to learn more about the function. Lastly, read more about `newggslopegraph()` and its arguments by referring to this [link](https://www.rdocumentation.org/packages/CGPfunctions/versions/0.6.3/topics/newggslopegraph).
+
+### **17.6.1 Step 1: Data Import**
+
+Import the rice data set into R environment by using the code chunk below.
+
+```{r}
+rice <- read_csv("data/rice.csv")
+```
+
+### **17.6.2 Step 2: Plotting the slopegraph**
+
+Next, code chunk below will be used to plot a basic slopegraph as shown below.
+
+```{r}
+rice %>% 
+  mutate(Year = factor(Year)) %>%
+  filter(Year %in% c(1961, 1980)) %>%
+  newggslopegraph(Year, Yield, Country,
+                Title = "Rice Yield of Top 11 Asian Counties",
+                SubTitle = "1961-1980",
+                Caption = "Prepared by: Liang Xiuhao")
+```
+
+::: callout-tip
+## Thing to learn from the code chunk above
+
+For effective data visualisation design, `factor()` is used convert the value type of *Year* field from numeric to factor.
+:::
+
