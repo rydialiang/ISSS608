@@ -122,6 +122,7 @@ unique_edges_type
 ```
 
 ## 1.6 Aggregating weight for edges
+
 To get aggregated weight for the edges by unique source, target and type.
 
 ```{r}
@@ -137,7 +138,6 @@ mc2_edges_agg <-
   ungroup
 ```
 
-
 ## 2.0 Task 1
 
 ## 2.1 Flow of fishing vessels
@@ -149,7 +149,6 @@ transaction_edges <- mc2_edges_raw %>%
   filter(type == "Event.Transaction")
 ```
 
-
 ```{r}
 transaction_edges_agg <-
   transaction_edges  %>%
@@ -159,7 +158,6 @@ transaction_edges_agg <-
   filter(source!=target) %>% 
   ungroup
 ```
-
 
 ```{r}
 fishing_vessels_nodes <- mc2_nodes_raw %>% 
@@ -233,14 +231,14 @@ cargo_list <- cargo_port_list %>%
   rename(cargo = source, city = target)
 
 ```
+
 ```{r}
 delivery_nodes <- mc2_nodes_raw %>% 
   filter(type == "Entity.Document.DeliveryReport")
 ```
 
-
-
 Adding quantity (qty_ton) to cargos
+
 ```{r}
 cargo_list <- delivery_nodes %>% 
   select(id,qty_tons) %>% 
@@ -248,6 +246,10 @@ cargo_list <- delivery_nodes %>%
   left_join(cargo_list)
 ```
 
+```{r}
+harbor_report <- mc2_edges_raw %>% 
+  filter(type == "Event.HarborReport")
+```
 
 ```{r}
 harbor_report <- mc2_edges_raw %>% 
@@ -266,6 +268,7 @@ cargo_list <- cargo_list %>%
 ```{r}
 colSums(is.na(cargo_list))
 ```
+
 ```{r}
 fishing_vessel_list <- fishing_vessels_nodes %>% 
   select(id) 
@@ -288,15 +291,13 @@ cargo_list <- cargo_list %>%
   left_join(transponder_location)
 ```
 
-
-
-
 ```{r}
 transponder_ping_edge <- mc2_edges_raw %>% 
   filter(type == "Event.TransportEvent.TransponderPing")
 ```
 
 Finding the vessel that enters the city same day as the cargo
+
 ```{r}
 fishing_vessel_list <- fishing_vessels_nodes %>% 
   select(id) 
@@ -320,19 +321,13 @@ vessel_city_list <- transponder_ping_edge %>%
 
 ```
 
-
-
-
 ## 3.0 Task 2
 
 Develop visualizations that illustrate the inappropriate behavior of SouthSeafood Express Corp vessels. How do their movement and catch contents compare to other fishing vessels? When and where did SouthSeafood Express Corp vessels perform their illegal fishing? How many different types of suspicious behaviors are observed? Use visual evidence to justify your conclusions.
 
-
 ## 3.1 Illegal fishing by SouthSeafood Express Corp
 
 SouthSeafood Express Corp operates two fishing vessels by the id of "snappersnatcher7be" and "roachrobberdb6".
-
-
 
 ```{r}
 transponder_ping_edge_agg <-
@@ -343,8 +338,6 @@ transponder_ping_edge_agg <-
   filter(source!=target) %>% 
   ungroup
 ```
-
-
 
 ```{r}
 transponder_ping_edge_agg %>% 
@@ -362,7 +355,6 @@ southseafood_edge <- mc2_edges_raw %>%
   filter(target %in% c("snappersnatcher7be","roachrobberdb6")) %>% 
   arrange(target,time)
 ```
-
 
 ```{r}
 ssf_edges_agg <-
@@ -386,7 +378,6 @@ id2 <- ssf_edges_agg %>%
 mc2_nodes1 <- rbind(id1,id2) %>% 
   distinct() 
 ```
-
 
 ```{r}
 ssf_graph <- tbl_graph(nodes = mc2_nodes1,
@@ -422,56 +413,14 @@ ssf_graph %>%
                  size = 3)
 ```
 
-
 ## 4.0 Task 4
 
 **The Questions**:
 
-1.  How did fishing activity change after SouthSeafood Express Corp was caught? 
+1.  How did fishing activity change after SouthSeafood Express Corp was caught?
 
 2.  What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
 
-In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. We will use this timeline as the 
+In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. We will use this timeline as the
 
-The final activities of SouthSeafood's vessels are on 2035-05-16 (snappersnatcher7be) and  2035-05-16 (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-16. 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+The final activities of SouthSeafood's vessels are on 2035-05-16 (snappersnatcher7be) and 2035-05-16 (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-16.

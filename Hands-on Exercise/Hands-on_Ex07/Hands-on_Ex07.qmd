@@ -1,0 +1,241 @@
+---
+title: "Hands-on Exercise 07: 17  Visualising and Analysing Time-oriented Data"
+author: "Liang Xiuhao"
+date: "May 29, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
+
+## **17.1 Learning Outcome**
+
+By the end of this hands-on exercise you will be able create the followings data visualisation by using R packages:
+
+-   plotting a calender heatmap by using ggplot2 functions,
+
+-   plotting a cycle plot by using ggplot2 function,
+
+-   plotting a slopegraph
+
+-   plotting a horizon chart
+
+## 17.2 Getting Started
+
+Loading the packages.
+
+```{r}
+pacman::p_load(scales, viridis, lubridate, ggthemes, gridExtra, readxl, knitr, data.table, CGPfunctions, ggHoriPlot, tidyverse)
+```
+
+## 17.3 Plotting Calendar Heatmap
+
+In this section, you will learn how to plot a calender heatmap programmatically by using ggplot2 package.
+
+![](images/clipboard-109595281.png)
+
+By the end of this section, you will be able to:
+
+-   plot a calender heatmap by using ggplot2 functions and extension,
+
+-   to write function using R programming,
+
+-   to derive specific date and time related field by using base R and lubridate packages
+
+-   to perform data preparation task by using tidyr and dplyr packages.
+
+### **17.4.1 The Data**
+
+For the purpose of this hands-on exercise, *eventlog.csv* file will be used. This data file consists of 199,999 rows of time-series cyber attack records by country.
+
+### **17.4.2 Importing the data**
+
+First, you will use the code chunk below to import *eventlog.csv* file into R environment and called the data frame as *attacks*.
+
+```{r}
+attacks <- read_csv("data/eventlog.csv")
+```
+
+### **17.4.3 Examining the data structure**
+
+It is always a good practice to examine the imported data frame before further analysis is performed.
+
+For example, *kable()* can be used to review the structure of the imported data frame.
+
+```{r}
+kable(head(attacks))
+```
+
+There are three columns, namely *timestamp*, *source_country* and *tz*.
+
+-   *timestamp* field stores date-time values in POSIXct format.
+
+-   *source_country* field stores the source of the attack. It is in *ISO 3166-1 alpha-2* country code.
+
+-   *tz* field stores time zone of the source IP address.
+
+```{r}
+glimpse(attacks)
+```
+
+### **17.4.4 Data Preparation**
+
+[**Step 1: Deriving *weekday* and *hour of day* fields**]{.underline}
+
+Before we can plot the calender heatmap, two new fields namely *wkday* and *hour* need to be derived. In this step, we will write a function to perform the task.
+
+```{r}
+make_hr_wkday <- function(ts,sc,tz){
+  real_times <- ymd_hms(ts,
+                        tz = tz[1],
+                        quiet = TRUE)
+  dt <- data.table(source_country = sc,
+                   wkday = weekdays(real_times),
+                   hour = hour(real_times))
+  return(dt)
+}
+```
+
+Understanding the code chunk:
+
+This function is named `make_hr_wkday` and it takes three arguments:
+
+1.  `ts` - A vector of timestamps.
+
+2.  `sc` - A vector indicating the source country.
+
+3.  `tz` - A vector of time zones.
+
+**Convert Timestamps to Date-Time Objects**:
+
+![](images/clipboard-4209565499.png)
+
+-   `ymd_hms` is a function from the `lubridate` package that parses date-time strings into `POSIXct` objects.
+
+-   `ts` is the input vector of timestamps.
+
+-   `tz = tz[1]` sets the time zone for the parsing. `tz[1]` means it uses the first element of the `tz` vector as the time zone.
+
+-   `quiet = TRUE` suppresses warning messages during parsing.
+
+**Create a Data Table:**
+
+![](images/clipboard-2219093599.png)
+
+-   `data.table` is a function from the `data.table` package, which creates a data table (an enhanced data frame).
+
+-   `source_country` = `sc` assigns the `sc` vector to a column named `source_country`.
+
+-   `wkday = weekdays(real_times)` extracts the weekday names from `real_times` and assigns them to a column named `wkday`.
+
+-   `hour = hour(real_times)` extracts the hour part of the `real_times` and assigns it to a column named `hour`.
+
+**Return the Data Table**:
+
+![](images/clipboard-843887728.png)
+
+-   The function returns the data table `dt`.
+
+[**Step 2: Deriving the attacks tibble data frame**]{.underline}
+
+```{r}
+wkday_levels <- c('Saturday', 'Friday', 
+                  'Thursday', 'Wednesday', 
+                  'Tuesday', 'Monday', 
+                  'Sunday')
+
+attacks <- attacks %>%
+  group_by(tz) %>%
+  do(make_hr_wkday(.$timestamp, 
+                   .$source_country, 
+                   .$tz)) %>% 
+  ungroup() %>% 
+  mutate(wkday = factor(
+    wkday, levels = wkday_levels),
+    hour  = factor(
+      hour, levels = 0:23))
+```
+
+**Define `wkday_levels`**:
+
+![](images/clipboard-390516883.png)
+
+This line defines a character vector `wkday_levels` that specifies a custom ordering of the days of the week, starting with Saturday and ending with Sunday.
+
+**Pipeline to Process the `attacks` Data Frame**:
+
+1.  **Group by Time Zone (`tz`)**:
+
+    -   This groups the `attacks` data frame by the `tz` (time zone) column.
+
+    -   The subsequent operations will be performed separately for each time zone group.
+
+2.  **Apply `make_hr_wkday` to Each Group**:
+
+    -   `do` applies the `make_hr_wkday` function to each group.
+    -   `.$timestamp`, `.$source_country`, and `.$tz` refer to the respective columns within each group.
+
+3.  **Ungroup the Data**:
+
+    -   This removes the grouping, resulting in a single, unified data frame.
+
+4.  **Mutate to Create Factors for `wkday` and `hour`**:
+
+    -   `wkday = factor(wkday, levels = wkday_levels)` converts the `wkday` column to a factor with levels ordered according to `wkday_levels`.
+
+    ```{=html}
+    <!-- -->
+    ```
+    -   `hour = factor(hour, levels = 0:23)` converts the `hour` column to a factor with levels from 0 to 23.
+
+Table below shows the tidy tibble table after processing.
+
+```{r}
+kable(head(attacks))
+```
+
+### **17.4.5 Building the Calendar Heatmaps**
+
+```{r}
+grouped <- attacks %>% 
+  count(wkday, hour) %>% 
+  ungroup() %>%
+  na.omit()
+
+ggplot(grouped, 
+       aes(hour, 
+           wkday, 
+           fill = n)) + 
+geom_tile(color = "white", 
+          size = 0.1) + 
+theme_tufte(base_family = "Helvetica") + 
+coord_equal() +
+scale_fill_gradient(name = "# of attacks",
+                    low = "sky blue", 
+                    high = "dark blue") +
+labs(x = NULL, 
+     y = NULL, 
+     title = "Attacks by weekday and time of day") +
+theme(axis.ticks = element_blank(),
+      plot.title = element_text(hjust = 0.5),
+      legend.title = element_text(size = 8),
+      legend.text = element_text(size = 6) )
+```
+
+::: callout-tip
+-   a tibble data table called *grouped* is derived by aggregating the attack by *wkday* and *hour* fields.
+
+-   a new field called *n* is derived by using `group_by()` and `count()` functions.
+
+-   `na.omit()` is used to exclude missing value.
+
+-   `geom_tile()` is used to plot tiles (grids) at each x and y position. `color` and `size` arguments are used to specify the border color and line size of the tiles.
+
+-   [`theme_tufte()`](https://jrnold.github.io/ggthemes/reference/theme_tufte.html) of [**ggthemes**](https://jrnold.github.io/ggthemes/reference/) package is used to remove unnecessary chart junk. To learn which visual components of default ggplot2 have been excluded, you are encouraged to comment out this line to examine the default plot.
+
+-   `coord_equal()` is used to ensure the plot will have an aspect ratio of 1:1.
+
+-   `scale_fill_gradient()` function is used to creates a two colour gradient (low-high).
+:::
