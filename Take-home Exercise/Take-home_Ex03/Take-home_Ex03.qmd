@@ -37,7 +37,7 @@ FishEye analysts need your help to perform geographic and temporal analysis of t
 ```{r}
 pacman::p_load(tidyverse, jsonlite, DT, lubridate,
                igraph, tidygraph, ggraph, 
-               visNetwork, sf)
+               visNetwork, sf, fuzzyjoin)
 ```
 
 ## 1.2 Loading the Data
@@ -424,18 +424,24 @@ vessel_location <- mc2_edges %>%
   mutate(next_time = ifelse(lead(target) == target, lead(time), NA)) %>% 
   mutate(next_time = as_datetime(next_time))   %>% 
   mutate(end_time = time + dwell)
+
+vessel_location_city <- vessel_location %>% 
+  filter(source %in% c("City of Haacklee",
+                       "City of Lomark",
+                       "City of Himark",
+                       "City of Paackland",
+                       "City of South Paackland",
+                       "City of Port Grove"))
 ```
 
-Left join the cargo list and vessel location by time.
 
-```{r}
-cargo_list %>%
-  left_join(vessel_location, by = cross_join()) %>%
-  rowwise() %>%
-  mutate(is_in_range = date >= start_time & date <= end_time) %>%
-  ungroup() %>%
-  filter(is_in_range)
-```
+
+
+
+
+
+
+
 
 
 
