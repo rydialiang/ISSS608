@@ -311,7 +311,7 @@ Next, we will extract the harbor report edges from mc2_edges, by filtering the "
 
 ```{r}
 harbor_report_edges <- mc2_edges %>% 
-  filter(event3 %in% c("HarborReport"))
+  filter(event2 %in% c("HarborReport"))
 ```
 
 ### 1.5.3 Harbor Import Records
@@ -361,9 +361,9 @@ In this section, we focus on a few key areas to understand how the commercially 
 2.  Which vessels deliver which products and when?
 3.  Examine the seasonal trends and anomalies in the port exit records
 
-## 2.1 Associating the Vessels and their Probable Cargoes
+## 2.1 Associating the vessels with their probable cargoes
 
-To find out which commodity goes to which ports, we first create a cargo list that links the cargo to the cities and commodities.
+To find out which commodity goes to which ports, we first create a cargo list that links the cargo to the cities and commodities. At the same time, we also clean up the name of the fish, leaving only its common name in the "name" column, by removing all the characters after the "/".
 
 ```{r}
 cargo_port_list <- harbor_import_records_edges %>% 
@@ -394,14 +394,137 @@ cargo_list <- cargo_port_list %>%
 cargo_list<- harbor_import_records_nodes %>% 
   rename(commodity = id) %>% 
   select(name, commodity) %>% 
-  left_join(cargo_list)
+  left_join(cargo_list) %>% 
+  mutate(name = str_replace(name, "/.*", ""))
 
+cargo_list<- harbor_import_records_nodes %>% 
+  select(id,qty_tons) %>% 
+  rename(cargo = id) %>% 
+  left_join(cargo_list,
+            unmatched = "drop") %>%
+  filter(if_all(c(qty_tons), ~ !is.na(.)))
+```
+
+## 2.3 Examine the seasonal trends and anomalies in the port exit records
+
+We examine the cargo_list and realised that there are some records that shows negative tonnage for their cargoes. This is abnormal as all cargoes should have positive qty_tons value. 
+
+```{r}
+negative_ton_cargo_by_city <- cargo_list %>% 
+  filter(qty_tons <= 0) %>% 
+  arrange(qty_tons) %>% 
+  group_by(city) %>% 
+  summarise(total_qty_ton_neg = sum(qty_tons)) %>% 
+  arrange(total_qty_ton_neg)
+
+positive_ton_cargo_by_city <- cargo_list %>% 
+  filter(qty_tons > 0) %>% 
+  arrange(qty_tons) %>% 
+  group_by(city) %>% 
+  summarise(total_qty_ton_pos = sum(qty_tons)) %>% 
+  arrange(desc(total_qty_ton_pos))
+
+negative_ton_cargo_by_city 
+positive_ton_cargo_by_city
 ```
 
 ```{r}
-cargo_list
+positive_ton_cargo_by_city$city <- factor(positive_ton_cargo_by_city$city, 
+                                           levels = rev(positive_ton_cargo_by_city$city[order(positive_ton_cargo_by_city$total_qty_ton_pos)]))
+
+ggplot(positive_ton_cargo_by_city, aes(x = city)) +
+  geom_bar(aes(y = total_qty_ton_pos), 
+           stat = "identity", 
+           position = "dodge", fill = "blue", alpha = 0.6) +  # Positive quantities
+  labs(title = "Quantities by City",
+       x = "City",
+       y = "Total Quantity (tons)") +
+  theme_minimal()
+```
+There seems to be suspicious activities going on at each cities when we look at the negative values in qty_ton.
+
+```{r}
+negative_ton_cargo_by_city
+```
+Next, we will remove the negative quantity and then find the aggregated value by the type of fish, the city, and the date of transaction.
+
+```{r}
+fish_by_port_agg <- cargo_list %>%
+  distinct() %>%
+  filter(qty_tons > 0) %>% 
+  group_by(name, city, date) %>%
+  summarise(total_qty_ton = sum(qty_tons)) %>%
+  ungroup() %>%
+  mutate(month = month(date)) 
+```
+```{r}
+# Create an overall Oceanus heat map for all types of fish
+fish_agg <- fish_by_port_agg  %>%
+  distinct() %>%
+  group_by(name,month) %>%
+  summarise(total_qty_ton = sum(total_qty_ton))
+
+ggplot(fish_agg, aes(x = month, y = name, fill = total_qty_ton)) +
+    geom_tile(color = "white") +
+    scale_fill_gradient(low = "white", high = "blue") +
+    labs(title = paste("Calendar Heatmap for fish in Oceanus"),
+         x = "Month of the Year",
+         y = "Fish Type",
+         fill = "Total Quantity (tons)") +
+    theme_minimal()
+```
+
+
+```{r}
+# Function to create a calendar heat map
+create_heatmap <- function(data, city, f) {
+  ggplot(data, aes(x = month, y = name, fill = total_qty_ton)) +
+    geom_tile(color = "white") +
+    scale_fill_gradient(low = "white", high = "blue") +
+    labs(title = paste("Calendar Heatmap for fish in", city),
+         x = "Month of the Year",
+         y = "Fish Type",
+         fill = "Total Quantity (tons)") +
+    theme_minimal()
+}
 ```
 
 ```{r}
+# Create an empty list to store heatmaps
+heatmaps <- list()
 
+# Iterate over each city
+cities <- unique(cargo_list$city)
+for (c in cities) {
+  # Filter the data for the current city
+  heatmap_data <- fish_by_port_agg %>% 
+    filter(city == c)
+  
+  # Create the heatmap for the current city
+  heatmap <- create_heatmap(heatmap_data, c, name)
+  
+  # Store the heatmap in the list
+  heatmaps[[c]] <- heatmap
+}
+
+# Print or visualize the heatmaps
+for (c in cities) {
+  print(heatmaps[[c]])
+}
 ```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
