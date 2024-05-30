@@ -405,6 +405,95 @@ cargo_list<- harbor_import_records_nodes %>%
   filter(if_all(c(qty_tons), ~ !is.na(.)))
 ```
 
+**Matching the vessel with the cargo list** 
+
+We first single out all the fishing vessels from mc2_edges and define the fishing vessel location, start time and end time of the vessels in the particular location. 
+
+```{r}
+fishing_vessel_list <- mc2_nodes %>% 
+  filter(entity3 == "FishingVessel") %>% 
+  select(id) 
+
+fishing_vessel_list <- as.list(fishing_vessel_list)
+
+vessel_location <- mc2_edges %>% 
+  filter(event3 == "TransponderPing") %>%
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
+  select(source, target, time, dwell) %>% 
+  arrange(target,time) %>% 
+  mutate(next_time = ifelse(lead(target) == target, lead(time), NA)) %>% 
+  mutate(next_time = as_datetime(next_time))   %>% 
+  mutate(end_time = time + dwell)
+```
+
+Left join the cargo list and vessel location by time.
+
+```{r}
+cargo_list %>%
+  left_join(vessel_location, by = cross_join()) %>%
+  rowwise() %>%
+  mutate(is_in_range = date >= start_time & date <= end_time) %>%
+  ungroup() %>%
+  filter(is_in_range)
+```
+
+
+
+
+Finding anomalies in vessel movement by comparing end time (calculated by dwell) with next time (the next time the vessel is detected at the next location). 
+
+```{r}
+ab_vessel_mvmt <- vessel_location %>%
+  mutate(time = ymd_hms(time)) %>% 
+  mutate(next_time = ymd_hms(next_time)) %>% 
+  mutate(end_time = ymd_hms(end_time)) %>% 
+  filter(end_time != next_time) 
+
+ab_vessel_mvmt_agg <- ab_vessel_mvmt %>% 
+  distinct() %>% 
+  group_by(source) %>% 
+  summarise(weights = n()) %>%
+  arrange(desc(weights))
+```
+
+
+
+**Overview of Harbor Report**
+
+```{r}
+distinct_harbor_report <- harbor_report_edges %>% 
+  select(source,target,date) %>% 
+  filter(source %in% unlist(fishing_vessel_list)) %>%
+  distinct() %>% 
+  arrange(source, date) %>%
+  mutate(target = fct_infreq(target))
+```
+
+```{r}
+ggplot(distinct_harbor_report) +
+  geom_bar(aes(x = target))
+```
+
+**Overview of Vessels Location by Transponder Ping**
+
+```{r}
+transponder_location <- mc2_edges %>% 
+  filter(event3 == "TransponderPing") %>%
+  filter(target %in% unlist(fishing_vessel_list)) %>%
+  filter(source %in% c("City of Haacklee",
+                       "City of Lomark",
+                       "City of Himark",
+                       "City of Paackland",
+                       "City of South Paackland",
+                       "City of Port Grove")) %>% 
+  select(source, target, time) %>%
+  mutate(source = fct_infreq(source))
+
+ggplot(transponder_location) +
+  geom_bar(aes(x = source))
+```
+A quick comparison between the two bar chart, we can conclude that port activities for fishing vessels are highest at City of Paackland and least at City of Himark. Also, there is no fishing vessels that visits City of Port Grove. 
+
 ## 2.3 Examine the seasonal trends and anomalies in the port exit records
 
 We examine the cargo_list and realised that there are some records that shows negative tonnage for their cargoes. This is abnormal as all cargoes should have positive qty_tons value. 
@@ -437,7 +526,7 @@ ggplot(positive_ton_cargo_by_city, aes(x = city)) +
            stat = "identity", 
            position = "dodge", fill = "blue", alpha = 0.6) +  # Positive quantities
   labs(title = "Quantities by City",
-       x = "City",
+       x = "",
        y = "Total Quantity (tons)") +
   theme_minimal()
 ```
