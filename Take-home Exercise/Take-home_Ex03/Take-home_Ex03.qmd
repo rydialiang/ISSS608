@@ -207,7 +207,7 @@ mc2_nodes <- mc2_nodes %>%
 
 ### 1.4.4 Splitting words in `type` column
 
-Details on the code chunk can be found in section 1.3.4. After splitting the words in `type` column, a physical file for clean mc2_nodes is saved in the format of R **rds**. Instead of "event", we will replace the column naming as "Entity" for mc2_nodes.
+Details on the code chunk can be found in section 1.3.4. At this point, we will not be saving the mc2_nodes as R **rds** format yet, as there are more works to be done to clean up the dataframe.
 
 ```{r}
 word_list <- strsplit(mc2_nodes$type, "\\.")
@@ -226,10 +226,35 @@ class(word_df)
 
 mc2_nodes <- mc2_nodes %>%
   cbind(word_df)
+```
 
+### 1.4.5 Tidying text field
+
+Using `mutate()` of dplyr and `gsub()` of Base R to tidy up the values in the cell. Essentially, the unwanted characters like `c`, `(`, `)`, and `\` are removed by substituting with empty value `""` for both Activities and fish_species_present columns. What is left in the columns will be characters separated by `,`. 
+
+```{r}
+mc2_nodes <- mc2_nodes %>%
+  mutate(Activities = gsub("c[(]", "", Activities)) %>% 
+  mutate(Activities = gsub("\"", "", Activities)) %>%
+  mutate(Activities = gsub("[)]", "", Activities)) 
+```
+
+```{r}
+mc2_nodes <- mc2_nodes %>%
+  mutate(fish_species_present = gsub("c[(]", "", fish_species_present)) %>% 
+  mutate(fish_species_present = gsub("\"", "", fish_species_present)) %>%
+  mutate(fish_species_present = gsub("[)]", "", fish_species_present)) 
+```
+
+Lastly, we will save the tidied mc2_nodes
+
+```{r}
 # prior to running this code, create an rds folder in data folder to ensure files are saved in the correct directory
 write_rds(mc2_nodes, "data/rds/mc2_nodes.rds")
 ```
+
+
+
 
 
 
