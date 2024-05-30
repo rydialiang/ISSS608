@@ -180,11 +180,12 @@ From the table above, beside the date data type, inappropriate field name, and t
 
 -   Some values in the Activities field are not ready to be analyse without further tidying (i.e. removing c(““)).
 
-We will first repeat the steps similar steps to wrangling the mc2_edges, before proceeding to tackle the issues for Activities and fish_species_present field. 
+We will first repeat the steps similar steps to wrangling the mc2_edges, before proceeding to tackle the issues for Activities and fish_species_present field.
 
 ### 1.4.2 Correcting the date data type with `lubridate()`
 
 Correct the date data type and take a `glimpse()` to confirm changes.
+
 ```{r}
 mc2_nodes$`_last_edited_date` <- as_datetime(mc2_nodes$`_last_edited_date`)
 mc2_nodes$`_date_added` <- as_datetime(mc2_nodes$`_date_added`)
@@ -230,7 +231,7 @@ mc2_nodes <- mc2_nodes %>%
 
 ### 1.4.5 Tidying text field
 
-Using `mutate()` of dplyr and `gsub()` of Base R to tidy up the values in the cell. Essentially, the unwanted characters like `c`, `(`, `)`, and `\` are removed by substituting with empty value `""` for both Activities and fish_species_present columns. What is left in the columns will be characters separated by `,`. 
+Using `mutate()` of dplyr and `gsub()` of Base R to tidy up the values in the cell. Essentially, the unwanted characters like `c`, `(`, `)`, and `\` are removed by substituting with empty value `""` for both Activities and fish_species_present columns. What is left in the columns will be characters separated by `,`.
 
 ```{r}
 mc2_nodes <- mc2_nodes %>%
@@ -253,31 +254,154 @@ Lastly, we will save the tidied mc2_nodes
 write_rds(mc2_nodes, "data/rds/mc2_nodes.rds")
 ```
 
+## 1.5 Extracting the required columns for each graph
 
+In this section, we will extract the required column for the following graphs:
 
+1.  Vessel Movements
 
+2.  Harbor Reports
 
+3.  Harbor Import Records
 
+### 1.5.1 Vessel Movements
 
+**Vessel Movements:** Oceanus is outfitted with a transponder/ping system named the Oceanus Vessel Locator System (OVLS).  Vessels are outfitted with a transponder and periodic 'pings' from base-stations results in a report of vessel locations at any time.  The raw ping granularity is at the minute-level but post-processing has converted it into visit/dwell times. OVLS is generally reliable, though vessel records may be missing for a variety of reasons.
 
+Node/Edge types and properties present
 
+1.  Entity.Vessel: Description of the vessel
+2.  Entity.Location: Description of a geographic location
+3.  Event.TransponderPing: Links a vessel to a location
 
+First, we will extract the relevant nodes, namely the vessels and locations from `mc2_nodes`. As we are only concerned about the fishing vessels, we will only extract values matching "Vessel" in entity2 column and values matching "FishingVessel" in entity3 column. For locations, we will match values of "Location" in entity2 column, and match values of "City", "Point" and "Region" in entity3 column.
 
+```{r}
+vessel_mvmt_nodes <- mc2_nodes %>% 
+  filter(entity2 %in% c("Vessel","Location")) %>% 
+  filter(entity3 %in% c("FishingVessel","City","Point","Region"))
+```
 
+Next, we will extract the vessel movement edges from mc2_edges, by filtering the "TransponderPing" from event3 column.
 
+```{r}
+vessel_mvmt_edges <- mc2_edges %>% 
+  filter(event3 %in% c("TransponderPing"))
+```
 
+### 1.5.2 Harbor Reports
 
+**Harbor Reports:** Harbor masters regularly report the vessels found in their purview anytime during the day.  This data is derived from a different system than OVLS (see "Vessel Movements"), though the data overlaps.  Harbor Reports are provided on a different schedule from different harbors. Since no harbor reports every day, this data has lower temporal granularity than vessel movement data. Additionally, the Harbor Master is also responsible for proximate navigational beacon(s), so this data has lower spatial granularity as well.  However, the list of vessels observed is considered canonical.
 
+Node/edge types present:
 
+1.  Entity.Vessel
 
+2.  Entity.location
 
+3.  Event.HarborReport
 
+Since the node type are the same as the vessel movements, we will make a copy of the node from vessel movement nodes.
 
+```{r}
+harbor_report_nodes <- vessel_mvmt_nodes
+```
 
+Next, we will extract the harbor report edges from mc2_edges, by filtering the "HarborReport" from event3 column.
 
+```{r}
+harbor_report_edges <- mc2_edges %>% 
+  filter(event3 %in% c("HarborReport"))
+```
 
+### 1.5.3 Harbor Import Records
 
+**Harbor Import Records**: Vessels deliver cargo to the ports, and that cargo is brought into Oceanus.  These records reflect the goods that \*leave\* the harbor to go to businesses in Oceanus or to be exported.  It was filtered pre-ingest to focus on the delivery of raw fish.  Because it is raw, fish leave the port quickly (generally one day after delivery).  Due to clerical error, the records purchased by FishEye do not include the vessel that delivered the cargo.
 
+Node/Edge types present:
 
+1.  Entity.location
 
+2.  Entity.Commodity.Fish
 
+3.  Entity.Document.DeliveryReport
+
+4.  Event.Transaction
+
+First, we will extract the relevant nodes, namely the location, commodity.fish and document.delivery report from `mc2_nodes`.
+
+```{r}
+harbor_import_records_nodes <- mc2_nodes %>% 
+  filter(entity2 %in% c("Location","Commodity","Document"))
+```
+
+Next, we will extract harbor import records edges, by filtering the event2 with value of "Transaction".
+
+```{r}
+harbor_import_records_edges <- mc2_edges %>% 
+  filter(event2 == "Transaction")
+```
+
+Before we move on to exploring the data, we will save the 3 sources edges and nodes tibble data frame as R **rds** format in the data/rds folder:
+
+```{r}
+write_rds(vessel_mvmt_nodes, "data/rds/vessel_mvmt_nodes.rds")
+write_rds(vessel_mvmt_edges, "data/rds/vessel_mvmt_edges.rds")
+write_rds(harbor_report_nodes, "data/rds/harbor_report_nodes.rds")
+write_rds(harbor_report_edges, "data/rds/harbor_report_edges.rds")
+write_rds(harbor_import_records_nodes, "data/rds/harbor_import_records_nodes.rds")
+write_rds(harbor_import_records_edges, "data/rds/harbor_import_records_edges.rds")
+```
+
+## 2.0 Task 1: Flow of Commercially Caught Fish
+
+In this section, we focus on a few key areas to understand how the commercially caught fish flows from the vessels through the various ports:
+
+1.  Associating the vessels with their probable cargoes
+2.  Which vessels deliver which products and when?
+3.  Examine the seasonal trends and anomalies in the port exit records
+
+## 2.1 Associating the Vessels and their Probable Cargoes
+
+To find out which commodity goes to which ports, we first create a cargo list that links the cargo to the cities and commodities.
+
+```{r}
+cargo_port_list <- harbor_import_records_edges %>% 
+  select(source,target) %>% 
+  filter(target %in% c("City of Haacklee",
+                       "City of Lomark",
+                       "City of Himark",
+                       "City of Paackland",
+                       "City of South Paackland",
+                       "City of Port Grove"))
+
+cargo_commodity_list <- harbor_import_records_edges %>% 
+  select(source,target) %>% 
+  filter(!target %in% c("City of Haacklee",
+                       "City of Lomark",
+                       "City of Himark",
+                       "City of Paackland",
+                       "City of South Paackland",
+                       "City of Port Grove")) %>% 
+  rename(commodity = target)
+
+cargo_list <- cargo_port_list %>% 
+  left_join(cargo_commodity_list) %>%
+  left_join(harbor_import_records_edges) %>% 
+  select(source, target, commodity, date) %>% 
+  rename(cargo = source, city = target) 
+
+cargo_list<- harbor_import_records_nodes %>% 
+  rename(commodity = id) %>% 
+  select(name, commodity) %>% 
+  left_join(cargo_list)
+
+```
+
+```{r}
+cargo_list
+```
+
+```{r}
+
+```
