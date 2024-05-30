@@ -315,7 +315,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#task-1-flow-of-commercially-caught-fish" id="toc-task-1-flow-of-commercially-caught-fish" class="nav-link" data-scroll-target="#task-1-flow-of-commercially-caught-fish">2.0 Task 1: Flow of Commercially Caught Fish</a></li>
   <li><a href="#associating-the-vessels-with-their-probable-cargoes" id="toc-associating-the-vessels-with-their-probable-cargoes" class="nav-link" data-scroll-target="#associating-the-vessels-with-their-probable-cargoes">2.1 Associating the vessels with their probable cargoes</a></li>
   <li><a href="#examine-the-seasonal-trends-and-anomalies-in-the-port-exit-records" id="toc-examine-the-seasonal-trends-and-anomalies-in-the-port-exit-records" class="nav-link" data-scroll-target="#examine-the-seasonal-trends-and-anomalies-in-the-port-exit-records">2.3 Examine the seasonal trends and anomalies in the port exit records</a></li>
-  <li><a href="#understanding-the-types-of-fish-that-should-be-in-the-market" id="toc-understanding-the-types-of-fish-that-should-be-in-the-market" class="nav-link" data-scroll-target="#understanding-the-types-of-fish-that-should-be-in-the-market">2.3.1 <strong>Understanding the types of fish that should be in the market</strong></a></li>
+  <li><a href="#understanding-the-types-of-fish-that-should-not-be-in-the-market" id="toc-understanding-the-types-of-fish-that-should-not-be-in-the-market" class="nav-link" data-scroll-target="#understanding-the-types-of-fish-that-should-not-be-in-the-market">2.3.1 <strong>Understanding the types of fish that should not be in the market</strong></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -887,15 +887,18 @@ $ fish_species_present &lt;list&gt; &lt;NULL&gt;, &lt;NULL&gt;, &lt;NULL&gt;, &l
 <span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(qty_tons <span class="sc">&gt;</span> <span class="dv">0</span>) <span class="sc">%&gt;%</span> </span>
 <span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name, city, date) <span class="sc">%&gt;%</span></span>
 <span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_qty_ton =</span> <span class="fu">sum</span>(qty_tons)) <span class="sc">%&gt;%</span></span>
-<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(date)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">%&gt;%</span> </span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(date, </span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>                       <span class="at">label =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a>                       <span class="at">abbr =</span> <span class="cn">TRUE</span>))</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
+<p>Secondly, when we observe the heatmap, we also realised that the data only covers the month from Feb to Nov in year 2035.</p>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb43"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an overall Oceanus heat map for all types of fish</span></span>
 <span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>fish_agg <span class="ot">&lt;-</span> fish_by_port_agg  <span class="sc">%&gt;%</span></span>
 <span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
 <span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name,month) <span class="sc">%&gt;%</span></span>
-<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_qty_ton =</span> <span class="fu">sum</span>(total_qty_ton))</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_qty_ton =</span> <span class="fu">sum</span>(total_qty_ton)) </span>
 <span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(fish_agg, <span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> name, <span class="at">fill =</span> total_qty_ton)) <span class="sc">+</span></span>
 <span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
@@ -985,8 +988,8 @@ $ fish_species_present &lt;list&gt; &lt;NULL&gt;, &lt;NULL&gt;, &lt;NULL&gt;, &l
 </div>
 </div>
 </section>
-<section id="understanding-the-types-of-fish-that-should-be-in-the-market" class="level2">
-<h2 class="anchored" data-anchor-id="understanding-the-types-of-fish-that-should-be-in-the-market">2.3.1 <strong>Understanding the types of fish that should be in the market</strong></h2>
+<section id="understanding-the-types-of-fish-that-should-not-be-in-the-market" class="level2">
+<h2 class="anchored" data-anchor-id="understanding-the-types-of-fish-that-should-not-be-in-the-market">2.3.1 <strong>Understanding the types of fish that should not be in the market</strong></h2>
 <div class="cell">
 <div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>region_fish_species <span class="ot">&lt;-</span> mc2_nodes <span class="sc">%&gt;%</span> </span>
 <span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(entity3 <span class="sc">==</span> <span class="st">"Region"</span>) <span class="sc">%&gt;%</span> </span>
@@ -1143,6 +1146,32 @@ $ fish_species_present &lt;list&gt; &lt;NULL&gt;, &lt;NULL&gt;, &lt;NULL&gt;, &l
 </div>
 </div>
 </div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb54"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb54-1"><a href="#cb54-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an overall Oceanus heat map for all types of fish</span></span>
+<span id="cb54-2"><a href="#cb54-2" aria-hidden="true" tabindex="-1"></a>fish_agg <span class="ot">&lt;-</span> fish_by_port_agg  <span class="sc">%&gt;%</span> </span>
+<span id="cb54-3"><a href="#cb54-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Sockfish"</span>, <span class="st">"Offidiaa"</span>, <span class="st">"Helenaa"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb54-4"><a href="#cb54-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb54-5"><a href="#cb54-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name,month) <span class="sc">%&gt;%</span></span>
+<span id="cb54-6"><a href="#cb54-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_qty_ton =</span> <span class="fu">sum</span>(total_qty_ton))</span>
+<span id="cb54-7"><a href="#cb54-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb54-8"><a href="#cb54-8" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(fish_agg, <span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> name, <span class="at">fill =</span> total_qty_ton)) <span class="sc">+</span></span>
+<span id="cb54-9"><a href="#cb54-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb54-10"><a href="#cb54-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb54-11"><a href="#cb54-11" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Calendar Heatmap for fish in Oceanus"</span>),</span>
+<span id="cb54-12"><a href="#cb54-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Month of the Year"</span>,</span>
+<span id="cb54-13"><a href="#cb54-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Fish Type"</span>,</span>
+<span id="cb54-14"><a href="#cb54-14" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> <span class="st">"Total Quantity (tons)"</span>) <span class="sc">+</span></span>
+<span id="cb54-15"><a href="#cb54-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-39-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From this heatmap above, we understand that there is an abnormal increase in Sockfish catch from May onwards, and abnormal increase in Offidiaa catch from September onwards , which are species unique to the Don Limpet Preserve and Ghoti Preserve respectively.</p>
+<p>Probable reason for this is that since SouthSeafood Express Corp was caught in mid-May for illegal fishing in Ghoti Preserve, other illegal fishing vessels made a switch to Don Limpet Reserves to fish.</p>
 
 
 </section>

@@ -454,15 +454,19 @@ fish_by_port_agg <- cargo_list %>%
   filter(qty_tons > 0) %>% 
   group_by(name, city, date) %>%
   summarise(total_qty_ton = sum(qty_tons)) %>%
-  ungroup() %>%
-  mutate(month = month(date)) 
+  ungroup() %>% 
+  mutate(month = month(date, 
+                       label = TRUE, 
+                       abbr = TRUE))
 ```
+Secondly, when we observe the heatmap, we also realised that the data only covers the month from Feb to Nov in year 2035. 
+
 ```{r}
 # Create an overall Oceanus heat map for all types of fish
 fish_agg <- fish_by_port_agg  %>%
   distinct() %>%
   group_by(name,month) %>%
-  summarise(total_qty_ton = sum(total_qty_ton))
+  summarise(total_qty_ton = sum(total_qty_ton)) 
 
 ggplot(fish_agg, aes(x = month, y = name, fill = total_qty_ton)) +
     geom_tile(color = "white") +
@@ -513,7 +517,7 @@ for (c in cities) {
 }
 ```
 
-## 2.3.1 **Understanding the types of fish that should be in the market**
+## 2.3.1 **Understanding the types of fish that should not be in the market**
 
 ```{r}
 region_fish_species <- mc2_nodes %>% 
@@ -603,9 +607,27 @@ for (c in cities) {
 }
 ```
 
+```{r}
+# Create an overall Oceanus heat map for all types of fish
+fish_agg <- fish_by_port_agg  %>% 
+  filter(name %in% c("Sockfish", "Offidiaa", "Helenaa")) %>% 
+  distinct() %>%
+  group_by(name,month) %>%
+  summarise(total_qty_ton = sum(total_qty_ton))
 
+ggplot(fish_agg, aes(x = month, y = name, fill = total_qty_ton)) +
+    geom_tile(color = "white") +
+    scale_fill_gradient(low = "white", high = "blue") +
+    labs(title = paste("Calendar Heatmap for fish in Oceanus"),
+         x = "Month of the Year",
+         y = "Fish Type",
+         fill = "Total Quantity (tons)") +
+    theme_minimal()
+```
 
+From this heatmap above, we understand that there is an abnormal increase in Sockfish catch from May onwards, and abnormal increase in Offidiaa catch from September onwards , which are species unique to the Don Limpet Preserve and Ghoti Preserve respectively. 
 
+Probable reason for this is that since SouthSeafood Express Corp was caught in mid-May for illegal fishing in Ghoti Preserve, other illegal fishing vessels made a switch to Don Limpet Reserves to fish. 
 
 
 
