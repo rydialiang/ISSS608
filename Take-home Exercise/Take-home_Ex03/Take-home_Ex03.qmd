@@ -513,12 +513,95 @@ for (c in cities) {
 }
 ```
 
+## 2.3.1 **Understanding the types of fish that should be in the market**
 
+```{r}
+region_fish_species <- mc2_nodes %>% 
+  filter(entity3 == "Region") %>% 
+  select(Name, fish_species_present, Activities, kind)
+```
 
+```{r}
+word_list <- strsplit(region_fish_species$fish_species_present, "\\,")
 
+max_elements <- max(lengths(word_list))
 
+word_list_padded <- lapply(word_list, 
+function(x) c(x, rep(NA, max_elements - length(x))))
 
+word_df <- do.call(rbind, word_list_padded)
+colnames(word_df) <- paste0("species", 1:max_elements) 
 
+word_df <- as_tibble(word_df) %>% 
+  mutate(species1 = str_replace(species1, "/.*", "")) %>% 
+  mutate(species2 = str_replace(species2, "/.*", "")) %>% 
+  mutate(species3 = str_replace(species3, "/.*", "")) %>% 
+  mutate(species4 = str_replace(species4, "/.*", "")) %>% 
+  mutate(species5 = str_replace(species5 , "/.*", "")) %>%
+  mutate_at(vars(species1:species5), trimws)
+class(word_df)
+
+region_fish_species <- region_fish_species %>%
+  cbind(word_df) 
+  
+region_fish_species
+```
+```{r}
+# Convert data to long format
+region_fish_species_long <- pivot_longer(region_fish_species, cols = starts_with("species"), names_to = "Species", values_to = "Presence")
+
+# Filter out empty values and trim away leading and trailing whitespace
+region_fish_species_long <- region_fish_species_long[region_fish_species_long$Presence != "", ] %>% 
+  na.omit() %>%
+  mutate_at(vars(Presence), trimws)
+```
+
+**Visualising the Species presence in each Region**
+
+```{r}
+# Order them based on 3 Preserves and 3 Fishing Ground
+desired_order <- c("Ghoti Preserve", "Nemo Reef", "Don Limpet Preserve","Cod Table", "Wrasse Beds","Tuna Shelf")  
+
+region_fish_species_long$Name <- factor(region_fish_species_long$Name, levels = desired_order)
+
+ggplot(region_fish_species_long, aes(x = Name, 
+                                     y = Presence,
+                                     colour = Presence)) +
+  geom_point() +
+  labs(title = "Species Presence by Name",
+       x = "Name",
+       y = "Species") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+From the above visualisation, we can derive that Sockfish, Offidiaa, and Helenaa species can only be found in the preserves but not in the fishing grounds. Therefore, any cargoes that contains these fish species would have fished illegal. Below shows the visualisation of the species and qty_ton that flows through each city by months. 
+
+```{r}
+# Create an empty list to store heatmaps
+heatmaps <- list()
+
+# Iterate over each city
+cities <- unique(cargo_list$city)
+for (c in cities) {
+  # Filter the data for the current city
+  heatmap_data <- fish_by_port_agg %>% 
+    filter(city == c) %>% 
+    filter(name %in% c("Sockfish", "Offidiaa", "Helenaa"))
+  
+  # Create the heatmap for the current city
+  heatmap <- create_heatmap(heatmap_data, c, name)
+  
+  # Store the heatmap in the list
+  heatmaps[[c]] <- heatmap
+}
+
+# Print or visualize the heatmaps
+for (c in cities) {
+  print(heatmaps[[c]])
+}
+```
 
 
 

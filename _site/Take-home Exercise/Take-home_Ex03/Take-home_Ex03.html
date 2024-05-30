@@ -315,6 +315,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#task-1-flow-of-commercially-caught-fish" id="toc-task-1-flow-of-commercially-caught-fish" class="nav-link" data-scroll-target="#task-1-flow-of-commercially-caught-fish">2.0 Task 1: Flow of Commercially Caught Fish</a></li>
   <li><a href="#associating-the-vessels-with-their-probable-cargoes" id="toc-associating-the-vessels-with-their-probable-cargoes" class="nav-link" data-scroll-target="#associating-the-vessels-with-their-probable-cargoes">2.1 Associating the vessels with their probable cargoes</a></li>
   <li><a href="#examine-the-seasonal-trends-and-anomalies-in-the-port-exit-records" id="toc-examine-the-seasonal-trends-and-anomalies-in-the-port-exit-records" class="nav-link" data-scroll-target="#examine-the-seasonal-trends-and-anomalies-in-the-port-exit-records">2.3 Examine the seasonal trends and anomalies in the port exit records</a></li>
+  <li><a href="#understanding-the-types-of-fish-that-should-be-in-the-market" id="toc-understanding-the-types-of-fish-that-should-be-in-the-market" class="nav-link" data-scroll-target="#understanding-the-types-of-fish-that-should-be-in-the-market">2.3.1 <strong>Understanding the types of fish that should be in the market</strong></a></li>
   </ul></li>
   </ul>
 </nav>
@@ -979,6 +980,165 @@ $ fish_species_present &lt;list&gt; &lt;NULL&gt;, &lt;NULL&gt;, &lt;NULL&gt;, &l
 <div>
 <figure class="figure">
 <p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-33-5.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+</section>
+<section id="understanding-the-types-of-fish-that-should-be-in-the-market" class="level2">
+<h2 class="anchored" data-anchor-id="understanding-the-types-of-fish-that-should-be-in-the-market">2.3.1 <strong>Understanding the types of fish that should be in the market</strong></h2>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb46"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>region_fish_species <span class="ot">&lt;-</span> mc2_nodes <span class="sc">%&gt;%</span> </span>
+<span id="cb46-2"><a href="#cb46-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(entity3 <span class="sc">==</span> <span class="st">"Region"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb46-3"><a href="#cb46-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Name, fish_species_present, Activities, kind)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb47"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb47-1"><a href="#cb47-1" aria-hidden="true" tabindex="-1"></a>word_list <span class="ot">&lt;-</span> <span class="fu">strsplit</span>(region_fish_species<span class="sc">$</span>fish_species_present, <span class="st">"</span><span class="sc">\\</span><span class="st">,"</span>)</span>
+<span id="cb47-2"><a href="#cb47-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-3"><a href="#cb47-3" aria-hidden="true" tabindex="-1"></a>max_elements <span class="ot">&lt;-</span> <span class="fu">max</span>(<span class="fu">lengths</span>(word_list))</span>
+<span id="cb47-4"><a href="#cb47-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-5"><a href="#cb47-5" aria-hidden="true" tabindex="-1"></a>word_list_padded <span class="ot">&lt;-</span> <span class="fu">lapply</span>(word_list, </span>
+<span id="cb47-6"><a href="#cb47-6" aria-hidden="true" tabindex="-1"></a><span class="cf">function</span>(x) <span class="fu">c</span>(x, <span class="fu">rep</span>(<span class="cn">NA</span>, max_elements <span class="sc">-</span> <span class="fu">length</span>(x))))</span>
+<span id="cb47-7"><a href="#cb47-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-8"><a href="#cb47-8" aria-hidden="true" tabindex="-1"></a>word_df <span class="ot">&lt;-</span> <span class="fu">do.call</span>(rbind, word_list_padded)</span>
+<span id="cb47-9"><a href="#cb47-9" aria-hidden="true" tabindex="-1"></a><span class="fu">colnames</span>(word_df) <span class="ot">&lt;-</span> <span class="fu">paste0</span>(<span class="st">"species"</span>, <span class="dv">1</span><span class="sc">:</span>max_elements) </span>
+<span id="cb47-10"><a href="#cb47-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb47-11"><a href="#cb47-11" aria-hidden="true" tabindex="-1"></a>word_df <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(word_df) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-12"><a href="#cb47-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species1 =</span> <span class="fu">str_replace</span>(species1, <span class="st">"/.*"</span>, <span class="st">""</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-13"><a href="#cb47-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species2 =</span> <span class="fu">str_replace</span>(species2, <span class="st">"/.*"</span>, <span class="st">""</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-14"><a href="#cb47-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species3 =</span> <span class="fu">str_replace</span>(species3, <span class="st">"/.*"</span>, <span class="st">""</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-15"><a href="#cb47-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species4 =</span> <span class="fu">str_replace</span>(species4, <span class="st">"/.*"</span>, <span class="st">""</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb47-16"><a href="#cb47-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">species5 =</span> <span class="fu">str_replace</span>(species5 , <span class="st">"/.*"</span>, <span class="st">""</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb47-17"><a href="#cb47-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">vars</span>(species1<span class="sc">:</span>species5), trimws)</span>
+<span id="cb47-18"><a href="#cb47-18" aria-hidden="true" tabindex="-1"></a><span class="fu">class</span>(word_df)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "tbl_df"     "tbl"        "data.frame"</code></pre>
+</div>
+<div class="sourceCode cell-code" id="cb49"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb49-1"><a href="#cb49-1" aria-hidden="true" tabindex="-1"></a>region_fish_species <span class="ot">&lt;-</span> region_fish_species <span class="sc">%&gt;%</span></span>
+<span id="cb49-2"><a href="#cb49-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cbind</span>(word_df) </span>
+<span id="cb49-3"><a href="#cb49-3" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb49-4"><a href="#cb49-4" aria-hidden="true" tabindex="-1"></a>region_fish_species</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 Name
+1           Cod Table
+2      Ghoti Preserve
+3         Wrasse Beds
+4           Nemo Reef
+5 Don Limpet Preserve
+6          Tuna Shelf
+                                                                                                  fish_species_present
+1                                             Cod/Gadus n.specificatae, Birdseye/Pisces frigus, Beauvoir/Habeas pisces
+2                       Wrasse/Labridae n.refert, Beauvoir/Habeas pisces, Helenaa/Pisces satis, Offidiaa/Piscis osseus
+3                                             Wrasse/Labridae n.refert, Birdseye/Pisces frigus, Beauvoir/Habeas pisces
+4 Wrasse/Labridae n.refert, Tuna/Thunnini n.vera, Birdseye/Pisces frigus, Beauvoir/Habeas pisces, Helenaa/Pisces satis
+5  Tuna/Thunnini n.vera, Birdseye/Pisces frigus, Beauvoir/Habeas pisces, Helenaa/Pisces satis, Sockfish/Pisces foetida
+6                         Tuna/Thunnini n.vera, Birdseye/Pisces frigus, Beauvoir/Habeas pisces, Harland/Piscis sapidum
+                         Activities                kind species1 species2
+1                Commercial fishing      Fishing Ground      Cod Birdseye
+2     Research, Tourism, Recreation Ecological Preserve   Wrasse Beauvoir
+3                Commercial fishing      Fishing Ground   Wrasse Birdseye
+4               Recreation, Tourism Ecological Preserve   Wrasse     Tuna
+5               Recreation, Tourism Ecological Preserve     Tuna Birdseye
+6 Commercial fishing, Sport fishing      Fishing Ground     Tuna Birdseye
+  species3 species4 species5
+1 Beauvoir     &lt;NA&gt;     &lt;NA&gt;
+2  Helenaa Offidiaa     &lt;NA&gt;
+3 Beauvoir     &lt;NA&gt;     &lt;NA&gt;
+4 Birdseye Beauvoir  Helenaa
+5 Beauvoir  Helenaa Sockfish
+6 Beauvoir  Harland     &lt;NA&gt;</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb51"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb51-1"><a href="#cb51-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Convert data to long format</span></span>
+<span id="cb51-2"><a href="#cb51-2" aria-hidden="true" tabindex="-1"></a>region_fish_species_long <span class="ot">&lt;-</span> <span class="fu">pivot_longer</span>(region_fish_species, <span class="at">cols =</span> <span class="fu">starts_with</span>(<span class="st">"species"</span>), <span class="at">names_to =</span> <span class="st">"Species"</span>, <span class="at">values_to =</span> <span class="st">"Presence"</span>)</span>
+<span id="cb51-3"><a href="#cb51-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb51-4"><a href="#cb51-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Filter out empty values and trim away leading and trailing whitespace</span></span>
+<span id="cb51-5"><a href="#cb51-5" aria-hidden="true" tabindex="-1"></a>region_fish_species_long <span class="ot">&lt;-</span> region_fish_species_long[region_fish_species_long<span class="sc">$</span>Presence <span class="sc">!=</span> <span class="st">""</span>, ] <span class="sc">%&gt;%</span> </span>
+<span id="cb51-6"><a href="#cb51-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">na.omit</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb51-7"><a href="#cb51-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate_at</span>(<span class="fu">vars</span>(Presence), trimws)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p><strong>Visualising the Species presence in each Region</strong></p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb52"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb52-1"><a href="#cb52-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Order them based on 3 Preserves and 3 Fishing Ground</span></span>
+<span id="cb52-2"><a href="#cb52-2" aria-hidden="true" tabindex="-1"></a>desired_order <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, <span class="st">"Nemo Reef"</span>, <span class="st">"Don Limpet Preserve"</span>,<span class="st">"Cod Table"</span>, <span class="st">"Wrasse Beds"</span>,<span class="st">"Tuna Shelf"</span>)  </span>
+<span id="cb52-3"><a href="#cb52-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-4"><a href="#cb52-4" aria-hidden="true" tabindex="-1"></a>region_fish_species_long<span class="sc">$</span>Name <span class="ot">&lt;-</span> <span class="fu">factor</span>(region_fish_species_long<span class="sc">$</span>Name, <span class="at">levels =</span> desired_order)</span>
+<span id="cb52-5"><a href="#cb52-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb52-6"><a href="#cb52-6" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(region_fish_species_long, <span class="fu">aes</span>(<span class="at">x =</span> Name, </span>
+<span id="cb52-7"><a href="#cb52-7" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">y =</span> Presence,</span>
+<span id="cb52-8"><a href="#cb52-8" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">colour =</span> Presence)) <span class="sc">+</span></span>
+<span id="cb52-9"><a href="#cb52-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb52-10"><a href="#cb52-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Species Presence by Name"</span>,</span>
+<span id="cb52-11"><a href="#cb52-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Name"</span>,</span>
+<span id="cb52-12"><a href="#cb52-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Species"</span>) <span class="sc">+</span></span>
+<span id="cb52-13"><a href="#cb52-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb52-14"><a href="#cb52-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb52-15"><a href="#cb52-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-37-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<p>From the above visualisation, we can derive that Sockfish, Offidiaa, and Helenaa species can only be found in the preserves but not in the fishing grounds. Therefore, any cargoes that contains these fish species would have fished illegal. Below shows the visualisation of the species and qty_ton that flows through each city by months.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb53"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb53-1"><a href="#cb53-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an empty list to store heatmaps</span></span>
+<span id="cb53-2"><a href="#cb53-2" aria-hidden="true" tabindex="-1"></a>heatmaps <span class="ot">&lt;-</span> <span class="fu">list</span>()</span>
+<span id="cb53-3"><a href="#cb53-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-4"><a href="#cb53-4" aria-hidden="true" tabindex="-1"></a><span class="co"># Iterate over each city</span></span>
+<span id="cb53-5"><a href="#cb53-5" aria-hidden="true" tabindex="-1"></a>cities <span class="ot">&lt;-</span> <span class="fu">unique</span>(cargo_list<span class="sc">$</span>city)</span>
+<span id="cb53-6"><a href="#cb53-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (c <span class="cf">in</span> cities) {</span>
+<span id="cb53-7"><a href="#cb53-7" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Filter the data for the current city</span></span>
+<span id="cb53-8"><a href="#cb53-8" aria-hidden="true" tabindex="-1"></a>  heatmap_data <span class="ot">&lt;-</span> fish_by_port_agg <span class="sc">%&gt;%</span> </span>
+<span id="cb53-9"><a href="#cb53-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(city <span class="sc">==</span> c) <span class="sc">%&gt;%</span> </span>
+<span id="cb53-10"><a href="#cb53-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(name <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Sockfish"</span>, <span class="st">"Offidiaa"</span>, <span class="st">"Helenaa"</span>))</span>
+<span id="cb53-11"><a href="#cb53-11" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb53-12"><a href="#cb53-12" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Create the heatmap for the current city</span></span>
+<span id="cb53-13"><a href="#cb53-13" aria-hidden="true" tabindex="-1"></a>  heatmap <span class="ot">&lt;-</span> <span class="fu">create_heatmap</span>(heatmap_data, c, name)</span>
+<span id="cb53-14"><a href="#cb53-14" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb53-15"><a href="#cb53-15" aria-hidden="true" tabindex="-1"></a>  <span class="co"># Store the heatmap in the list</span></span>
+<span id="cb53-16"><a href="#cb53-16" aria-hidden="true" tabindex="-1"></a>  heatmaps[[c]] <span class="ot">&lt;-</span> heatmap</span>
+<span id="cb53-17"><a href="#cb53-17" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb53-18"><a href="#cb53-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb53-19"><a href="#cb53-19" aria-hidden="true" tabindex="-1"></a><span class="co"># Print or visualize the heatmaps</span></span>
+<span id="cb53-20"><a href="#cb53-20" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> (c <span class="cf">in</span> cities) {</span>
+<span id="cb53-21"><a href="#cb53-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">print</span>(heatmaps[[c]])</span>
+<span id="cb53-22"><a href="#cb53-22" aria-hidden="true" tabindex="-1"></a>}</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-38-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-38-2.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-38-3.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-38-4.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-38-5.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
 </div>
