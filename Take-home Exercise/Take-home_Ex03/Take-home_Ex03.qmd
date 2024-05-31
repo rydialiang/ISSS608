@@ -962,6 +962,23 @@ transponder_ping_edge %>%
             size = 3)
   
 ```
+Derive monthly transponder ping:
+
+```{r}
+monthly_transponder_ping <- transponder_ping_edge %>% 
+  filter(source %in% c("Ghoti Preserve", 
+                       "Nemo Reef", 
+                       "Don Limpet Preserve",
+                       "Cod Table", 
+                       "Wrasse Beds",
+                       "Tuna Shelf")) %>% 
+  mutate(month = month(time)) %>% 
+  select(source, target, month) %>% 
+  group_by(source, month) %>% 
+  summarize(n = n()) 
+```
+
+
 
 ```{r, fig.width= 10}
 monthly_transponder_ping$month <- factor(monthly_transponder_ping$month)
