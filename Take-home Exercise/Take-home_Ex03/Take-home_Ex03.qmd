@@ -822,8 +822,22 @@ ssf_graph %>%
                  hjust = 1,
                  size = 3)
 ```
+### 3.1.1 When and where did SouthSeafood Express Corp vessels perform their illegal fishing?
 
+Since only Snapper Snatcher appears to be operating in Ghoti Preserve, we will examine this fishing vessel more closely. 
 
+```{r}
+snapper_activities <- mc2_edges %>% 
+  filter(event3 == "TransponderPing") %>% 
+  filter(target %in% c("snappersnatcher7be")) %>% 
+  filter(source == "Ghoti Preserve") %>% 
+  arrange(target,time) %>% 
+  mutate(end_time = time + dwell) %>% 
+  select(time, dwell, end_time)
+snapper_activities
+```
+
+There three instances (2,9 and 16 Feb) where Snapper Snatcher stayed at the Ghoti Preserve for over 3 days. These are the instances where SouthSeafood Express Corp's Snapper Snatcher conducted IUU Fishing in Ghoti Preserve. 
 
 
 ## 4.0 Task 4
@@ -894,6 +908,7 @@ For confirmation, we take a look at the changes to OVLS Transponder Ping, compar
 
 ```{r}
 transponder_ping_edge_long <- transponder_ping_edge %>% 
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
   filter(source %in% c("Ghoti Preserve", 
                        "Nemo Reef", 
                        "Don Limpet Preserve",
@@ -919,6 +934,7 @@ In the line graph below, we observe that the overall fishing vessels activities 
 
 ```{r}
 average <- transponder_ping_edge %>% 
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
   filter(source %in% c("Ghoti Preserve", 
                        "Nemo Reef", 
                        "Don Limpet Preserve",
@@ -935,6 +951,7 @@ transponder_ping_edge %>%
                        "Cod Table", 
                        "Wrasse Beds",
                        "Tuna Shelf")) %>%
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
   mutate(month = month(time)) %>% 
   group_by(month) %>% 
   summarise(n = as.numeric(n())) %>%
@@ -946,26 +963,28 @@ transponder_ping_edge %>%
             size = 3) +
   labs(title = "Visit Frequency to All Fishing Grounds and Preserves by Month",
        x = "Month",
-       y = "Total Count") +
+       y = "Frequency") +
   geom_hline(average, 
              yintercept = as.numeric(average), 
              color="black",
              linetype = 6) +
-  geom_point(x = 5, y = 14260,
+  geom_point(x = 5, y = 13366,
              size = 4, color = "red") +
-  geom_text(aes(x = 5, y = 14260, label = "SouthSeafood caught"),
+  geom_text(aes(x = 5, y = 13366, label = "SouthSeafood caught"),
             color = "red",
             hjust = -0.2,
             size = 3) +
-  geom_text(aes(x = 4.5, y = 12900, label = "Monthly Average"),
+  geom_text(aes(x = 4.5, y = 12000, label = "Monthly Average = 11854"),
             color = "black",
-            size = 3)
+            size = 3) +
+  theme_minimal()
   
 ```
 Derive monthly transponder ping:
 
 ```{r}
 monthly_transponder_ping <- transponder_ping_edge %>% 
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
   filter(source %in% c("Ghoti Preserve", 
                        "Nemo Reef", 
                        "Don Limpet Preserve",
@@ -1002,7 +1021,7 @@ ggplot(monthly_transponder_ping , aes(x = month,
   geom_point(size = 2) +
   facet_wrap(~ source, scales = "free_y") +  # Facet by 'source'
   theme_minimal() +
-  labs(title = "Changes in Visit Frequency by Month",
+  labs(title = "Changes in Visit Frequency by Month by Fishing Vessels",
        x = "Month",
        y = "No. of Visits",
        color = "Source") +
@@ -1028,12 +1047,13 @@ ggplot(monthly_transponder_ping , aes(x = month,
             size = 2)
 
 ```
-From the plot above, we can see that after SouthSeafood was caught in mid-May, there is a drop in activities for all the fishing grounds and preserves immediately after mid-May, except for the increase in Don Limpet Preserve. 
+From the plot above, we can see that after SouthSeafood was caught in mid-May, there is a drop in activities for all the fishing grounds and preserves immediately after mid-May, except for the increase in Don Limpet Preserve, from 1 in Mar and Jun to 2 observations in Aug.  
 
 Let's observe for month to month if the dwell time increase for Don Limpet Preserve.
 
 ```{r}
 don_monthly_transponder_ping <- transponder_ping_edge %>% 
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
   select(source, dwell, time) %>% 
   mutate(month = month(time)) %>% 
   filter(source == "Don Limpet Preserve") %>%
@@ -1049,14 +1069,16 @@ don_monthly_transponder_ping <- transponder_ping_edge %>%
               linetype = 6,
               color = "black") +
   geom_text(data = NULL, aes(label = "Trend Line"), 
-            x = 9, y = 6250000, 
+            x = 6, y = 7500, 
             angle = 15,
             hjust = -0.3, vjust = -1.5, 
             color = "black", size = 4)
   
 ```
+
 ```{r}
 nemo_monthly_transponder_ping <- transponder_ping_edge %>% 
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
   select(source, dwell, time) %>% 
   mutate(month = month(time)) %>% 
   filter(source == "Nemo Reef") %>%
@@ -1072,14 +1094,16 @@ nemo_monthly_transponder_ping <- transponder_ping_edge %>%
               linetype = 6,
               color = "black") +
   geom_text(data = NULL, aes(label = "Trend Line"), 
-            x = 5, y = 20000000, 
+            x = 5, y = 12500000, 
             angle = -15,
             hjust = 0.3, 
             color = "black", size = 4)
 
 ```
+
 ```{r}
 ghoti_monthly_transponder_ping <- transponder_ping_edge %>% 
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
   select(source, dwell, time) %>% 
   mutate(month = month(time)) %>% 
   filter(source == "Ghoti Preserve") %>%
@@ -1095,20 +1119,30 @@ ghoti_monthly_transponder_ping <- transponder_ping_edge %>%
               linetype = 6,
               color = "black") +
   geom_text(data = NULL, aes(label = "Trend Line"), 
-            x = 9.5, y = 8400000, 
-            angle = -8, 
+            x = 8, y = 5000000, 
+            angle = -5, 
             color = "black", size = 4)
 ```
 
-```{r, fig.width=6, fig.height=10}
-don_monthly_transponder_ping/nemo_monthly_transponder_ping/ghoti_monthly_transponder_ping
+```{r, fig.width=6, fig.height=6}
+nemo_monthly_transponder_ping/ghoti_monthly_transponder_ping
+```
+From the above plots, we observe that for Nemo Reef and Ghoti Preserve, the trend is downards for the amount of time spent by the fishing vessels. 
+
+```{r}
+fishing_vessels_in_don <- transponder_ping_edge %>% 
+  filter(source == "Don Limpet Preserve") %>% 
+  filter(target %in% unlist(fishing_vessel_list)) %>% 
+  select(target, dwell, date_added, time) %>% 
+  mutate(end_time = dwell + time) %>% 
+  arrange(time)
+fishing_vessels_in_don
 ```
 
+There are only 4 records of visits through the OVLS to Don Limpet, once in Mar and Jun, for about 1.5 to 2hrs each, and another 2 in Aug, for about 1.25 to 1.75 hrs each. Thire record is high inconguent to the growing number of Sockfish that are found in the delivery report from May onwards. 
 
 
-
-
-
+### 4.2 What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
 
 
 

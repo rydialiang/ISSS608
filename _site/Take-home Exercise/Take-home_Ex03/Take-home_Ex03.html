@@ -317,9 +317,15 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
   <li><a href="#examine-the-seasonal-trends-and-anomalies-in-the-port-exit-records" id="toc-examine-the-seasonal-trends-and-anomalies-in-the-port-exit-records" class="nav-link" data-scroll-target="#examine-the-seasonal-trends-and-anomalies-in-the-port-exit-records">2.3 Examine the seasonal trends and anomalies in the port exit records</a></li>
   <li><a href="#understanding-the-types-of-fish-that-should-not-be-in-the-market" id="toc-understanding-the-types-of-fish-that-should-not-be-in-the-market" class="nav-link" data-scroll-target="#understanding-the-types-of-fish-that-should-not-be-in-the-market">2.3.1 <strong>Understanding the types of fish that should not be in the market</strong></a></li>
   <li><a href="#task-2" id="toc-task-2" class="nav-link" data-scroll-target="#task-2">3.0 Task 2</a></li>
-  <li><a href="#illegal-fishing-by-southseafood-express-corp" id="toc-illegal-fishing-by-southseafood-express-corp" class="nav-link" data-scroll-target="#illegal-fishing-by-southseafood-express-corp">3.1 Illegal fishing by SouthSeafood Express Corp</a></li>
+  <li><a href="#illegal-fishing-by-southseafood-express-corp" id="toc-illegal-fishing-by-southseafood-express-corp" class="nav-link" data-scroll-target="#illegal-fishing-by-southseafood-express-corp">3.1 Illegal fishing by SouthSeafood Express Corp</a>
+  <ul class="collapse">
+  <li><a href="#when-and-where-did-southseafood-express-corp-vessels-perform-their-illegal-fishing" id="toc-when-and-where-did-southseafood-express-corp-vessels-perform-their-illegal-fishing" class="nav-link" data-scroll-target="#when-and-where-did-southseafood-express-corp-vessels-perform-their-illegal-fishing">3.1.1 When and where did SouthSeafood Express Corp vessels perform their illegal fishing?</a></li>
+  </ul></li>
   <li><a href="#task-4" id="toc-task-4" class="nav-link" data-scroll-target="#task-4">4.0 Task 4</a></li>
-  <li><a href="#changes-in-commercial-fishing" id="toc-changes-in-commercial-fishing" class="nav-link" data-scroll-target="#changes-in-commercial-fishing">4.1 Changes in Commercial Fishing</a></li>
+  <li><a href="#changes-in-commercial-fishing" id="toc-changes-in-commercial-fishing" class="nav-link" data-scroll-target="#changes-in-commercial-fishing">4.1 Changes in Commercial Fishing</a>
+  <ul class="collapse">
+  <li><a href="#what-new-behaviors-in-the-oceanus-commercial-fishing-community-are-most-suspicious-and-why" id="toc-what-new-behaviors-in-the-oceanus-commercial-fishing-community-are-most-suspicious-and-why" class="nav-link" data-scroll-target="#what-new-behaviors-in-the-oceanus-commercial-fishing-community-are-most-suspicious-and-why">4.2 What new behaviors in the Oceanus commercial fishing community are most suspicious and why?</a></li>
+  </ul></li>
   </ul></li>
   </ul>
 </nav>
@@ -1365,6 +1371,28 @@ $ fish_species_present &lt;list&gt; &lt;NULL&gt;, &lt;NULL&gt;, &lt;NULL&gt;, &l
 </div>
 </div>
 </div>
+<section id="when-and-where-did-southseafood-express-corp-vessels-perform-their-illegal-fishing" class="level3">
+<h3 class="anchored" data-anchor-id="when-and-where-did-southseafood-express-corp-vessels-perform-their-illegal-fishing">3.1.1 When and where did SouthSeafood Express Corp vessels perform their illegal fishing?</h3>
+<p>Since only Snapper Snatcher appears to be operating in Ghoti Preserve, we will examine this fishing vessel more closely.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a>snapper_activities <span class="ot">&lt;-</span> mc2_edges <span class="sc">%&gt;%</span> </span>
+<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(event3 <span class="sc">==</span> <span class="st">"TransponderPing"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(target <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"snappersnatcher7be"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">==</span> <span class="st">"Ghoti Preserve"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(target,time) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">end_time =</span> time <span class="sc">+</span> dwell) <span class="sc">%&gt;%</span> </span>
+<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(time, dwell, end_time)</span>
+<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>snapper_activities</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                 time      dwell            end_time
+1 2035-02-02 05:39:59 282000.853 2035-02-05 12:00:00
+2 2035-02-09 05:49:11 281448.765 2035-02-12 12:00:00
+3 2035-02-16 07:02:09 277070.841 2035-02-19 12:00:00
+4 2035-03-15 05:46:02   6410.348 2035-03-15 07:32:52</code></pre>
+</div>
+</div>
+<p>There three instances (2,9 and 16 Feb) where Snapper Snatcher stayed at the Ghoti Preserve for over 3 days. These are the instances where SouthSeafood Express Corp’s Snapper Snatcher conducted IUU Fishing in Ghoti Preserve.</p>
+</section>
 </section>
 <section id="task-4" class="level2">
 <h2 class="anchored" data-anchor-id="task-4">4.0 Task 4</h2>
@@ -1380,46 +1408,46 @@ $ fish_species_present &lt;list&gt; &lt;NULL&gt;, &lt;NULL&gt;, &lt;NULL&gt;, &l
 <h2 class="anchored" data-anchor-id="changes-in-commercial-fishing">4.1 Changes in Commercial Fishing</h2>
 <p>Firstly, we take a look at the species caught across the months (Feb to Nov 2035).</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb68"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb68-1"><a href="#cb68-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an overall Oceanus heat map for all types of fish</span></span>
-<span id="cb68-2"><a href="#cb68-2" aria-hidden="true" tabindex="-1"></a>fish_agg <span class="ot">&lt;-</span> fish_by_port_agg  <span class="sc">%&gt;%</span></span>
-<span id="cb68-3"><a href="#cb68-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
-<span id="cb68-4"><a href="#cb68-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name,month) <span class="sc">%&gt;%</span></span>
-<span id="cb68-5"><a href="#cb68-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_qty_ton =</span> <span class="fu">sum</span>(total_qty_ton)) </span>
-<span id="cb68-6"><a href="#cb68-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb68-7"><a href="#cb68-7" aria-hidden="true" tabindex="-1"></a>oceanus_heatmap <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(fish_agg, <span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> name, <span class="at">fill =</span> total_qty_ton)) <span class="sc">+</span></span>
-<span id="cb68-8"><a href="#cb68-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
-<span id="cb68-9"><a href="#cb68-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb68-10"><a href="#cb68-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Calendar Heatmap for fish in Oceanus"</span>),</span>
-<span id="cb68-11"><a href="#cb68-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Month of the Year"</span>,</span>
-<span id="cb68-12"><a href="#cb68-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Fish Type"</span>,</span>
-<span id="cb68-13"><a href="#cb68-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> <span class="st">"Total Quantity (tons)"</span>) <span class="sc">+</span></span>
-<span id="cb68-14"><a href="#cb68-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb68-15"><a href="#cb68-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="st">"May"</span>,<span class="at">color =</span> <span class="st">'red'</span>, <span class="at">linetype =</span> <span class="st">'dashed'</span>) <span class="sc">+</span></span>
-<span id="cb68-16"><a href="#cb68-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="st">"May"</span> , <span class="at">y =</span> <span class="st">"Offidiaa"</span>, <span class="at">label =</span> <span class="st">"SouthSeafood caught"</span>, <span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Create an overall Oceanus heat map for all types of fish</span></span>
+<span id="cb70-2"><a href="#cb70-2" aria-hidden="true" tabindex="-1"></a>fish_agg <span class="ot">&lt;-</span> fish_by_port_agg  <span class="sc">%&gt;%</span></span>
+<span id="cb70-3"><a href="#cb70-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">distinct</span>() <span class="sc">%&gt;%</span></span>
+<span id="cb70-4"><a href="#cb70-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(name,month) <span class="sc">%&gt;%</span></span>
+<span id="cb70-5"><a href="#cb70-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">total_qty_ton =</span> <span class="fu">sum</span>(total_qty_ton)) </span>
+<span id="cb70-6"><a href="#cb70-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb70-7"><a href="#cb70-7" aria-hidden="true" tabindex="-1"></a>oceanus_heatmap <span class="ot">&lt;-</span> <span class="fu">ggplot</span>(fish_agg, <span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> name, <span class="at">fill =</span> total_qty_ton)) <span class="sc">+</span></span>
+<span id="cb70-8"><a href="#cb70-8" aria-hidden="true" tabindex="-1"></a>    <span class="fu">geom_tile</span>(<span class="at">color =</span> <span class="st">"white"</span>) <span class="sc">+</span></span>
+<span id="cb70-9"><a href="#cb70-9" aria-hidden="true" tabindex="-1"></a>    <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"white"</span>, <span class="at">high =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb70-10"><a href="#cb70-10" aria-hidden="true" tabindex="-1"></a>    <span class="fu">labs</span>(<span class="at">title =</span> <span class="fu">paste</span>(<span class="st">"Calendar Heatmap for fish in Oceanus"</span>),</span>
+<span id="cb70-11"><a href="#cb70-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">x =</span> <span class="st">"Month of the Year"</span>,</span>
+<span id="cb70-12"><a href="#cb70-12" aria-hidden="true" tabindex="-1"></a>         <span class="at">y =</span> <span class="st">"Fish Type"</span>,</span>
+<span id="cb70-13"><a href="#cb70-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">fill =</span> <span class="st">"Total Quantity (tons)"</span>) <span class="sc">+</span></span>
+<span id="cb70-14"><a href="#cb70-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb70-15"><a href="#cb70-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">xintercept =</span> <span class="st">"May"</span>,<span class="at">color =</span> <span class="st">'red'</span>, <span class="at">linetype =</span> <span class="st">'dashed'</span>) <span class="sc">+</span></span>
+<span id="cb70-16"><a href="#cb70-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">annotate</span>(<span class="st">"text"</span>, <span class="at">x =</span> <span class="st">"May"</span> , <span class="at">y =</span> <span class="st">"Offidiaa"</span>, <span class="at">label =</span> <span class="st">"SouthSeafood caught"</span>, <span class="at">angle =</span> <span class="dv">90</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">hjust =</span> <span class="fl">0.5</span>, <span class="at">color =</span> <span class="st">"red"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb69"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb69-1"><a href="#cb69-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Order them based on 3 Preserves and 3 Fishing Ground</span></span>
-<span id="cb69-2"><a href="#cb69-2" aria-hidden="true" tabindex="-1"></a>desired_order <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, <span class="st">"Nemo Reef"</span>, <span class="st">"Don Limpet Preserve"</span>,<span class="st">"Cod Table"</span>, <span class="st">"Wrasse Beds"</span>,<span class="st">"Tuna Shelf"</span>)  </span>
-<span id="cb69-3"><a href="#cb69-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb69-4"><a href="#cb69-4" aria-hidden="true" tabindex="-1"></a>region_fish_species_long<span class="sc">$</span>Name <span class="ot">&lt;-</span> <span class="fu">factor</span>(region_fish_species_long<span class="sc">$</span>Name, <span class="at">levels =</span> desired_order)</span>
-<span id="cb69-5"><a href="#cb69-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb69-6"><a href="#cb69-6" aria-hidden="true" tabindex="-1"></a>species_plot <span class="ot">&lt;-</span><span class="fu">ggplot</span>(region_fish_species_long, <span class="fu">aes</span>(<span class="at">x =</span> Name, </span>
-<span id="cb69-7"><a href="#cb69-7" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">y =</span> Presence,</span>
-<span id="cb69-8"><a href="#cb69-8" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">colour =</span> Presence)) <span class="sc">+</span></span>
-<span id="cb69-9"><a href="#cb69-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb69-10"><a href="#cb69-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Species Presence by Name"</span>,</span>
-<span id="cb69-11"><a href="#cb69-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Name"</span>,</span>
-<span id="cb69-12"><a href="#cb69-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Species"</span>) <span class="sc">+</span></span>
-<span id="cb69-13"><a href="#cb69-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb69-14"><a href="#cb69-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
-<span id="cb69-15"><a href="#cb69-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a><span class="co"># Order them based on 3 Preserves and 3 Fishing Ground</span></span>
+<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>desired_order <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, <span class="st">"Nemo Reef"</span>, <span class="st">"Don Limpet Preserve"</span>,<span class="st">"Cod Table"</span>, <span class="st">"Wrasse Beds"</span>,<span class="st">"Tuna Shelf"</span>)  </span>
+<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>region_fish_species_long<span class="sc">$</span>Name <span class="ot">&lt;-</span> <span class="fu">factor</span>(region_fish_species_long<span class="sc">$</span>Name, <span class="at">levels =</span> desired_order)</span>
+<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a>species_plot <span class="ot">&lt;-</span><span class="fu">ggplot</span>(region_fish_species_long, <span class="fu">aes</span>(<span class="at">x =</span> Name, </span>
+<span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">y =</span> Presence,</span>
+<span id="cb71-8"><a href="#cb71-8" aria-hidden="true" tabindex="-1"></a>                                     <span class="at">colour =</span> Presence)) <span class="sc">+</span></span>
+<span id="cb71-9"><a href="#cb71-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb71-10"><a href="#cb71-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Species Presence by Name"</span>,</span>
+<span id="cb71-11"><a href="#cb71-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Name"</span>,</span>
+<span id="cb71-12"><a href="#cb71-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Species"</span>) <span class="sc">+</span></span>
+<span id="cb71-13"><a href="#cb71-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb71-14"><a href="#cb71-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb71-15"><a href="#cb71-15" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb70"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb70-1"><a href="#cb70-1" aria-hidden="true" tabindex="-1"></a>oceanus_heatmap <span class="sc">/</span> species_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>oceanus_heatmap <span class="sc">/</span> species_plot</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-55-1.png" class="img-fluid figure-img" width="576"></p>
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-56-1.png" class="img-fluid figure-img" width="576"></p>
 </figure>
 </div>
 </div>
@@ -1432,77 +1460,26 @@ $ fish_species_present &lt;list&gt; &lt;NULL&gt;, &lt;NULL&gt;, &lt;NULL&gt;, &l
 </ol>
 <p>For confirmation, we take a look at the changes to OVLS Transponder Ping, comparing the total pings to various Fishing Grounds and Preserves month by month.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb71"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb71-1"><a href="#cb71-1" aria-hidden="true" tabindex="-1"></a>transponder_ping_edge_long <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
-<span id="cb71-2"><a href="#cb71-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
-<span id="cb71-3"><a href="#cb71-3" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Nemo Reef"</span>, </span>
-<span id="cb71-4"><a href="#cb71-4" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Don Limpet Preserve"</span>,</span>
-<span id="cb71-5"><a href="#cb71-5" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Cod Table"</span>, </span>
-<span id="cb71-6"><a href="#cb71-6" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Wrasse Beds"</span>,</span>
-<span id="cb71-7"><a href="#cb71-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Tuna Shelf"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb71-8"><a href="#cb71-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
-<span id="cb71-9"><a href="#cb71-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, target, month) <span class="sc">%&gt;%</span> </span>
-<span id="cb71-10"><a href="#cb71-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(source, month) <span class="sc">%&gt;%</span> </span>
-<span id="cb71-11"><a href="#cb71-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>()) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>transponder_ping_edge_long <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
+<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(target <span class="sc">%in%</span> <span class="fu">unlist</span>(fishing_vessel_list)) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
+<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Nemo Reef"</span>, </span>
+<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Don Limpet Preserve"</span>,</span>
+<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Cod Table"</span>, </span>
+<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Wrasse Beds"</span>,</span>
+<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Tuna Shelf"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, target, month) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-11"><a href="#cb73-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(source, month) <span class="sc">%&gt;%</span> </span>
+<span id="cb73-12"><a href="#cb73-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>()) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb72"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb72-1"><a href="#cb72-1" aria-hidden="true" tabindex="-1"></a>transponder_ping_edge_long <span class="sc">%&gt;%</span> </span>
-<span id="cb72-2"><a href="#cb72-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">as.factor</span>(month)) <span class="sc">%&gt;%</span> </span>
-<span id="cb72-3"><a href="#cb72-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">newggslopegraph</span>(month,n, source,</span>
-<span id="cb72-4"><a href="#cb72-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">Title =</span> <span class="st">"Changes in Visit Frequency"</span>,</span>
-<span id="cb72-5"><a href="#cb72-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">SubTitle =</span> <span class="st">"across Feb to Nov 2035"</span>,</span>
-<span id="cb72-6"><a href="#cb72-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">Caption =</span> <span class="st">"Prepared by: Liang Xiuhao"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
-<div class="cell-output-display">
-<div>
-<figure class="figure">
-<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-57-1.png" class="img-fluid figure-img" width="672"></p>
-</figure>
-</div>
-</div>
-</div>
-<p>In the line graph below, we observe that the overall fishing vessels activities in the fishing ground and preserves dropped.</p>
-<div class="cell">
-<div class="sourceCode cell-code" id="cb73"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb73-1"><a href="#cb73-1" aria-hidden="true" tabindex="-1"></a>average <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
-<span id="cb73-2"><a href="#cb73-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
-<span id="cb73-3"><a href="#cb73-3" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Nemo Reef"</span>, </span>
-<span id="cb73-4"><a href="#cb73-4" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Don Limpet Preserve"</span>,</span>
-<span id="cb73-5"><a href="#cb73-5" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Cod Table"</span>, </span>
-<span id="cb73-6"><a href="#cb73-6" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Wrasse Beds"</span>,</span>
-<span id="cb73-7"><a href="#cb73-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Tuna Shelf"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb73-8"><a href="#cb73-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
-<span id="cb73-9"><a href="#cb73-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">average =</span> (<span class="fu">n</span>()<span class="sc">/</span><span class="dv">10</span>))</span>
-<span id="cb73-10"><a href="#cb73-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb73-11"><a href="#cb73-11" aria-hidden="true" tabindex="-1"></a>transponder_ping_edge <span class="sc">%&gt;%</span> </span>
-<span id="cb73-12"><a href="#cb73-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
-<span id="cb73-13"><a href="#cb73-13" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Nemo Reef"</span>, </span>
-<span id="cb73-14"><a href="#cb73-14" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Don Limpet Preserve"</span>,</span>
-<span id="cb73-15"><a href="#cb73-15" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Cod Table"</span>, </span>
-<span id="cb73-16"><a href="#cb73-16" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Wrasse Beds"</span>,</span>
-<span id="cb73-17"><a href="#cb73-17" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Tuna Shelf"</span>)) <span class="sc">%&gt;%</span></span>
-<span id="cb73-18"><a href="#cb73-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
-<span id="cb73-19"><a href="#cb73-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span> </span>
-<span id="cb73-20"><a href="#cb73-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">as.numeric</span>(<span class="fu">n</span>())) <span class="sc">%&gt;%</span></span>
-<span id="cb73-21"><a href="#cb73-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> n)) <span class="sc">+</span> </span>
-<span id="cb73-22"><a href="#cb73-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span>  </span>
-<span id="cb73-23"><a href="#cb73-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">4</span>, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb73-24"><a href="#cb73-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> n), </span>
-<span id="cb73-25"><a href="#cb73-25" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>,</span>
-<span id="cb73-26"><a href="#cb73-26" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb73-27"><a href="#cb73-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Visit Frequency to All Fishing Grounds and Preserves by Month"</span>,</span>
-<span id="cb73-28"><a href="#cb73-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
-<span id="cb73-29"><a href="#cb73-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Total Count"</span>) <span class="sc">+</span></span>
-<span id="cb73-30"><a href="#cb73-30" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(average, </span>
-<span id="cb73-31"><a href="#cb73-31" aria-hidden="true" tabindex="-1"></a>             <span class="at">yintercept =</span> <span class="fu">as.numeric</span>(average), </span>
-<span id="cb73-32"><a href="#cb73-32" aria-hidden="true" tabindex="-1"></a>             <span class="at">color=</span><span class="st">"black"</span>,</span>
-<span id="cb73-33"><a href="#cb73-33" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="dv">6</span>) <span class="sc">+</span></span>
-<span id="cb73-34"><a href="#cb73-34" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">14260</span>,</span>
-<span id="cb73-35"><a href="#cb73-35" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="dv">4</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb73-36"><a href="#cb73-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">14260</span>, <span class="at">label =</span> <span class="st">"SouthSeafood caught"</span>),</span>
-<span id="cb73-37"><a href="#cb73-37" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>,</span>
-<span id="cb73-38"><a href="#cb73-38" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.2</span>,</span>
-<span id="cb73-39"><a href="#cb73-39" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb73-40"><a href="#cb73-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fl">4.5</span>, <span class="at">y =</span> <span class="dv">12900</span>, <span class="at">label =</span> <span class="st">"Monthly Average"</span>),</span>
-<span id="cb73-41"><a href="#cb73-41" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>,</span>
-<span id="cb73-42"><a href="#cb73-42" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>transponder_ping_edge_long <span class="sc">%&gt;%</span> </span>
+<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">as.factor</span>(month)) <span class="sc">%&gt;%</span> </span>
+<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">newggslopegraph</span>(month,n, source,</span>
+<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">Title =</span> <span class="st">"Changes in Visit Frequency"</span>,</span>
+<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">SubTitle =</span> <span class="st">"across Feb to Nov 2035"</span>,</span>
+<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">Caption =</span> <span class="st">"Prepared by: Liang Xiuhao"</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
@@ -1511,153 +1488,238 @@ $ fish_species_present &lt;list&gt; &lt;NULL&gt;, &lt;NULL&gt;, &lt;NULL&gt;, &l
 </div>
 </div>
 </div>
+<p>In the line graph below, we observe that the overall fishing vessels activities in the fishing ground and preserves dropped.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>average <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
+<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(target <span class="sc">%in%</span> <span class="fu">unlist</span>(fishing_vessel_list)) <span class="sc">%&gt;%</span> </span>
+<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
+<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Nemo Reef"</span>, </span>
+<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Don Limpet Preserve"</span>,</span>
+<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Cod Table"</span>, </span>
+<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Wrasse Beds"</span>,</span>
+<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Tuna Shelf"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
+<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">average =</span> (<span class="fu">n</span>()<span class="sc">/</span><span class="dv">10</span>))</span>
+<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb75-12"><a href="#cb75-12" aria-hidden="true" tabindex="-1"></a>transponder_ping_edge <span class="sc">%&gt;%</span> </span>
+<span id="cb75-13"><a href="#cb75-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
+<span id="cb75-14"><a href="#cb75-14" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Nemo Reef"</span>, </span>
+<span id="cb75-15"><a href="#cb75-15" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Don Limpet Preserve"</span>,</span>
+<span id="cb75-16"><a href="#cb75-16" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Cod Table"</span>, </span>
+<span id="cb75-17"><a href="#cb75-17" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Wrasse Beds"</span>,</span>
+<span id="cb75-18"><a href="#cb75-18" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Tuna Shelf"</span>)) <span class="sc">%&gt;%</span></span>
+<span id="cb75-19"><a href="#cb75-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(target <span class="sc">%in%</span> <span class="fu">unlist</span>(fishing_vessel_list)) <span class="sc">%&gt;%</span> </span>
+<span id="cb75-20"><a href="#cb75-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
+<span id="cb75-21"><a href="#cb75-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span> </span>
+<span id="cb75-22"><a href="#cb75-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">n =</span> <span class="fu">as.numeric</span>(<span class="fu">n</span>())) <span class="sc">%&gt;%</span></span>
+<span id="cb75-23"><a href="#cb75-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> n)) <span class="sc">+</span> </span>
+<span id="cb75-24"><a href="#cb75-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span>  </span>
+<span id="cb75-25"><a href="#cb75-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">4</span>, <span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb75-26"><a href="#cb75-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">label =</span> n), </span>
+<span id="cb75-27"><a href="#cb75-27" aria-hidden="true" tabindex="-1"></a>            <span class="at">vjust =</span> <span class="sc">-</span><span class="dv">1</span>,</span>
+<span id="cb75-28"><a href="#cb75-28" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb75-29"><a href="#cb75-29" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Visit Frequency to All Fishing Grounds and Preserves by Month"</span>,</span>
+<span id="cb75-30"><a href="#cb75-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb75-31"><a href="#cb75-31" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Frequency"</span>) <span class="sc">+</span></span>
+<span id="cb75-32"><a href="#cb75-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(average, </span>
+<span id="cb75-33"><a href="#cb75-33" aria-hidden="true" tabindex="-1"></a>             <span class="at">yintercept =</span> <span class="fu">as.numeric</span>(average), </span>
+<span id="cb75-34"><a href="#cb75-34" aria-hidden="true" tabindex="-1"></a>             <span class="at">color=</span><span class="st">"black"</span>,</span>
+<span id="cb75-35"><a href="#cb75-35" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="dv">6</span>) <span class="sc">+</span></span>
+<span id="cb75-36"><a href="#cb75-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">13366</span>,</span>
+<span id="cb75-37"><a href="#cb75-37" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="dv">4</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
+<span id="cb75-38"><a href="#cb75-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">13366</span>, <span class="at">label =</span> <span class="st">"SouthSeafood caught"</span>),</span>
+<span id="cb75-39"><a href="#cb75-39" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>,</span>
+<span id="cb75-40"><a href="#cb75-40" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.2</span>,</span>
+<span id="cb75-41"><a href="#cb75-41" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb75-42"><a href="#cb75-42" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="fl">4.5</span>, <span class="at">y =</span> <span class="dv">12000</span>, <span class="at">label =</span> <span class="st">"Monthly Average = 11854"</span>),</span>
+<span id="cb75-43"><a href="#cb75-43" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb75-44"><a href="#cb75-44" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb75-45"><a href="#cb75-45" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>()</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-59-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
 <p>Derive monthly transponder ping:</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb74"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb74-1"><a href="#cb74-1" aria-hidden="true" tabindex="-1"></a>monthly_transponder_ping <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
-<span id="cb74-2"><a href="#cb74-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
-<span id="cb74-3"><a href="#cb74-3" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Nemo Reef"</span>, </span>
-<span id="cb74-4"><a href="#cb74-4" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Don Limpet Preserve"</span>,</span>
-<span id="cb74-5"><a href="#cb74-5" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Cod Table"</span>, </span>
-<span id="cb74-6"><a href="#cb74-6" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Wrasse Beds"</span>,</span>
-<span id="cb74-7"><a href="#cb74-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Tuna Shelf"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb74-8"><a href="#cb74-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
-<span id="cb74-9"><a href="#cb74-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, target, month) <span class="sc">%&gt;%</span> </span>
-<span id="cb74-10"><a href="#cb74-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(source, month) <span class="sc">%&gt;%</span> </span>
-<span id="cb74-11"><a href="#cb74-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>()) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>monthly_transponder_ping <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
+<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(target <span class="sc">%in%</span> <span class="fu">unlist</span>(fishing_vessel_list)) <span class="sc">%&gt;%</span> </span>
+<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
+<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Nemo Reef"</span>, </span>
+<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Don Limpet Preserve"</span>,</span>
+<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Cod Table"</span>, </span>
+<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Wrasse Beds"</span>,</span>
+<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>                       <span class="st">"Tuna Shelf"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
+<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, target, month) <span class="sc">%&gt;%</span> </span>
+<span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(source, month) <span class="sc">%&gt;%</span> </span>
+<span id="cb76-12"><a href="#cb76-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarize</span>(<span class="at">n =</span> <span class="fu">n</span>()) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb75"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb75-1"><a href="#cb75-1" aria-hidden="true" tabindex="-1"></a>monthly_transponder_ping<span class="sc">$</span>month <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly_transponder_ping<span class="sc">$</span>month)</span>
-<span id="cb75-2"><a href="#cb75-2" aria-hidden="true" tabindex="-1"></a>monthly_transponder_ping<span class="sc">$</span>source <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly_transponder_ping<span class="sc">$</span>source,</span>
-<span id="cb75-3"><a href="#cb75-3" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
-<span id="cb75-4"><a href="#cb75-4" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Nemo Reef"</span>,</span>
-<span id="cb75-5"><a href="#cb75-5" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Don Limpet Preserve"</span>,</span>
-<span id="cb75-6"><a href="#cb75-6" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Cod Table"</span>,</span>
-<span id="cb75-7"><a href="#cb75-7" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Wrasse Beds"</span>,</span>
-<span id="cb75-8"><a href="#cb75-8" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Tuna Shelf"</span>))</span>
-<span id="cb75-9"><a href="#cb75-9" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb75-10"><a href="#cb75-10" aria-hidden="true" tabindex="-1"></a>hline.data <span class="ot">&lt;-</span> monthly_transponder_ping <span class="sc">%&gt;%</span> </span>
-<span id="cb75-11"><a href="#cb75-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(source) <span class="sc">%&gt;%</span></span>
-<span id="cb75-12"><a href="#cb75-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avgvalue =</span> <span class="fu">mean</span>(n))</span>
-<span id="cb75-13"><a href="#cb75-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb75-14"><a href="#cb75-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(monthly_transponder_ping , <span class="fu">aes</span>(<span class="at">x =</span> month, </span>
-<span id="cb75-15"><a href="#cb75-15" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">y =</span> n, </span>
-<span id="cb75-16"><a href="#cb75-16" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">group =</span> source, </span>
-<span id="cb75-17"><a href="#cb75-17" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">color =</span> source)) <span class="sc">+</span></span>
-<span id="cb75-18"><a href="#cb75-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
-<span id="cb75-19"><a href="#cb75-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
-<span id="cb75-20"><a href="#cb75-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> source, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span>  <span class="co"># Facet by 'source'</span></span>
-<span id="cb75-21"><a href="#cb75-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb75-22"><a href="#cb75-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Changes in Visit Frequency by Month"</span>,</span>
-<span id="cb75-23"><a href="#cb75-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
-<span id="cb75-24"><a href="#cb75-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"No. of Visits"</span>,</span>
-<span id="cb75-25"><a href="#cb75-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Source"</span>) <span class="sc">+</span></span>
-<span id="cb75-26"><a href="#cb75-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> hline.data,</span>
-<span id="cb75-27"><a href="#cb75-27" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">yintercept =</span> avgvalue),</span>
-<span id="cb75-28"><a href="#cb75-28" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="dv">6</span>,</span>
-<span id="cb75-29"><a href="#cb75-29" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"black"</span>,</span>
-<span id="cb75-30"><a href="#cb75-30" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb75-31"><a href="#cb75-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> hline.data, </span>
-<span id="cb75-32"><a href="#cb75-32" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">"4"</span>, <span class="at">y =</span> avgvalue, <span class="at">label =</span> <span class="st">"Average"</span>), </span>
-<span id="cb75-33"><a href="#cb75-33" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="dv">1</span>, </span>
-<span id="cb75-34"><a href="#cb75-34" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>,</span>
-<span id="cb75-35"><a href="#cb75-35" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
-<span id="cb75-36"><a href="#cb75-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept =</span> <span class="dv">4</span>),</span>
-<span id="cb75-37"><a href="#cb75-37" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="dv">6</span>,</span>
-<span id="cb75-38"><a href="#cb75-38" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"red"</span>,</span>
-<span id="cb75-39"><a href="#cb75-39" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
-<span id="cb75-40"><a href="#cb75-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> hline.data, </span>
-<span id="cb75-41"><a href="#cb75-41" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">"4"</span>, <span class="at">y =</span> avgvalue, <span class="at">label =</span> <span class="st">"SouthSeafood caught"</span>), </span>
-<span id="cb75-42"><a href="#cb75-42" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>,</span>
-<span id="cb75-43"><a href="#cb75-43" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="dv">90</span>,</span>
-<span id="cb75-44"><a href="#cb75-44" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>,</span>
-<span id="cb75-45"><a href="#cb75-45" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>monthly_transponder_ping<span class="sc">$</span>month <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly_transponder_ping<span class="sc">$</span>month)</span>
+<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>monthly_transponder_ping<span class="sc">$</span>source <span class="ot">&lt;-</span> <span class="fu">factor</span>(monthly_transponder_ping<span class="sc">$</span>source,</span>
+<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>                                             <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"Ghoti Preserve"</span>, </span>
+<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Nemo Reef"</span>,</span>
+<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Don Limpet Preserve"</span>,</span>
+<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Cod Table"</span>,</span>
+<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Wrasse Beds"</span>,</span>
+<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a>                                                        <span class="st">"Tuna Shelf"</span>))</span>
+<span id="cb77-9"><a href="#cb77-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-10"><a href="#cb77-10" aria-hidden="true" tabindex="-1"></a>hline.data <span class="ot">&lt;-</span> monthly_transponder_ping <span class="sc">%&gt;%</span> </span>
+<span id="cb77-11"><a href="#cb77-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(source) <span class="sc">%&gt;%</span></span>
+<span id="cb77-12"><a href="#cb77-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">avgvalue =</span> <span class="fu">mean</span>(n))</span>
+<span id="cb77-13"><a href="#cb77-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb77-14"><a href="#cb77-14" aria-hidden="true" tabindex="-1"></a><span class="fu">ggplot</span>(monthly_transponder_ping , <span class="fu">aes</span>(<span class="at">x =</span> month, </span>
+<span id="cb77-15"><a href="#cb77-15" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">y =</span> n, </span>
+<span id="cb77-16"><a href="#cb77-16" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">group =</span> source, </span>
+<span id="cb77-17"><a href="#cb77-17" aria-hidden="true" tabindex="-1"></a>                                      <span class="at">color =</span> source)) <span class="sc">+</span></span>
+<span id="cb77-18"><a href="#cb77-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb77-19"><a href="#cb77-19" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">size =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb77-20"><a href="#cb77-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span> source, <span class="at">scales =</span> <span class="st">"free_y"</span>) <span class="sc">+</span>  <span class="co"># Facet by 'source'</span></span>
+<span id="cb77-21"><a href="#cb77-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb77-22"><a href="#cb77-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Changes in Visit Frequency by Month by Fishing Vessels"</span>,</span>
+<span id="cb77-23"><a href="#cb77-23" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb77-24"><a href="#cb77-24" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"No. of Visits"</span>,</span>
+<span id="cb77-25"><a href="#cb77-25" aria-hidden="true" tabindex="-1"></a>       <span class="at">color =</span> <span class="st">"Source"</span>) <span class="sc">+</span></span>
+<span id="cb77-26"><a href="#cb77-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_hline</span>(<span class="at">data =</span> hline.data,</span>
+<span id="cb77-27"><a href="#cb77-27" aria-hidden="true" tabindex="-1"></a>             <span class="fu">aes</span>(<span class="at">yintercept =</span> avgvalue),</span>
+<span id="cb77-28"><a href="#cb77-28" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="dv">6</span>,</span>
+<span id="cb77-29"><a href="#cb77-29" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb77-30"><a href="#cb77-30" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb77-31"><a href="#cb77-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> hline.data, </span>
+<span id="cb77-32"><a href="#cb77-32" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">"4"</span>, <span class="at">y =</span> avgvalue, <span class="at">label =</span> <span class="st">"Average"</span>), </span>
+<span id="cb77-33"><a href="#cb77-33" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="dv">1</span>, <span class="at">vjust =</span> <span class="dv">1</span>, </span>
+<span id="cb77-34"><a href="#cb77-34" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>,</span>
+<span id="cb77-35"><a href="#cb77-35" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
+<span id="cb77-36"><a href="#cb77-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept =</span> <span class="dv">4</span>),</span>
+<span id="cb77-37"><a href="#cb77-37" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="dv">6</span>,</span>
+<span id="cb77-38"><a href="#cb77-38" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"red"</span>,</span>
+<span id="cb77-39"><a href="#cb77-39" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb77-40"><a href="#cb77-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> hline.data, </span>
+<span id="cb77-41"><a href="#cb77-41" aria-hidden="true" tabindex="-1"></a>            <span class="fu">aes</span>(<span class="at">x =</span> <span class="st">"4"</span>, <span class="at">y =</span> avgvalue, <span class="at">label =</span> <span class="st">"SouthSeafood caught"</span>), </span>
+<span id="cb77-42"><a href="#cb77-42" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="fl">1.5</span>, <span class="at">vjust =</span> <span class="fl">1.5</span>,</span>
+<span id="cb77-43"><a href="#cb77-43" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="dv">90</span>,</span>
+<span id="cb77-44"><a href="#cb77-44" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>,</span>
+<span id="cb77-45"><a href="#cb77-45" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">2</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-60-1.png" class="img-fluid figure-img" width="960"></p>
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-61-1.png" class="img-fluid figure-img" width="960"></p>
 </figure>
 </div>
 </div>
 </div>
-<p>From the plot above, we can see that after SouthSeafood was caught in mid-May, there is a drop in activities for all the fishing grounds and preserves immediately after mid-May, except for the increase in Don Limpet Preserve.</p>
+<p>From the plot above, we can see that after SouthSeafood was caught in mid-May, there is a drop in activities for all the fishing grounds and preserves immediately after mid-May, except for the increase in Don Limpet Preserve, from 1 in Mar and Jun to 2 observations in Aug.&nbsp;</p>
 <p>Let’s observe for month to month if the dwell time increase for Don Limpet Preserve.</p>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb76"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb76-1"><a href="#cb76-1" aria-hidden="true" tabindex="-1"></a>don_monthly_transponder_ping <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
-<span id="cb76-2"><a href="#cb76-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, dwell, time) <span class="sc">%&gt;%</span> </span>
-<span id="cb76-3"><a href="#cb76-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
-<span id="cb76-4"><a href="#cb76-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">==</span> <span class="st">"Don Limpet Preserve"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb76-5"><a href="#cb76-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span> </span>
-<span id="cb76-6"><a href="#cb76-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">dwell_total =</span> <span class="fu">sum</span>(dwell)) <span class="sc">%&gt;%</span></span>
-<span id="cb76-7"><a href="#cb76-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> dwell_total)) <span class="sc">+</span> </span>
-<span id="cb76-8"><a href="#cb76-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb76-9"><a href="#cb76-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Dwell Time in Don Limpet by Month"</span>,</span>
-<span id="cb76-10"><a href="#cb76-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
-<span id="cb76-11"><a href="#cb76-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Total Count"</span>) <span class="sc">+</span></span>
-<span id="cb76-12"><a href="#cb76-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb76-13"><a href="#cb76-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb76-14"><a href="#cb76-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">linetype =</span> <span class="dv">6</span>,</span>
-<span id="cb76-15"><a href="#cb76-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb76-16"><a href="#cb76-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> <span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">label =</span> <span class="st">"Trend Line"</span>), </span>
-<span id="cb76-17"><a href="#cb76-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> <span class="dv">9</span>, <span class="at">y =</span> <span class="dv">6250000</span>, </span>
-<span id="cb76-18"><a href="#cb76-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="dv">15</span>,</span>
-<span id="cb76-19"><a href="#cb76-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">1.5</span>, </span>
-<span id="cb76-20"><a href="#cb76-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>don_monthly_transponder_ping <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
+<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(target <span class="sc">%in%</span> <span class="fu">unlist</span>(fishing_vessel_list)) <span class="sc">%&gt;%</span> </span>
+<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, dwell, time) <span class="sc">%&gt;%</span> </span>
+<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
+<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">==</span> <span class="st">"Don Limpet Preserve"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span> </span>
+<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">dwell_total =</span> <span class="fu">sum</span>(dwell)) <span class="sc">%&gt;%</span></span>
+<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> dwell_total)) <span class="sc">+</span> </span>
+<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Dwell Time in Don Limpet by Month"</span>,</span>
+<span id="cb78-11"><a href="#cb78-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb78-12"><a href="#cb78-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Total Count"</span>) <span class="sc">+</span></span>
+<span id="cb78-13"><a href="#cb78-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb78-14"><a href="#cb78-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb78-15"><a href="#cb78-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">linetype =</span> <span class="dv">6</span>,</span>
+<span id="cb78-16"><a href="#cb78-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb78-17"><a href="#cb78-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> <span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">label =</span> <span class="st">"Trend Line"</span>), </span>
+<span id="cb78-18"><a href="#cb78-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> <span class="dv">6</span>, <span class="at">y =</span> <span class="dv">7500</span>, </span>
+<span id="cb78-19"><a href="#cb78-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="dv">15</span>,</span>
+<span id="cb78-20"><a href="#cb78-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.3</span>, <span class="at">vjust =</span> <span class="sc">-</span><span class="fl">1.5</span>, </span>
+<span id="cb78-21"><a href="#cb78-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb77"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb77-1"><a href="#cb77-1" aria-hidden="true" tabindex="-1"></a>nemo_monthly_transponder_ping <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
-<span id="cb77-2"><a href="#cb77-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, dwell, time) <span class="sc">%&gt;%</span> </span>
-<span id="cb77-3"><a href="#cb77-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
-<span id="cb77-4"><a href="#cb77-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">==</span> <span class="st">"Nemo Reef"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb77-5"><a href="#cb77-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span> </span>
-<span id="cb77-6"><a href="#cb77-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">dwell_total =</span> <span class="fu">sum</span>(dwell)) <span class="sc">%&gt;%</span></span>
-<span id="cb77-7"><a href="#cb77-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> dwell_total)) <span class="sc">+</span> </span>
-<span id="cb77-8"><a href="#cb77-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb77-9"><a href="#cb77-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Dwell Time in Nemo Reef by Month"</span>,</span>
-<span id="cb77-10"><a href="#cb77-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
-<span id="cb77-11"><a href="#cb77-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Total Count"</span>) <span class="sc">+</span></span>
-<span id="cb77-12"><a href="#cb77-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb77-13"><a href="#cb77-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb77-14"><a href="#cb77-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">linetype =</span> <span class="dv">6</span>,</span>
-<span id="cb77-15"><a href="#cb77-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb77-16"><a href="#cb77-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> <span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">label =</span> <span class="st">"Trend Line"</span>), </span>
-<span id="cb77-17"><a href="#cb77-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">20000000</span>, </span>
-<span id="cb77-18"><a href="#cb77-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="sc">-</span><span class="dv">15</span>,</span>
-<span id="cb77-19"><a href="#cb77-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="fl">0.3</span>, </span>
-<span id="cb77-20"><a href="#cb77-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>nemo_monthly_transponder_ping <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
+<span id="cb79-2"><a href="#cb79-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(target <span class="sc">%in%</span> <span class="fu">unlist</span>(fishing_vessel_list)) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-3"><a href="#cb79-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, dwell, time) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-4"><a href="#cb79-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-5"><a href="#cb79-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">==</span> <span class="st">"Nemo Reef"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb79-6"><a href="#cb79-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span> </span>
+<span id="cb79-7"><a href="#cb79-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">dwell_total =</span> <span class="fu">sum</span>(dwell)) <span class="sc">%&gt;%</span></span>
+<span id="cb79-8"><a href="#cb79-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> dwell_total)) <span class="sc">+</span> </span>
+<span id="cb79-9"><a href="#cb79-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb79-10"><a href="#cb79-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Dwell Time in Nemo Reef by Month"</span>,</span>
+<span id="cb79-11"><a href="#cb79-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb79-12"><a href="#cb79-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Total Count"</span>) <span class="sc">+</span></span>
+<span id="cb79-13"><a href="#cb79-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb79-14"><a href="#cb79-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb79-15"><a href="#cb79-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">linetype =</span> <span class="dv">6</span>,</span>
+<span id="cb79-16"><a href="#cb79-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb79-17"><a href="#cb79-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> <span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">label =</span> <span class="st">"Trend Line"</span>), </span>
+<span id="cb79-18"><a href="#cb79-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">12500000</span>, </span>
+<span id="cb79-19"><a href="#cb79-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="sc">-</span><span class="dv">15</span>,</span>
+<span id="cb79-20"><a href="#cb79-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="fl">0.3</span>, </span>
+<span id="cb79-21"><a href="#cb79-21" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb78"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb78-1"><a href="#cb78-1" aria-hidden="true" tabindex="-1"></a>ghoti_monthly_transponder_ping <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
-<span id="cb78-2"><a href="#cb78-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, dwell, time) <span class="sc">%&gt;%</span> </span>
-<span id="cb78-3"><a href="#cb78-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
-<span id="cb78-4"><a href="#cb78-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">==</span> <span class="st">"Ghoti Preserve"</span>) <span class="sc">%&gt;%</span></span>
-<span id="cb78-5"><a href="#cb78-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span> </span>
-<span id="cb78-6"><a href="#cb78-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">dwell_total =</span> <span class="fu">sum</span>(dwell)) <span class="sc">%&gt;%</span></span>
-<span id="cb78-7"><a href="#cb78-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> dwell_total)) <span class="sc">+</span> </span>
-<span id="cb78-8"><a href="#cb78-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
-<span id="cb78-9"><a href="#cb78-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Dwell Time in Ghoti by Month"</span>,</span>
-<span id="cb78-10"><a href="#cb78-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
-<span id="cb78-11"><a href="#cb78-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Total Count"</span>) <span class="sc">+</span></span>
-<span id="cb78-12"><a href="#cb78-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
-<span id="cb78-13"><a href="#cb78-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb78-14"><a href="#cb78-14" aria-hidden="true" tabindex="-1"></a>              <span class="at">linetype =</span> <span class="dv">6</span>,</span>
-<span id="cb78-15"><a href="#cb78-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
-<span id="cb78-16"><a href="#cb78-16" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> <span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">label =</span> <span class="st">"Trend Line"</span>), </span>
-<span id="cb78-17"><a href="#cb78-17" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> <span class="fl">9.5</span>, <span class="at">y =</span> <span class="dv">8400000</span>, </span>
-<span id="cb78-18"><a href="#cb78-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="sc">-</span><span class="dv">8</span>, </span>
-<span id="cb78-19"><a href="#cb78-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb80"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb80-1"><a href="#cb80-1" aria-hidden="true" tabindex="-1"></a>ghoti_monthly_transponder_ping <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
+<span id="cb80-2"><a href="#cb80-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(target <span class="sc">%in%</span> <span class="fu">unlist</span>(fishing_vessel_list)) <span class="sc">%&gt;%</span> </span>
+<span id="cb80-3"><a href="#cb80-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(source, dwell, time) <span class="sc">%&gt;%</span> </span>
+<span id="cb80-4"><a href="#cb80-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">month =</span> <span class="fu">month</span>(time)) <span class="sc">%&gt;%</span> </span>
+<span id="cb80-5"><a href="#cb80-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">==</span> <span class="st">"Ghoti Preserve"</span>) <span class="sc">%&gt;%</span></span>
+<span id="cb80-6"><a href="#cb80-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(month) <span class="sc">%&gt;%</span> </span>
+<span id="cb80-7"><a href="#cb80-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">dwell_total =</span> <span class="fu">sum</span>(dwell)) <span class="sc">%&gt;%</span></span>
+<span id="cb80-8"><a href="#cb80-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> month, <span class="at">y =</span> dwell_total)) <span class="sc">+</span> </span>
+<span id="cb80-9"><a href="#cb80-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_line</span>(<span class="at">color =</span> <span class="st">"blue"</span>) <span class="sc">+</span></span>
+<span id="cb80-10"><a href="#cb80-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Dwell Time in Ghoti by Month"</span>,</span>
+<span id="cb80-11"><a href="#cb80-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Month"</span>,</span>
+<span id="cb80-12"><a href="#cb80-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Total Count"</span>) <span class="sc">+</span></span>
+<span id="cb80-13"><a href="#cb80-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>() <span class="sc">+</span></span>
+<span id="cb80-14"><a href="#cb80-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_smooth</span>(<span class="at">method =</span> <span class="st">"lm"</span>, <span class="at">se =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb80-15"><a href="#cb80-15" aria-hidden="true" tabindex="-1"></a>              <span class="at">linetype =</span> <span class="dv">6</span>,</span>
+<span id="cb80-16"><a href="#cb80-16" aria-hidden="true" tabindex="-1"></a>              <span class="at">color =</span> <span class="st">"black"</span>) <span class="sc">+</span></span>
+<span id="cb80-17"><a href="#cb80-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="at">data =</span> <span class="cn">NULL</span>, <span class="fu">aes</span>(<span class="at">label =</span> <span class="st">"Trend Line"</span>), </span>
+<span id="cb80-18"><a href="#cb80-18" aria-hidden="true" tabindex="-1"></a>            <span class="at">x =</span> <span class="dv">8</span>, <span class="at">y =</span> <span class="dv">5000000</span>, </span>
+<span id="cb80-19"><a href="#cb80-19" aria-hidden="true" tabindex="-1"></a>            <span class="at">angle =</span> <span class="sc">-</span><span class="dv">5</span>, </span>
+<span id="cb80-20"><a href="#cb80-20" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"black"</span>, <span class="at">size =</span> <span class="dv">4</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </div>
 <div class="cell">
-<div class="sourceCode cell-code" id="cb79"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb79-1"><a href="#cb79-1" aria-hidden="true" tabindex="-1"></a>don_monthly_transponder_ping<span class="sc">/</span>nemo_monthly_transponder_ping<span class="sc">/</span>ghoti_monthly_transponder_ping</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb81"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb81-1"><a href="#cb81-1" aria-hidden="true" tabindex="-1"></a>nemo_monthly_transponder_ping<span class="sc">/</span>ghoti_monthly_transponder_ping</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 <div class="cell-output-display">
 <div>
 <figure class="figure">
-<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-64-1.png" class="img-fluid figure-img" width="576"></p>
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-65-1.png" class="img-fluid figure-img" width="576"></p>
 </figure>
 </div>
 </div>
 </div>
+<p>From the above plots, we observe that for Nemo Reef and Ghoti Preserve, the trend is downards for the amount of time spent by the fishing vessels.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb82"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb82-1"><a href="#cb82-1" aria-hidden="true" tabindex="-1"></a>fishing_vessels_in_don <span class="ot">&lt;-</span> transponder_ping_edge <span class="sc">%&gt;%</span> </span>
+<span id="cb82-2"><a href="#cb82-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(source <span class="sc">==</span> <span class="st">"Don Limpet Preserve"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb82-3"><a href="#cb82-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(target <span class="sc">%in%</span> <span class="fu">unlist</span>(fishing_vessel_list)) <span class="sc">%&gt;%</span> </span>
+<span id="cb82-4"><a href="#cb82-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(target, dwell, date_added, time) <span class="sc">%&gt;%</span> </span>
+<span id="cb82-5"><a href="#cb82-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">end_time =</span> dwell <span class="sc">+</span> time) <span class="sc">%&gt;%</span> </span>
+<span id="cb82-6"><a href="#cb82-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">arrange</span>(time)</span>
+<span id="cb82-7"><a href="#cb82-7" aria-hidden="true" tabindex="-1"></a>fishing_vessels_in_don</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>                   target    dwell          date_added                time
+1    yellowperchpiratec59 7413.772 2035-03-04 16:50:54 2035-03-03 16:50:54
+2 arcticgraylingangler094 5037.287 2035-06-20 06:00:00 2035-06-18 06:00:00
+3    whitefishwrangler7df 6149.014 2035-06-20 06:00:00 2035-08-18 06:00:00
+4       bluegillbandita5f 4571.235 2035-08-29 06:00:00 2035-08-27 06:00:00
+             end_time
+1 2035-03-03 18:54:28
+2 2035-06-18 07:23:57
+3 2035-08-18 07:42:29
+4 2035-08-27 07:16:11</code></pre>
+</div>
+</div>
+<p>There are only 4 records of visits through the OVLS to Don Limpet, once in Mar and Jun, for about 1.5 to 2hrs each, and another 2 in Aug, for about 1.25 to 1.75 hrs each. Thire record is high inconguent to the growing number of Sockfish that are found in the delivery report from May onwards.</p>
+<section id="what-new-behaviors-in-the-oceanus-commercial-fishing-community-are-most-suspicious-and-why" class="level3">
+<h3 class="anchored" data-anchor-id="what-new-behaviors-in-the-oceanus-commercial-fishing-community-are-most-suspicious-and-why">4.2 What new behaviors in the Oceanus commercial fishing community are most suspicious and why?</h3>
 
 
+</section>
 </section>
 </section>
 
