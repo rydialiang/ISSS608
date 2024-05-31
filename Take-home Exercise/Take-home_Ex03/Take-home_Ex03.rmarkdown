@@ -10,6 +10,7 @@ execute:
   freeze: true
 ---
 
+
 # VAST 2024 Mini Challenge 2
 
 ## Mini-Challenge 2: Creating Signatures for Geo-Temporal Patterns
@@ -34,6 +35,7 @@ FishEye analysts need your help to perform geographic and temporal analysis of t
 
 ## 1.1 Loading R Packages
 
+
 ```{r}
 pacman::p_load(tidyverse, jsonlite, DT, lubridate,
                igraph, tidygraph, ggraph, 
@@ -42,21 +44,27 @@ pacman::p_load(tidyverse, jsonlite, DT, lubridate,
                ggHoriPlot)
 ```
 
+
 ## 1.2 Loading the Data
 
 Loading the .json data using `jsonlite` package.
+
 
 ```{r}
 mc2_data <- fromJSON("data/MC2/mc2.json")
 ```
 
+
 mc2 is a directed multigraph, consists of nodes dataframe and links dataframe.
+
 
 ```{r}
 oceanus_map <- read_sf("data/MC2/Oceanus Information/Oceanus Geography.geojson")
 ```
 
+
 Loading the oceanus map:
+
 
 ```{r}
 ggplot(oceanus_map) +
@@ -67,22 +75,27 @@ ggplot(oceanus_map) +
                vjust = 1.5)
 ```
 
+
 ## 1.3 **Wrangling and tidying edges**
 
 ### 1.3.1 Extracting edges
 
 First, we extract only distinct edges from the tibble *links* data.frame of *mc2_data* and save it as a tibble data.frame called *mc2_edges*.
 
+
 ```{r}
 mc2_edges <- mc2_data$links %>% 
   distinct()
 ```
 
+
 Next, `glimpse()` of dplyr will be used to reveal the structure of *mc2_edges* tibble data.table.
+
 
 ```{r}
 glimpse(mc2_edges)
 ```
+
 
 From the table above, we can identify some issues with the data:
 
@@ -92,6 +105,7 @@ From the table above, we can identify some issues with the data:
 
 ### 1.3.2 Correcting the date data type with `lubridate()`
 
+
 ```{r}
 mc2_edges$time <- as_datetime(mc2_edges$time)
 mc2_edges$`_last_edited_date` <- as_datetime(mc2_edges$`_last_edited_date`)
@@ -99,15 +113,19 @@ mc2_edges$`_date_added` <- as_datetime(mc2_edges$`_date_added`)
 mc2_edges$date <- as_datetime(mc2_edges$date)
 ```
 
+
 Next, glimpse() will be used to confirm if the process have been performed correctly.
+
 
 ```{r}
 glimpse(mc2_edges)
 ```
 
+
 ### 1.3.3 Changing field name
 
 In the code chunk below, rename() of dplyr package is used to change the following fields.
+
 
 ```{r}
 mc2_edges <- mc2_edges %>%
@@ -117,6 +135,7 @@ mc2_edges <- mc2_edges %>%
          "raw_source" = "_raw_source",
          "algorithm" = "_algorithm") 
 ```
+
 
 ### 1.3.4 Splitting words in `type` column
 
@@ -135,6 +154,7 @@ The code chunk below combined the following steps:
 6.  Append word_df to mc2_edges tibble data.frame.
 
 7.  Saving mc2_edges into R **rds** format as a physical file, so that there is no need to repeat the following code chunk to access a tidy mc2_edges tibble data frame.
+
 
 ```{r}
 word_list <- strsplit(mc2_edges$type, "\\.")
@@ -159,22 +179,27 @@ write_rds(mc2_edges, "data/rds/mc2_edges.rds")
 
 ```
 
+
 ## 1.4 **Wrangling and tidying nodes**
 
 ### 1.4.1 Extracting nodes
 
 The code chunk below will be used to extract the nodes data.frame of mc2_data and parses it as a tibble data.frame called mc2_nodes.
 
+
 ```{r}
 mc2_nodes <- as_tibble(mc2_data$nodes) %>%
   distinct()
 ```
 
+
 Next, take a `glimpse()` to understand the data structure.
+
 
 ```{r}
 glimpse(mc2_nodes)
 ```
+
 
 From the table above, beside the date data type, inappropriate field name, and treatment for `type` column issues we discussed earlier, two additional data issues can be observed. They are:
 
@@ -188,6 +213,7 @@ We will first repeat the steps similar steps to wrangling the mc2_edges, before 
 
 Correct the date data type and take a `glimpse()` to confirm changes.
 
+
 ```{r}
 mc2_nodes$`_last_edited_date` <- as_datetime(mc2_nodes$`_last_edited_date`)
 mc2_nodes$`_date_added` <- as_datetime(mc2_nodes$`_date_added`)
@@ -195,9 +221,11 @@ mc2_nodes$date <- as_datetime(mc2_nodes$date)
 glimpse(mc2_nodes)
 ```
 
+
 ### 1.4.3 Changing field name
 
 In the code chunk below, rename() of dplyr package is used to change the following fields.
+
 
 ```{r}
 mc2_nodes <- mc2_nodes %>%
@@ -208,9 +236,11 @@ mc2_nodes <- mc2_nodes %>%
          "algorithm" = "_algorithm") 
 ```
 
+
 ### 1.4.4 Splitting words in `type` column
 
 Details on the code chunk can be found in section 1.3.4. At this point, we will not be saving the mc2_nodes as R **rds** format yet, as there are more works to be done to clean up the dataframe.
+
 
 ```{r}
 word_list <- strsplit(mc2_nodes$type, "\\.")
@@ -231,9 +261,11 @@ mc2_nodes <- mc2_nodes %>%
   cbind(word_df)
 ```
 
+
 ### 1.4.5 Tidying text field
 
 Using `mutate()` of dplyr and `gsub()` of Base R to tidy up the values in the cell. Essentially, the unwanted characters like `c`, `(`, `)`, and `\` are removed by substituting with empty value `""` for both Activities and fish_species_present columns. What is left in the columns will be characters separated by `,`.
+
 
 ```{r}
 mc2_nodes <- mc2_nodes %>%
@@ -249,12 +281,15 @@ mc2_nodes <- mc2_nodes %>%
   mutate(fish_species_present = gsub("[)]", "", fish_species_present)) 
 ```
 
+
 Lastly, we will save the tidied mc2_nodes
+
 
 ```{r}
 # prior to running this code, create an rds folder in data folder to ensure files are saved in the correct directory
 write_rds(mc2_nodes, "data/rds/mc2_nodes.rds")
 ```
+
 
 ## 1.5 Extracting the required columns for each graph
 
@@ -278,18 +313,22 @@ Node/Edge types and properties present
 
 First, we will extract the relevant nodes, namely the vessels and locations from `mc2_nodes`. As we are only concerned about the fishing vessels, we will only extract values matching "Vessel" in entity2 column and values matching "FishingVessel" in entity3 column. For locations, we will match values of "Location" in entity2 column, and match values of "City", "Point" and "Region" in entity3 column.
 
+
 ```{r}
 vessel_mvmt_nodes <- mc2_nodes %>% 
   filter(entity2 %in% c("Vessel","Location")) %>% 
   filter(entity3 %in% c("FishingVessel","City","Point","Region"))
 ```
 
+
 Next, we will extract the vessel movement edges from mc2_edges, by filtering the "TransponderPing" from event3 column.
+
 
 ```{r}
 vessel_mvmt_edges <- mc2_edges %>% 
   filter(event3 %in% c("TransponderPing"))
 ```
+
 
 ### 1.5.2 Harbor Reports
 
@@ -305,16 +344,20 @@ Node/edge types present:
 
 Since the node type are the same as the vessel movements, we will make a copy of the node from vessel movement nodes.
 
+
 ```{r}
 harbor_report_nodes <- vessel_mvmt_nodes
 ```
 
+
 Next, we will extract the harbor report edges from mc2_edges, by filtering the "HarborReport" from event3 column.
+
 
 ```{r}
 harbor_report_edges <- mc2_edges %>% 
   filter(event2 %in% c("HarborReport"))
 ```
+
 
 ### 1.5.3 Harbor Import Records
 
@@ -332,19 +375,24 @@ Node/Edge types present:
 
 First, we will extract the relevant nodes, namely the location, commodity.fish and document.delivery report from `mc2_nodes`.
 
+
 ```{r}
 harbor_import_records_nodes <- mc2_nodes %>% 
   filter(entity2 %in% c("Location","Commodity","Document"))
 ```
 
+
 Next, we will extract harbor import records edges, by filtering the event2 with value of "Transaction".
+
 
 ```{r}
 harbor_import_records_edges <- mc2_edges %>% 
   filter(event2 == "Transaction")
 ```
 
+
 Before we move on to exploring the data, we will save the 3 sources edges and nodes tibble data frame as R **rds** format in the data/rds folder:
+
 
 ```{r}
 write_rds(vessel_mvmt_nodes, "data/rds/vessel_mvmt_nodes.rds")
@@ -354,6 +402,7 @@ write_rds(harbor_report_edges, "data/rds/harbor_report_edges.rds")
 write_rds(harbor_import_records_nodes, "data/rds/harbor_import_records_nodes.rds")
 write_rds(harbor_import_records_edges, "data/rds/harbor_import_records_edges.rds")
 ```
+
 
 ## 2.0 Task 1: Flow of Commercially Caught Fish
 
@@ -366,6 +415,7 @@ In this section, we focus on a few key areas to understand how the commercially 
 ## 2.1 Associating the vessels with their probable cargoes
 
 To find out which commodity goes to which ports, we first create a cargo list that links the cargo to the cities and commodities. At the same time, we also clean up the name of the fish, leaving only its common name in the "name" column, by removing all the characters after the "/".
+
 
 ```{r}
 cargo_port_list <- harbor_import_records_edges %>% 
@@ -407,9 +457,11 @@ cargo_list<- harbor_import_records_nodes %>%
   filter(if_all(c(qty_tons), ~ !is.na(.)))
 ```
 
+
 **Matching the vessel with the cargo list** 
 
 We first single out all the fishing vessels from mc2_edges and define the fishing vessel location, start time and end time of the vessels in the particular location. 
+
 
 ```{r}
 fishing_vessel_list <- mc2_nodes %>% 
@@ -448,7 +500,9 @@ vessel_location_city <- vessel_location %>%
 
 
 
+
 Finding anomalies in vessel movement by comparing end time (calculated by dwell) with next time (the next time the vessel is detected at the next location). 
+
 
 ```{r}
 ab_vessel_mvmt <- vessel_location %>%
@@ -466,7 +520,9 @@ ab_vessel_mvmt_agg <- ab_vessel_mvmt %>%
 
 
 
+
 **Overview of Harbor Report**
+
 
 ```{r}
 distinct_harbor_report <- harbor_report_edges %>% 
@@ -482,7 +538,9 @@ ggplot(distinct_harbor_report) +
   geom_bar(aes(x = target))
 ```
 
+
 **Overview of Vessels Location by Transponder Ping**
+
 
 ```{r}
 transponder_location <- mc2_edges %>% 
@@ -500,11 +558,13 @@ transponder_location <- mc2_edges %>%
 ggplot(transponder_location) +
   geom_bar(aes(x = source))
 ```
+
 A quick comparison between the two bar chart, we can conclude that port activities for fishing vessels are highest at City of Paackland and least at City of Himark. Also, there is no fishing vessels that visits City of Port Grove. 
 
 ## 2.3 Examine the seasonal trends and anomalies in the port exit records
 
 We examine the cargo_list and realised that there are some records that shows negative tonnage for their cargoes. This is abnormal as all cargoes should have positive qty_tons value. 
+
 
 ```{r}
 negative_ton_cargo_by_city <- cargo_list %>% 
@@ -538,12 +598,16 @@ ggplot(positive_ton_cargo_by_city, aes(x = city)) +
        y = "Total Quantity (tons)") +
   theme_minimal()
 ```
+
 There seems to be suspicious activities going on at each cities when we look at the negative values in qty_ton.
+
 
 ```{r}
 negative_ton_cargo_by_city
 ```
+
 Next, we will remove the negative quantity and then find the aggregated value by the type of fish, the city, and the date of transaction.
+
 
 ```{r}
 fish_by_port_agg <- cargo_list %>%
@@ -556,7 +620,9 @@ fish_by_port_agg <- cargo_list %>%
                        label = TRUE, 
                        abbr = TRUE))
 ```
+
 Secondly, when we observe the heatmap, we also realised that the data only covers the month from Feb to Nov in year 2035. 
+
 
 ```{r}
 # Create an overall Oceanus heat map for all types of fish
@@ -574,7 +640,6 @@ ggplot(fish_agg, aes(x = month, y = name, fill = total_qty_ton)) +
          fill = "Total Quantity (tons)") +
     theme_minimal()
 ```
-
 
 ```{r}
 # Function to create a calendar heat map
@@ -614,7 +679,9 @@ for (c in cities) {
 }
 ```
 
+
 ## 2.3.1 **Understanding the types of fish that should not be in the market**
+
 
 ```{r}
 region_fish_species <- mc2_nodes %>% 
@@ -647,6 +714,7 @@ region_fish_species <- region_fish_species %>%
   
 region_fish_species
 ```
+
 ```{r}
 # Convert data to long format
 region_fish_species_long <- pivot_longer(region_fish_species, cols = starts_with("species"), names_to = "Species", values_to = "Presence")
@@ -657,7 +725,9 @@ region_fish_species_long <- region_fish_species_long[region_fish_species_long$Pr
   mutate_at(vars(Presence), trimws)
 ```
 
+
 **Visualising the Species presence in each Region**
+
 
 ```{r}
 # Order them based on 3 Preserves and 3 Fishing Ground
@@ -677,7 +747,9 @@ ggplot(region_fish_species_long, aes(x = Name,
         legend.position = "none")
 ```
 
+
 From the above visualisation, we can derive that Sockfish, Offidiaa, and Helenaa species can only be found in the preserves but not in the fishing grounds. Therefore, any cargoes that contains these fish species would have fished illegal. Below shows the visualisation of the species and qty_ton that flows through each city by months. 
+
 
 ```{r}
 # Create an empty list to store heatmaps
@@ -722,6 +794,7 @@ ggplot(fish_agg, aes(x = month, y = name, fill = total_qty_ton)) +
     theme_minimal()
 ```
 
+
 From this heatmap above, we understand that there is an abnormal increase in Sockfish catch from May onwards, and abnormal increase in Offidiaa catch from September onwards , which are species unique to the Don Limpet Preserve and Ghoti Preserve respectively. 
 
 Probable reason for this is that since SouthSeafood Express Corp was caught in mid-May for illegal fishing in Ghoti Preserve, other illegal fishing vessels made a switch to Don Limpet Reserves to fish. 
@@ -733,6 +806,7 @@ Develop visualizations that illustrate the inappropriate behavior of SouthSeafoo
 ## 3.1 Illegal fishing by SouthSeafood Express Corp
 
 SouthSeafood Express Corp operates two fishing vessels by the id of "snappersnatcher7be" and "roachrobberdb6".
+
 
 ```{r}
 transponder_ping_edge <- mc2_edges %>% 
@@ -826,6 +900,7 @@ ssf_graph %>%
 
 
 
+
 ## 4.0 Task 4
 
 **The Questions**:
@@ -841,6 +916,7 @@ The final activities of SouthSeafood's vessels are on 2035-05-16 (snappersnatche
 ## 4.1 Changes in Commercial Fishing
 
 Firstly, we take a look at the species caught across the months (Feb to Nov 2035). 
+
 
 ```{r}
 # Create an overall Oceanus heat map for all types of fish
@@ -882,6 +958,7 @@ species_plot <-ggplot(region_fish_species_long, aes(x = Name,
 ```{r, fig.width=6, fig.height=6}
 oceanus_heatmap / species_plot
 ```
+
 For recapitulation, we know that Sockfish, Offidiaa, and Helenaa are fish species that are unique to the three Preserves. From the two plots above, we can derive initial conclusion that there is an usual increase in Sockfish catch after SouthSeafood was caught in mid-May. We also see a minor increase in Helenaa between Jun to Aug, and later in Oct to Nov. The spike in Offidiaa catch begins in Sep and grows gradually to Nov. 
 
 Combining the information above, we can make the following two hypothesis about the changes in fishing activities in Oceanus after SouthSeafood was caught:
@@ -891,6 +968,7 @@ Combining the information above, we can make the following two hypothesis about 
 2.  The fishing vessels moved into Ghoti Preserves from Sep onwards for IUU fishing. Tell tale sign is the increase in Offidia catch from Sep, which is species unique to Ghoti Preserve. 
 
 For confirmation, we take a look at the changes to OVLS Transponder Ping, comparing the total pings to various Fishing Grounds and Preserves month by month.
+
 
 ```{r}
 transponder_ping_edge_long <- transponder_ping_edge %>% 
@@ -906,7 +984,6 @@ transponder_ping_edge_long <- transponder_ping_edge %>%
   summarize(n = n()) 
 ```
 
-
 ```{r}
 transponder_ping_edge_long %>% 
   mutate(month = as.factor(month)) %>% 
@@ -915,7 +992,9 @@ transponder_ping_edge_long %>%
                 SubTitle = "across Feb to Nov 2035",
                 Caption = "Prepared by: Liang Xiuhao")
 ```
+
 In the line graph below, we observe that the overall fishing vessels activities in the fishing ground and preserves dropped. 
+
 
 ```{r}
 average <- transponder_ping_edge %>% 
@@ -1011,9 +1090,11 @@ ggplot(monthly_transponder_ping , aes(x = month,
             size = 2)
 
 ```
+
 From the plot above, we can see that after SouthSeafood was caught in mid-May, there is a drop in activities for all the fishing grounds and preserves immediately after mid-May, except for the increase in Don Limpet Preserve. 
 
 Let's observe for month to month if the dwell time increase for Don Limpet Preserve.
+
 
 ```{r}
 don_monthly_transponder_ping <- transponder_ping_edge %>% 
@@ -1038,6 +1119,7 @@ don_monthly_transponder_ping <- transponder_ping_edge %>%
             color = "black", size = 4)
   
 ```
+
 ```{r}
 nemo_monthly_transponder_ping <- transponder_ping_edge %>% 
   select(source, dwell, time) %>% 
@@ -1061,6 +1143,7 @@ nemo_monthly_transponder_ping <- transponder_ping_edge %>%
             color = "black", size = 4)
 
 ```
+
 ```{r}
 ghoti_monthly_transponder_ping <- transponder_ping_edge %>% 
   select(source, dwell, time) %>% 
@@ -1086,38 +1169,4 @@ ghoti_monthly_transponder_ping <- transponder_ping_edge %>%
 ```{r, fig.width=6, fig.height=10}
 don_monthly_transponder_ping/nemo_monthly_transponder_ping/ghoti_monthly_transponder_ping
 ```
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
