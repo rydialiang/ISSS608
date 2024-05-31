@@ -436,17 +436,70 @@ vessel_location_city <- vessel_location %>%
                        "City of Port Grove"))
 ```
 
+**Merging cargo_list and vessel_location_city**
 
+```{r}
+cargo_list <- cargo_list %>% 
+  mutate(vessel_delivery_date = date + days(-1))
+```
 
+```{r}
+vessel_location_city <- vessel_location_city %>% 
+  mutate(date = substr(`time`,1,10)) %>% 
+  mutate(vessel_delivery_date = ymd(date)) 
+```
 
+```{r}
+vessel_location_match <- vessel_location_city %>% 
+  select(source,target,vessel_delivery_date) %>% 
+  rename(city = source, vessel_hr = target) %>% 
+  left_join(cargo_list,
+            unmatched = "drop") %>%
+  filter(if_all(c(qty_tons), ~ !is.na(.))) %>% 
+  distinct()
+```
 
+There are a total of 5,307 unique cargoes, but we have  65,340 matches between the cargoes and vessels.
 
+```{r}
+vessel_location_match %>% 
+  select(cargo) %>% 
+  distinct()
+```
 
+```{r}
+id1 <- vessel_location_match  %>% 
+  select(vessel_hr) %>% 
+  rename(id = vessel_hr) 
 
+id2 <- vessel_location_match  %>% 
+  select(cargo) %>% 
+  rename(id = cargo)
 
+cargo_vessel_nodes <- rbind(id1,id2) %>% 
+  distinct() 
 
+cargo_vessel_edges <- vessel_location_match %>% 
+  select(vessel_hr,cargo) %>% 
+  distinct() %>%
+  group_by(vessel_hr, cargo) %>%
+  rename(source = vessel_hr, target = cargo)%>%
+  filter(source!=target) %>% 
+  ungroup
 
+cargo_vessel_graph <- tbl_graph(nodes = cargo_vessel_nodes,
+                       edges = cargo_vessel_edges,
+                       directed = FALSE)
+```
 
+```{r}
+#| eval: FALSE
+cargo_vessel_graph %>%
+  ggraph(layout = 'nicely') +
+  geom_edge_link() +
+  geom_node_point() + 
+  theme_graph()
+```
 
 Finding anomalies in vessel movement by comparing end time (calculated by dwell) with next time (the next time the vessel is detected at the next location). 
 
@@ -462,6 +515,7 @@ ab_vessel_mvmt_agg <- ab_vessel_mvmt %>%
   group_by(source) %>% 
   summarise(weights = n()) %>%
   arrange(desc(weights))
+ab_vessel_mvmt_agg
 ```
 
 
@@ -1139,10 +1193,11 @@ fishing_vessels_in_don <- transponder_ping_edge %>%
 fishing_vessels_in_don
 ```
 
-There are only 4 records of visits through the OVLS to Don Limpet, once in Mar and Jun, for about 1.5 to 2hrs each, and another 2 in Aug, for about 1.25 to 1.75 hrs each. Thire record is high inconguent to the growing number of Sockfish that are found in the delivery report from May onwards. 
+There are only 4 records of visits through the OVLS to Don Limpet, once in Mar and Jun, for about 1.5 to 2hrs each, and another 2 in Aug, for about 1.25 to 1.75 hrs each. These record is high inconguent to the growing number of Sockfish that are found in the delivery report from May onwards. 
 
 
 ### 4.2 What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
+
 
 
 
