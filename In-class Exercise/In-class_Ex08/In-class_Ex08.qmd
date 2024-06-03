@@ -1,0 +1,11 @@
+---
+title: "In-class Exercise 8: R Shiny 1"
+author: "Rydia"
+date: "May 13, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+---
