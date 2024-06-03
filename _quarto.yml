@@ -26,11 +26,11 @@ website:
           - text: "Hands-on Exercise 7"
             href: Hands-on Exercise/Hands-on_Ex07/Hands-on_Ex07.qmd
           - text: "Hands-on Exercise 8a"
-            href: Hands-on Exercise/Hands-on_Ex08/Hands-on_Ex08a.qmd
-            text: "Hands-on Exercise 8b"
-            href: Hands-on Exercise/Hands-on_Ex08/Hands-on_Ex08b.qmd
-            text: "Hands-on Exercise 8c"
-            href: Hands-on Exercise/Hands-on_Ex08/Hands-on_Ex08c.qmd
+            href: Hands-on Exercise/Hands-on_Ex08a/Hands-on_Ex08a.qmd
+          - text: "Hands-on Exercise 8b"
+            href: Hands-on Exercise/Hands-on_Ex08b/Hands-on_Ex08b.qmd
+          - text: "Hands-on Exercise 8c"
+            href: Hands-on Exercise/Hands-on_Ex08c/Hands-on_Ex08c.qmd
           - text: "Hands-on Exercise 9"
             href: Hands-on Exercise/Hands-on_Ex09/Hands-on_Ex09.qmd
           - text: "Hands-on Exercise 10"
