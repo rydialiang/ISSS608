@@ -52,29 +52,72 @@ mc2_data <- fromJSON("data/MC2/mc2.json")
 
 mc2 is a directed multigraph, consists of nodes dataframe and links dataframe.
 
+# 1.2.1 Loading the Geographical Data
+
 ```{r}
-oceanus_map = st_read("data/MC2/Oceanus Information/Oceanus Geography.geojson") %>%
+oceanus_geography = st_read("data/MC2/Oceanus Information/Oceanus Geography.geojson") %>%
   st_transform(crs = 4326)
 ```
 
-
 ```{r}
-glimpse(oceanus_map)
-```
-
-Loading the oceanus map:
-
-```{r}
-ggplot(oceanus_map) +
-  geom_sf(color = "black") +
-  geom_sf_text(aes(label = Name), size = 2,
-               vjust = 1.5)
+glimpse(oceanus_geography)
 ```
 
 ```{r}
-write_rds(oceanus_map, "data/rds/oceanus_map.rds")
+write_rds(oceanus_geography, 
+  "data/rds/oceanus_geography.rds")
 ```
 
+**Importing Geographical Data in ESRI shapefile format**
+
+```{r}
+oceanus_locations <- st_read(dsn = "data/MC2/shp",
+  layer = "Oceanus Geography")
+```
+
+```{r}
+glimpse(oceanus_locations)
+```
+
+```{r}
+ggplot(data = oceanus_locations) +
+  geom_sf()
+```
+
+```{r}
+write_rds(oceanus_locations, 
+  "data/rds/oceanus_locations.rds")
+```
+
+## 1.2.2 Wrangling of Geographical Data
+
+In the code chunk below, st_coordinate() of sf package is used to extract coordinates from oceanus_locations sf data.frame.
+
+```{r}
+coords <- st_coordinates(oceanus_locations)
+```
+
+Next, code chunk below is used to drop the geometry column of oceanus_locations of sf data.frame by using st_drop_geometry() of sf package and save the output into a new data.frame called oceanus_locations_df.
+
+```{r}
+oceanus_locations_df <- oceanus_locations %>%
+  st_drop_geometry()
+```
+
+Then, the code chunk below is to append the x- and y-coodinate values from coords list into the XCOORD and YCOORD columns of oceanus_locations_df respectively.
+
+```{r}
+oceanus_locations_df$XCOORD <- coords[, "X"]
+oceanus_locations_df$YCOORD <- coords[, "Y"]
+```
+
+Lastly, the code chunk below is used to tidy OceanusLocations_df by selecting the necessary columns only and at the same time, rename X.Kind to Loc_Type.
+
+```{r}
+oceanus_locations_df <- oceanus_locations_df %>%
+  select(Name, X.Kind, XCOORD, YCOORD) %>%
+  rename(Loc_Type = X.Kind)
+```
 
 ## 1.3 **Wrangling and tidying edges**
 
@@ -285,17 +328,11 @@ Node/Edge types and properties present
 2.  Entity.Location: Description of a geographic location
 3.  Event.TransponderPing: Links a vessel to a location
 
-First, we will extract the relevant nodes, namely the vessels and locations from `mc2_nodes`. As we are only concerned about the fishing vessels and cargo vessels, we will only extract values matching "Vessel" in entity2 column and values matching "FishingVessel" & "CargoVessel" in entity3 column. For locations, we will match values of "Location" in entity2 column, and match values of "City", "Point" and "Region" in entity3 column.
-
-```{r}
-unique(mc2_nodes$entity3)
-```
-
+First, we will extract the relevant nodes, namely the vessels and locations from `mc2_nodes`.
 
 ```{r}
 vessel_mvmt_nodes <- mc2_nodes %>% 
-  filter(entity2 %in% c("Vessel","Location")) %>% 
-  filter(entity3 %in% c("FishingVessel","CargoVessel","City","Point","Region"))
+  filter(entity2 %in% c("Vessel","Location")) 
 ```
 
 Next, we will extract the vessel movement edges from mc2_edges, by filtering the "TransponderPing" from event3 column.
@@ -303,6 +340,16 @@ Next, we will extract the vessel movement edges from mc2_edges, by filtering the
 ```{r}
 vessel_mvmt_edges <- mc2_edges %>% 
   filter(event3 %in% c("TransponderPing"))
+```
+
+```{r}
+vessel_movement_data <- vessel_mvmt_edges %>% 
+  filter(event3 %in% c("TransponderPing")) %>%
+  select(time, dwell, source, target) %>% 
+  mutate(source = gsub("^City of", "", source)) %>%
+  mutate(source = gsub("^\\s+", "", source)) %>%
+  left_join(oceanus_locations_df,
+            by = c("source" = "Name"))
 ```
 
 ### 1.5.2 Harbor Reports
@@ -363,11 +410,137 @@ Before we move on to exploring the data, we will save the 3 sources edges and no
 ```{r}
 write_rds(vessel_mvmt_nodes, "data/rds/vessel_mvmt_nodes.rds")
 write_rds(vessel_mvmt_edges, "data/rds/vessel_mvmt_edges.rds")
+write_rds(vessel_movement_data, "data/rds/vessel_movement_data.rds")
 write_rds(harbor_report_nodes, "data/rds/harbor_report_nodes.rds")
 write_rds(harbor_report_edges, "data/rds/harbor_report_edges.rds")
 write_rds(harbor_import_records_nodes, "data/rds/harbor_import_records_nodes.rds")
 write_rds(harbor_import_records_edges, "data/rds/harbor_import_records_edges.rds")
 ```
+
+```{r}
+unique(mc2_edges$type)
+```
+
+## 1.6 Exploratory Data Analysis
+
+### 1.6.1 Understanding the nodes and edges data
+
+In this section, we will gain more insights from the existing data. The table below summarises the type of data we can glean from the nodes and edges:
+
++----------------+---------------------+-----------------------------------------------------------+
+| mc2_nodes Type | Entity              | Details                                                   |
++================+=====================+===========================================================+
+| Commodity      | Fish                | **10 x Fish Species**                                     |
+|                |                     |                                                           |
+|                |                     | ![](images/clipboard-629994936.png)                       |
++----------------+---------------------+-----------------------------------------------------------+
+| Location       | 1.  City            | **6 x City**                                              |
+|                | 2.  Point           |                                                           |
+|                | 3.  Region          | ![](images/clipboard-3282014997.png)                      |
+|                |                     |                                                           |
+|                |                     | **12 x Point**                                            |
+|                |                     |                                                           |
+|                |                     | ![](images/clipboard-802842425.png){width="94"}           |
+|                |                     |                                                           |
+|                |                     | **6 x Region**                                            |
+|                |                     |                                                           |
+|                |                     | -   3 x Ecological Preserves                              |
+|                |                     |                                                           |
+|                |                     | -   3 x Fishing Ground                                    |
+|                |                     |                                                           |
+|                |                     | ![](images/clipboard-3654858944.png)                      |
++----------------+---------------------+-----------------------------------------------------------+
+| Document       | Delivery Report     | 5,307 unique cargoes, with qty_ton and date (of delivery) |
++----------------+---------------------+-----------------------------------------------------------+
+| Vessels        | 1.  Fishing Vessels | **296 x Vessels**                                         |
+|                | 2.  Cargo Vessels   |                                                           |
+|                | 3.  Ferry Cargo     | -   178 x Fishing Vessels                                 |
+|                | 4.  Ferry Passenger |                                                           |
+|                | 5.  Research        | -   100 x Cargo Vessels                                   |
+|                | 6.  Tour            |                                                           |
+|                | 7.  Others          | -   2 x Cargo Ferry                                       |
+|                |                     |                                                           |
+|                |                     | -   3 x Passenger Ferry                                   |
+|                |                     |                                                           |
+|                |                     | -   2 x Research Vessels                                  |
+|                |                     |                                                           |
+|                |                     | -   6 x Tour Vessels                                      |
+|                |                     |                                                           |
+|                |                     | -   5 x Other Vessels                                     |
++----------------+---------------------+-----------------------------------------------------------+
+
++------------------+--------------------------------------------------------------------------------+
+| mc2_edges type   | Count (n)                                                                      |
++==================+================================================================================+
+| Transponder Ping | 258,542 x Pings                                                                |
++------------------+--------------------------------------------------------------------------------+
+| Transaction      | 10,614 x Transactions (matching 5,307 unique cargoes to fish species and city) |
++------------------+--------------------------------------------------------------------------------+
+| Harbor Report    |  2,487 x Sightings                                                             |
++------------------+--------------------------------------------------------------------------------+
+
+### 1.6.2 Understanding the Fish Species in each Region
+
+```{r}
+region_fish_species <- mc2_nodes %>% 
+  filter(entity3 == "Region") %>% 
+  select(Name, fish_species_present, Activities, kind)
+```
+
+```{r}
+word_list <- strsplit(region_fish_species$fish_species_present, "\\,")
+
+max_elements <- max(lengths(word_list))
+
+word_list_padded <- lapply(word_list, 
+function(x) c(x, rep(NA, max_elements - length(x))))
+
+word_df <- do.call(rbind, word_list_padded)
+colnames(word_df) <- paste0("species", 1:max_elements) 
+
+word_df <- as_tibble(word_df) %>% 
+  mutate(species1 = str_replace(species1, "/.*", "")) %>% 
+  mutate(species2 = str_replace(species2, "/.*", "")) %>% 
+  mutate(species3 = str_replace(species3, "/.*", "")) %>% 
+  mutate(species4 = str_replace(species4, "/.*", "")) %>% 
+  mutate(species5 = str_replace(species5 , "/.*", "")) %>%
+  mutate_at(vars(species1:species5), trimws)
+
+region_fish_species <- region_fish_species %>%
+  cbind(word_df)
+
+# Convert data to long format
+region_fish_species_long <- pivot_longer(region_fish_species, cols = starts_with("species"), names_to = "Species", values_to = "Presence")
+
+# Filter out empty values and trim away leading and trailing whitespace
+region_fish_species_long <- region_fish_species_long[region_fish_species_long$Presence != "", ] %>% 
+  na.omit() %>%
+  mutate_at(vars(Presence), trimws)
+```
+
+```{r}
+# Order them based on 3 Preserves and 3 Fishing Ground
+desired_order <- c("Ghoti Preserve", "Nemo Reef", "Don Limpet Preserve","Cod Table", "Wrasse Beds","Tuna Shelf")  
+
+region_fish_species_long$Name <- factor(region_fish_species_long$Name, levels = desired_order)
+
+ggplot(region_fish_species_long, aes(x = Name, 
+                                     y = Presence,
+                                     colour = Presence)) +
+  geom_point() +
+  labs(title = "Species Presence in each Region",
+       x = "Region",
+       y = "Species") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none")
+```
+
+::: callout-note
+## Insights from this visualisation
+
+We can derive that Sockfish, Offidiaa, and Helenaa species can only be found in the preserves but not in the fishing grounds. Therefore, any cargoes that contains these fish species would have fished illegally. Below shows the visualisation of the species and qty_ton that flows through each city by months.
+:::
 
 ## 2.0 Task 1: Flow of Commercially Caught Fish
 
@@ -422,16 +595,15 @@ cargo_list<- harbor_import_records_nodes %>%
   filter(if_all(c(qty_tons), ~ !is.na(.)))
 ```
 
-**Matching the vessel with the cargo list** 
+**Matching the vessel with the cargo list**
 
-We will use the vessel_mvmt_nodes that contains information on the movement of fishing vessels and cargoes, and define the vessels location, start time and end time of the vessels in the particular location using transponder ping. 
+We will use the vessel_mvmt_nodes that contains information on the movement of fishing vessels and cargoes, and define the vessels location, start time and end time of the vessels in the particular location using transponder ping.
 
 ```{r}
 fishing_vessel_list <- vessel_mvmt_nodes %>% 
   filter(entity3 %in% c("FishingVessel")) %>% 
   select(id)
 ```
-
 
 ```{r}
 vessel_list <- vessel_mvmt_nodes %>% 
@@ -460,7 +632,7 @@ vessel_location_city <- vessel_location %>%
 
 **Vessel Location based on harbor report**
 
-The next step we do is to extract the date, location and vessel from the harbor report. Since this is describe as canonical, it should be considered for matching first before using the vessel location data from transponder ping. Columns are renamed to match the information in the cargo_list. 
+The next step we do is to extract the date, location and vessel from the harbor report. Since this is describe as canonical, it should be considered for matching first before using the vessel location data from transponder ping. Columns are renamed to match the information in the cargo_list.
 
 ```{r}
 vessel_mvmt_hr <- harbor_report_edges %>% 
@@ -470,7 +642,7 @@ vessel_mvmt_hr <- harbor_report_edges %>%
 
 **Merging cargo_list and vessel_mvmt_hr**
 
-Adding one column on vessel delivery date, which is 1 day before the date stated in the harbor import record. 
+Adding one column on vessel delivery date, which is 1 day before the date stated in the harbor import record.
 
 ```{r}
 cargo_list <- cargo_list %>% 
@@ -483,13 +655,13 @@ Saving cargo_list:
 write_rds(cargo_list, "data/rds/cargo_list.rds")
 ```
 
-
 ```{r}
 vessel_location_match_hr <- cargo_list%>% 
   left_join(vessel_mvmt_hr ) %>%
   filter(if_all(c(qty_tons,vessel), ~ !is.na(.))) %>% 
   distinct()
 ```
+
 ```{r}
 write_rds(vessel_location_match_hr, "data/rds/vessel_location_match_hr.rds")
 ```
@@ -498,13 +670,11 @@ write_rds(vessel_location_match_hr, "data/rds/vessel_location_match_hr.rds")
 hr_match <- mc2_nodes %>% 
   select(id,Name,flag_country, company, tonnage,entity3) %>% 
   rename(vessel = id) %>% 
-  left_join(vessel_location_match_hr,
-            unmatched = "drop") %>%   
+  left_join(vessel_location_match_hr) %>%   
   filter(if_all(c(qty_tons, tonnage), ~ !is.na(.))) %>% 
-  distinct() 
+  distinct() %>% 
+  filter()
 ```
-
-
 
 **Merging cargo_list and vessel_location_city**
 
@@ -525,10 +695,8 @@ vessel_location_match <- vessel_location_city %>%
   distinct()
 ```
 
+**Vessel Match Graph**
 
-
-
-**Vessel Match Graph
 ```{r}
 id1 <- vessel_location_match_hr  %>% 
   select(vessel) %>% 
@@ -563,10 +731,7 @@ cargo_vessel_graph %>%
   theme_graph()
 ```
 
-
-
-
-Finding anomalies in vessel movement by comparing end time (calculated by dwell) with next time (the next time the vessel is detected at the next location). 
+Finding anomalies in vessel movement by comparing end time (calculated by dwell) with next time (the next time the vessel is detected at the next location).
 
 ```{r}
 ab_vessel_mvmt <- vessel_location %>%
@@ -582,8 +747,6 @@ ab_vessel_mvmt_agg <- ab_vessel_mvmt %>%
   arrange(desc(weights))
 ab_vessel_mvmt_agg
 ```
-
-
 
 **Overview of Harbor Report**
 
@@ -619,11 +782,12 @@ transponder_location <- mc2_edges %>%
 ggplot(transponder_location) +
   geom_bar(aes(x = source))
 ```
-A quick comparison between the two bar chart, we can conclude that port activities for fishing vessels are highest at City of Paackland and least at City of Himark. Also, there is no fishing vessels that visits City of Port Grove. 
+
+A quick comparison between the two bar chart, we can conclude that port activities for fishing vessels are highest at City of Paackland and least at City of Himark. Also, there is no fishing vessels that visits City of Port Grove.
 
 ## 2.3 Examine the seasonal trends and anomalies in the port exit records
 
-We examine the cargo_list and realised that there are some records that shows negative tonnage for their cargoes. This is abnormal as all cargoes should have positive qty_tons value. 
+We examine the cargo_list and realised that there are some records that shows negative tonnage for their cargoes. This is abnormal as all cargoes should have positive qty_tons value.
 
 ```{r}
 negative_ton_cargo_by_city <- cargo_list %>% 
@@ -657,11 +821,13 @@ ggplot(positive_ton_cargo_by_city, aes(x = city)) +
        y = "Total Quantity (tons)") +
   theme_minimal()
 ```
+
 There seems to be suspicious activities going on at each cities when we look at the negative values in qty_ton.
 
 ```{r}
 negative_ton_cargo_by_city
 ```
+
 Next, we will remove the negative quantity and then find the aggregated value by the type of fish, the city, and the date of transaction.
 
 ```{r}
@@ -675,7 +841,8 @@ fish_by_port_agg <- cargo_list %>%
                        label = TRUE, 
                        abbr = TRUE))
 ```
-Secondly, when we observe the heatmap, we also realised that the data only covers the month from Feb to Nov in year 2035. 
+
+Secondly, when we observe the heatmap, we also realised that the data only covers the month from Feb to Nov in year 2035.
 
 ```{r}
 # Create an overall Oceanus heat map for all types of fish
@@ -693,7 +860,6 @@ ggplot(fish_agg, aes(x = month, y = name, fill = total_qty_ton)) +
          fill = "Total Quantity (tons)") +
     theme_minimal()
 ```
-
 
 ```{r}
 # Function to create a calendar heat map
@@ -766,14 +932,8 @@ region_fish_species <- region_fish_species %>%
   
 region_fish_species
 ```
-```{r}
-# Convert data to long format
-region_fish_species_long <- pivot_longer(region_fish_species, cols = starts_with("species"), names_to = "Species", values_to = "Presence")
 
-# Filter out empty values and trim away leading and trailing whitespace
-region_fish_species_long <- region_fish_species_long[region_fish_species_long$Presence != "", ] %>% 
-  na.omit() %>%
-  mutate_at(vars(Presence), trimws)
+```         
 ```
 
 **Visualising the Species presence in each Region**
@@ -796,7 +956,7 @@ ggplot(region_fish_species_long, aes(x = Name,
         legend.position = "none")
 ```
 
-From the above visualisation, we can derive that Sockfish, Offidiaa, and Helenaa species can only be found in the preserves but not in the fishing grounds. Therefore, any cargoes that contains these fish species would have fished illegal. Below shows the visualisation of the species and qty_ton that flows through each city by months. 
+From the above visualisation, we can derive that Sockfish, Offidiaa, and Helenaa species can only be found in the preserves but not in the fishing grounds. Therefore, any cargoes that contains these fish species would have fished illegal. Below shows the visualisation of the species and qty_ton that flows through each city by months.
 
 ```{r}
 # Create an empty list to store heatmaps
@@ -841,9 +1001,9 @@ ggplot(fish_agg, aes(x = month, y = name, fill = total_qty_ton)) +
     theme_minimal()
 ```
 
-From this heatmap above, we understand that there is an abnormal increase in Sockfish catch from May onwards, and abnormal increase in Offidiaa catch from September onwards , which are species unique to the Don Limpet Preserve and Ghoti Preserve respectively. 
+From this heatmap above, we understand that there is an abnormal increase in Sockfish catch from May onwards, and abnormal increase in Offidiaa catch from September onwards , which are species unique to the Don Limpet Preserve and Ghoti Preserve respectively.
 
-Probable reason for this is that since SouthSeafood Express Corp was caught in mid-May for illegal fishing in Ghoti Preserve, other illegal fishing vessels made a switch to Don Limpet Reserves to fish. 
+Probable reason for this is that since SouthSeafood Express Corp was caught in mid-May for illegal fishing in Ghoti Preserve, other illegal fishing vessels made a switch to Don Limpet Reserves to fish.
 
 ## 3.0 Task 2
 
@@ -941,9 +1101,10 @@ ssf_graph %>%
                  hjust = 1,
                  size = 3)
 ```
+
 ### 3.1.1 When and where did SouthSeafood Express Corp vessels perform their illegal fishing?
 
-Since only Snapper Snatcher appears to be operating in Ghoti Preserve, we will examine this fishing vessel more closely. 
+Since only Snapper Snatcher appears to be operating in Ghoti Preserve, we will examine this fishing vessel more closely.
 
 ```{r}
 snapper_activities <- mc2_edges %>% 
@@ -956,8 +1117,53 @@ snapper_activities <- mc2_edges %>%
 snapper_activities
 ```
 
-There three instances (2,9 and 16 Feb) where Snapper Snatcher stayed at the Ghoti Preserve for over 3 days. These are the instances where SouthSeafood Express Corp's Snapper Snatcher conducted IUU Fishing in Ghoti Preserve. 
+There three instances (2,9 and 16 Feb) where Snapper Snatcher stayed at the Ghoti Preserve for over 3 days. These are the instances where SouthSeafood Express Corp's Snapper Snatcher conducted IUU Fishing in Ghoti Preserve.
 
+### 3.1.2 Visualising Vessel Trajectory
+
+In the code chunk below, st_as_sf() of sf package is used to convert vessel_movement_data data.frame into sf point data.frame by using values in XCOORD and YCOORD columns. The output is an sf data.frame called vessel_movement_sf.
+
+```{r}
+vessel_movement_sf <- vessel_movement_data %>%
+  st_as_sf(coords = c("XCOORD", "YCOORD"), 
+           crs = 4326)
+```
+
+Next arrange() is used to sort the records according to the vessels’ name (i.e. target) and navigation time (i.e. time)
+
+```{r}
+vessel_movement_sf <- vessel_movement_sf %>%
+  arrange(target, time)
+```
+
+Lastly, st_cast() of sf package is used to convert vessel_movement_sf from point features into linestring features called vessel_trajectory.
+
+```{r}
+vessel_trajectory <- vessel_movement_sf %>%
+  group_by(target) %>%
+  summarize(do_union = FALSE) %>%
+  st_cast("LINESTRING")
+```
+
+**Selecting SouthSeafood Express vessels**
+
+```{r}
+vessel_trajectory_selected <- vessel_trajectory %>%
+  filter(target %in% c("snappersnatcher7be", "roachrobberdb6"))
+```
+
+Next, appropriate functions of ggplot2 is used to plot the selected vessel trajectories by using the code chunk below.
+
+```{r}
+ggplot() +
+  geom_sf(data = oceanus_geography) +
+  geom_sf(data = vessel_trajectory_selected, 
+          aes(color = factor(target)), 
+          size = 1) +
+  theme_minimal() +
+  labs(title = "Trajectories of SouthSeafood Express Vessels", 
+  x = "Longitude", y = "Latitude", color = "ID")
+```
 
 ## 4.0 Task 4
 
@@ -973,7 +1179,7 @@ The final activities of SouthSeafood's vessels are on 2035-05-16 (snappersnatche
 
 ## 4.1 Changes in Commercial Fishing
 
-Firstly, we take a look at the species caught across the months (Feb to Nov 2035). 
+Firstly, we take a look at the species caught across the months (Feb to Nov 2035).
 
 ```{r}
 # Create an overall Oceanus heat map for all types of fish
@@ -1015,13 +1221,14 @@ species_plot <-ggplot(region_fish_species_long, aes(x = Name,
 ```{r, fig.width=6, fig.height=6}
 oceanus_heatmap / species_plot
 ```
-For recapitulation, we know that Sockfish, Offidiaa, and Helenaa are fish species that are unique to the three Preserves. From the two plots above, we can derive initial conclusion that there is an usual increase in Sockfish catch after SouthSeafood was caught in mid-May. We also see a minor increase in Helenaa between Jun to Aug, and later in Oct to Nov. The spike in Offidiaa catch begins in Sep and grows gradually to Nov. 
+
+For recapitulation, we know that Sockfish, Offidiaa, and Helenaa are fish species that are unique to the three Preserves. From the two plots above, we can derive initial conclusion that there is an usual increase in Sockfish catch after SouthSeafood was caught in mid-May. We also see a minor increase in Helenaa between Jun to Aug, and later in Oct to Nov. The spike in Offidiaa catch begins in Sep and grows gradually to Nov.
 
 Combining the information above, we can make the following two hypothesis about the changes in fishing activities in Oceanus after SouthSeafood was caught:
 
-1.  The fishing vessels switched to Don Limpet Preserve for IUU fishing. Tell tale sign is the increase in Sockfish catch, which is species unique to Don Limpet Preserve. This also explains the slight increase in Helena catch from Jun. 
+1.  The fishing vessels switched to Don Limpet Preserve for IUU fishing. Tell tale sign is the increase in Sockfish catch, which is species unique to Don Limpet Preserve. This also explains the slight increase in Helena catch from Jun.
 
-2.  The fishing vessels moved into Ghoti Preserves from Sep onwards for IUU fishing. Tell tale sign is the increase in Offidia catch from Sep, which is species unique to Ghoti Preserve. 
+2.  The fishing vessels moved into Ghoti Preserves from Sep onwards for IUU fishing. Tell tale sign is the increase in Offidia catch from Sep, which is species unique to Ghoti Preserve.
 
 For confirmation, we take a look at the changes to OVLS Transponder Ping, comparing the total pings to various Fishing Grounds and Preserves month by month.
 
@@ -1040,7 +1247,6 @@ transponder_ping_edge_long <- transponder_ping_edge %>%
   summarize(n = n()) 
 ```
 
-
 ```{r}
 transponder_ping_edge_long %>% 
   mutate(month = as.factor(month)) %>% 
@@ -1049,7 +1255,8 @@ transponder_ping_edge_long %>%
                 SubTitle = "across Feb to Nov 2035",
                 Caption = "Prepared by: Liang Xiuhao")
 ```
-In the line graph below, we observe that the overall fishing vessels activities in the fishing ground and preserves dropped. 
+
+In the line graph below, we observe that the overall fishing vessels activities in the fishing ground and preserves dropped.
 
 ```{r}
 average <- transponder_ping_edge %>% 
@@ -1099,6 +1306,7 @@ transponder_ping_edge %>%
   theme_minimal()
   
 ```
+
 Derive monthly transponder ping:
 
 ```{r}
@@ -1115,8 +1323,6 @@ monthly_transponder_ping <- transponder_ping_edge %>%
   group_by(source, month) %>% 
   summarize(n = n()) 
 ```
-
-
 
 ```{r, fig.width= 10}
 monthly_transponder_ping$month <- factor(monthly_transponder_ping$month)
@@ -1166,7 +1372,8 @@ ggplot(monthly_transponder_ping , aes(x = month,
             size = 2)
 
 ```
-From the plot above, we can see that after SouthSeafood was caught in mid-May, there is a drop in activities for all the fishing grounds and preserves immediately after mid-May, except for the increase in Don Limpet Preserve, from 1 in Mar and Jun to 2 observations in Aug.  
+
+From the plot above, we can see that after SouthSeafood was caught in mid-May, there is a drop in activities for all the fishing grounds and preserves immediately after mid-May, except for the increase in Don Limpet Preserve, from 1 in Mar and Jun to 2 observations in Aug.
 
 Let's observe for month to month if the dwell time increase for Don Limpet Preserve.
 
@@ -1246,7 +1453,12 @@ ghoti_monthly_transponder_ping <- transponder_ping_edge %>%
 ```{r, fig.width=6, fig.height=6}
 nemo_monthly_transponder_ping/ghoti_monthly_transponder_ping
 ```
-From the above plots, we observe that for Nemo Reef and Ghoti Preserve, the trend is downwards for the amount of time spent by the fishing vessels. 
+
+From the above plots, we observe that for Nemo Reef and Ghoti Preserve, the trend is downwards for the amount of time spent by the fishing vessels.
+
+```{r}
+don_monthly_transponder_ping
+```
 
 ```{r}
 fishing_vessels_in_don <- transponder_ping_edge %>% 
@@ -1258,37 +1470,6 @@ fishing_vessels_in_don <- transponder_ping_edge %>%
 fishing_vessels_in_don
 ```
 
-There are only 4 records of visits through the OVLS to Don Limpet, once in Mar and Jun, for about 1.5 to 2hrs each, and another 2 in Aug, for about 1.25 to 1.75 hrs each. These record is high inconguent to the growing number of Sockfish that are found in the delivery report from May onwards. 
-
+There are only 4 records of visits through the OVLS to Don Limpet, once in Mar and Jun, for about 1.5 to 2hrs each, and another 2 in Aug, for about 1.25 to 1.75 hrs each. These record is high incongruent to the growing number of Sockfish that are found in the delivery report from May onwards.
 
 ### 4.2 What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
