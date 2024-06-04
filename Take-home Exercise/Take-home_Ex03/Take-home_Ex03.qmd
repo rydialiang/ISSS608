@@ -8,6 +8,10 @@ execute:
   echo: true
   warning: false
   freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
 ---
 
 # VAST 2024 Mini Challenge 2
