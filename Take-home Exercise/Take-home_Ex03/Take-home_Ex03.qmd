@@ -22,19 +22,7 @@ Mini-challenge 2 focuses on analyzing ship movements and shipping records to und
 
 The details of the mini challenge can be found [here](https://vast-challenge.github.io/2024/MC2.html).
 
-## Tasks and Questions
-
-FishEye analysts need your help to perform geographic and temporal analysis of the CatchNet data so they can prevent illegal fishing from happening again. Your task is to develop new visual analytics tools and workflows that can be used to discover and understand signatures of different types of behavior. Can you use your tool to visualize a signature of SouthSeafood Express Corp’s illegal behavior? FishEye needs your help to develop a workflow to find other instances of illegal behavior.
-
-1.  FishEye analysts have long wanted to better understand the flow of commercially caught fish through Oceanus’s many ports. But as they were loading data into CatchNet, they discovered they had purchased the wrong port records. They wanted to get the ship off-load records, but they instead got the port-exit records (essentially trucks/trains leaving the port area). Port exit records do not include which vessel that delivered the products. Given this limitation, develop a visualization system to associate vessels with their probable cargos. Which vessels deliver which products and when? What are the seasonal trends and anomalies in the port exit records?
-
-2.  Develop visualizations that illustrate the inappropriate behavior of SouthSeafood Express Corp vessels. How do their movement and catch contents compare to other fishing vessels? When and where did SouthSeafood Express Corp vessels perform their illegal fishing? How many different types of suspicious behaviors are observed? Use visual evidence to justify your conclusions.
-
-3.  To support further Fisheye investigations, develop visual analytics workflows that allow you to discover other vessels engaging in behaviors similar to SouthSeafood Express Corp’s illegal activities? Provide visual evidence of the similarities.
-
-4.  How did fishing activity change after SouthSeafood Express Corp was caught? What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
-
-## 1.0 Data Preparation
+# 1.0 Data Preparation
 
 ## 1.1 Loading R Packages
 
@@ -56,7 +44,7 @@ mc2_data <- fromJSON("data/MC2/mc2.json")
 
 mc2 is a directed multigraph, consists of nodes dataframe and links dataframe.
 
-# 1.2.1 Loading the Geographical Data
+### 1.2.1 Loading the Geographical Data
 
 ```{r}
 oceanus_geography = st_read("data/MC2/Oceanus Information/Oceanus Geography.geojson") %>%
@@ -93,7 +81,7 @@ write_rds(oceanus_locations,
   "data/rds/oceanus_locations.rds")
 ```
 
-## 1.2.2 Wrangling of Geographical Data
+### 1.2.2 Wrangling of Geographical Data
 
 In the code chunk below, st_coordinate() of sf package is used to extract coordinates from oceanus_locations sf data.frame.
 
@@ -312,9 +300,101 @@ Lastly, we will save the tidied mc2_nodes
 write_rds(mc2_nodes, "data/rds/mc2_nodes.rds")
 ```
 
-## 1.5 Extracting the required columns for each graph
+## 1.5 Processing nodes and edges data 
 
-In this section, we will extract the required column for the following graphs:
+### 1.5.1 Understanding the nodes and edges data
+
+In this section, we will gain more insights from the existing data. The table below summarises the type of data we can glean from the nodes and edges:
+
++----------------+---------------------+-----------------------------------------------------------+----------------------------------------------------+
+| mc2_nodes Type | Entity              | Details                                                   | Relevant Fields                                    |
++================+=====================+===========================================================+====================================================+
+| Commodity      | Fish                | **10 x Fish Species**                                     | 1.  name (fish species common name/scientific name |
+|                |                     |                                                           | 2.  id                                             |
+|                |                     | ![](images/clipboard-629994936.png)                       |                                                    |
++----------------+---------------------+-----------------------------------------------------------+----------------------------------------------------+
+| Location       | 1.  City            | **6 x City**                                              | 1.  id ( City Name)                                |
+|                | 2.  Point           |                                                           | 2.  Name (City short name)                         |
+|                | 3.  Region          | ![](images/clipboard-3282014997.png)                      | 3.  description                                    |
+|                |                     |                                                           | 4.  activities                                     |
+|                |                     | **12 x Point**                                            | 5.  kind                                           |
+|                |                     |                                                           | 6.  entity3 (type of location)                     |
+|                |                     | ![](images/clipboard-802842425.png){width="94"}           |                                                    |
+|                |                     |                                                           |                                                    |
+|                |                     | **6 x Region**                                            |                                                    |
+|                |                     |                                                           |                                                    |
+|                |                     | -   3 x Ecological Preserves                              |                                                    |
+|                |                     |                                                           |                                                    |
+|                |                     | -   3 x Fishing Ground                                    |                                                    |
+|                |                     |                                                           |                                                    |
+|                |                     | ![](images/clipboard-3654858944.png)                      |                                                    |
++----------------+---------------------+-----------------------------------------------------------+----------------------------------------------------+
+| Document       | Delivery Report     | 5,307 unique cargoes, with qty_ton and date (of delivery) | 1.  id                                             |
+|                |                     |                                                           | 2.  qty_tons                                       |
+|                |                     |                                                           | 3.  date                                           |
++----------------+---------------------+-----------------------------------------------------------+----------------------------------------------------+
+| Vessels        | 1.  Fishing Vessels | **296 x Vessels**                                         | 1.  id                                             |
+|                | 2.  Cargo Vessels   |                                                           | 2.  Name                                           |
+|                | 3.  Ferry Cargo     | -   178 x Fishing Vessels                                 | 3.  flag_country                                   |
+|                | 4.  Ferry Passenger |                                                           | 4.  company                                        |
+|                | 5.  Research        | -   100 x Cargo Vessels                                   | 5.  tonnage                                        |
+|                | 6.  Tour            |                                                           | 6.  length_overall                                 |
+|                | 7.  Others          | -   2 x Cargo Ferry                                       | 7.  entity3 (type of vessels)                      |
+|                |                     |                                                           |                                                    |
+|                |                     | -   3 x Passenger Ferry                                   |                                                    |
+|                |                     |                                                           |                                                    |
+|                |                     | -   2 x Research Vessels                                  |                                                    |
+|                |                     |                                                           |                                                    |
+|                |                     | -   6 x Tour Vessels                                      |                                                    |
+|                |                     |                                                           |                                                    |
+|                |                     | -   5 x Other Vessels                                     |                                                    |
++----------------+---------------------+-----------------------------------------------------------+----------------------------------------------------+
+
++------------------+--------------------------------------------------------------------------------+----------------------------------+
+| mc2_edges type   | Count (n)                                                                      | Relevant Fields                  |
++==================+================================================================================+==================================+
+| Transponder Ping | 258,542 x Pings                                                                | 1.  time                         |
+|                  |                                                                                | 2.  dwell                        |
+|                  |                                                                                | 3.  source (locations)           |
+|                  |                                                                                | 4.  target (vessels)             |
++------------------+--------------------------------------------------------------------------------+----------------------------------+
+| Transaction      | 10,614 x Transactions (matching 5,307 unique cargoes to fish species and city) | 1.  source (cargo)               |
+|                  |                                                                                | 2.  target (fish species & city) |
+|                  |                                                                                | 3.  date                         |
++------------------+--------------------------------------------------------------------------------+----------------------------------+
+| Harbor Report    |  2,487 x Sightings                                                             | 1.  source (vessels)             |
+|                  |                                                                                | 2.  target (city)                |
+|                  |                                                                                | 3.  date                         |
++------------------+--------------------------------------------------------------------------------+----------------------------------+
+
+### 1.5.2 Extracting Relevant Information for each nodes and edges data
+
+In this section, we will extract the required column and save it into a more intuitive columns with intuitive names. From the analysis above, we will have 4 nodes data and 3 edges data as below:
+
+::: callout-note
+## Nodes and Edges Data
+
+**Nodes:**
+
+1.  fish_nodes: all types of fish species in the data set
+2.  location_nodes: all locations in the data set
+3.  cargo_nodes: all cargoes in the data set
+4.  vessel_nodes: all vessels in the data set
+
+**Edges:**
+
+1.  vessel_movement: vessel movement, location, time and dwell
+2.  transaction: date and location of transaction of cargoes
+3.  harbor_report: date and vessel that dock in the harbor (city)
+:::
+
+
+```{r}
+fish_species_all <- mc2_nodes %>% 
+  filter(entity2 == "Commodity") %>% 
+  select(name, id) %>% 
+  mutate(name = str_replace(name, "/.*", ""))
+```
 
 1.  Vessel Movements
 
@@ -371,7 +451,8 @@ Node/edge types present:
 Since the node type are the same as the vessel movements, we will make a copy of the node from vessel movement nodes.
 
 ```{r}
-harbor_report_nodes <- vessel_mvmt_nodes
+harbor_report_nodes <- vessel_mvmt_nodes %>% 
+  filter(entity3 %in% c("City", "FishingVessel", "Others", "CargoVessel", "Tour", "Research", "Ferry"))
 ```
 
 Next, we will extract the harbor report edges from mc2_edges, by filtering the "HarborReport" from event3 column.
@@ -427,68 +508,14 @@ unique(mc2_edges$type)
 
 ## 1.6 Exploratory Data Analysis
 
-### 1.6.1 Understanding the nodes and edges data
-
-In this section, we will gain more insights from the existing data. The table below summarises the type of data we can glean from the nodes and edges:
-
-+----------------+---------------------+-----------------------------------------------------------+
-| mc2_nodes Type | Entity              | Details                                                   |
-+================+=====================+===========================================================+
-| Commodity      | Fish                | **10 x Fish Species**                                     |
-|                |                     |                                                           |
-|                |                     | ![](images/clipboard-629994936.png)                       |
-+----------------+---------------------+-----------------------------------------------------------+
-| Location       | 1.  City            | **6 x City**                                              |
-|                | 2.  Point           |                                                           |
-|                | 3.  Region          | ![](images/clipboard-3282014997.png)                      |
-|                |                     |                                                           |
-|                |                     | **12 x Point**                                            |
-|                |                     |                                                           |
-|                |                     | ![](images/clipboard-802842425.png){width="94"}           |
-|                |                     |                                                           |
-|                |                     | **6 x Region**                                            |
-|                |                     |                                                           |
-|                |                     | -   3 x Ecological Preserves                              |
-|                |                     |                                                           |
-|                |                     | -   3 x Fishing Ground                                    |
-|                |                     |                                                           |
-|                |                     | ![](images/clipboard-3654858944.png)                      |
-+----------------+---------------------+-----------------------------------------------------------+
-| Document       | Delivery Report     | 5,307 unique cargoes, with qty_ton and date (of delivery) |
-+----------------+---------------------+-----------------------------------------------------------+
-| Vessels        | 1.  Fishing Vessels | **296 x Vessels**                                         |
-|                | 2.  Cargo Vessels   |                                                           |
-|                | 3.  Ferry Cargo     | -   178 x Fishing Vessels                                 |
-|                | 4.  Ferry Passenger |                                                           |
-|                | 5.  Research        | -   100 x Cargo Vessels                                   |
-|                | 6.  Tour            |                                                           |
-|                | 7.  Others          | -   2 x Cargo Ferry                                       |
-|                |                     |                                                           |
-|                |                     | -   3 x Passenger Ferry                                   |
-|                |                     |                                                           |
-|                |                     | -   2 x Research Vessels                                  |
-|                |                     |                                                           |
-|                |                     | -   6 x Tour Vessels                                      |
-|                |                     |                                                           |
-|                |                     | -   5 x Other Vessels                                     |
-+----------------+---------------------+-----------------------------------------------------------+
-
-+------------------+--------------------------------------------------------------------------------+
-| mc2_edges type   | Count (n)                                                                      |
-+==================+================================================================================+
-| Transponder Ping | 258,542 x Pings                                                                |
-+------------------+--------------------------------------------------------------------------------+
-| Transaction      | 10,614 x Transactions (matching 5,307 unique cargoes to fish species and city) |
-+------------------+--------------------------------------------------------------------------------+
-| Harbor Report    |  2,487 x Sightings                                                             |
-+------------------+--------------------------------------------------------------------------------+
-
 ### 1.6.2 Understanding the Fish Species in each Region
+
+Before we can detect anomalies in the for fishing activities, we first need to understand where are the fish species found in each Region.
 
 ```{r}
 region_fish_species <- mc2_nodes %>% 
   filter(entity3 == "Region") %>% 
-  select(Name, fish_species_present, Activities, kind)
+  select(Name, fish_species_present, Activities, kind) 
 ```
 
 ```{r}
@@ -522,7 +549,7 @@ region_fish_species_long <- region_fish_species_long[region_fish_species_long$Pr
   mutate_at(vars(Presence), trimws)
 ```
 
-```{r}
+```{r fig.width = 10, fig.height= 5}
 # Order them based on 3 Preserves and 3 Fishing Ground
 desired_order <- c("Ghoti Preserve", "Nemo Reef", "Don Limpet Preserve","Cod Table", "Wrasse Beds","Tuna Shelf")  
 
@@ -543,8 +570,38 @@ ggplot(region_fish_species_long, aes(x = Name,
 ::: callout-note
 ## Insights from this visualisation
 
-We can derive that Sockfish, Offidiaa, and Helenaa species can only be found in the preserves but not in the fishing grounds. Therefore, any cargoes that contains these fish species would have fished illegally. Below shows the visualisation of the species and qty_ton that flows through each city by months.
+[**Ecological Preserves**]{.underline}
+
+We can derive that Sockfish, Offidiaa, and Helenaa species can only be found in the preserves but not in the fishing grounds. Therefore, any cargoes that contains these fish species (Sockfish, Offidiaa, and Helenaa) would have fished illegally. Below shows the visualisation of the species and qty_ton that flows through each city by months.
+
+-   Sockfish: Only found in Don Limpet Preserve
+
+-   Offidiaa: Only found in Ghoti Preserve
+
+-   Helenaa: Only found in Ecological Preserves (all three)
+
+[**Fishing Grounds**]{.underline}
+
+-   Cod: Only found in Cod Table
+
+-   Harland: Only found in Tuna Shelf
+
+**Other notable point**
+
+-   Salmon: Not found in any of the 6 locations mentioned above. This might be imports from other countries or from international shipping.
 :::
+
+### 1.6.3 Understanding the qty_tons of each Fish Species by City
+
+After identifying the three fish species (Sockfish, Offidiaa, and Helenaa) that are only found in the Ecological Preserves, we will have an overview of how each of the fish species are spread across the city.
+
+```{r}
+fish_species_all
+```
+
+```{r}
+
+```
 
 ## 2.0 Task 1: Flow of Commercially Caught Fish
 
