@@ -448,12 +448,15 @@ We will add in oceanus_location and vessel_nodes data together with the Transpon
 vessel_movement <- mc2_edges %>% 
   filter(event3 == "TransponderPing") %>% 
   select(time, dwell, source, target) %>% 
-  rename(loc= source, vessel = target ) %>% 
-  mutate(loc_short = gsub("^City of", "", loc)) %>%
-  mutate(loc_short = gsub("^\\s+", "", loc)) %>%
+  rename(loc= source, vessel = target )
+
+vessel_movement$loc_short <- vessel_movement$loc
+
+vessel_movement <- vessel_movement %>%   
+  mutate(loc_short = gsub("^City of", "",loc_short)) %>%
+  mutate(loc_short = gsub("^\\s+", "",loc_short)) %>% 
   left_join(oceanus_locations_df) %>% 
   left_join(vessel_nodes)
-
 
 ```
 
@@ -931,7 +934,7 @@ p1/p2
 ::: callout-note
 ### Insights from this visualisation
 
--   There are cargoes which has negative. This is abnormal as all cargoes qty_tons values should be at least zero .
+-   There are cargoes which has negative values. This is abnormal as all cargoes qty_tons values should be at least zero .
 
 -   There are a number of outliers cargoes with qty_tons above ~70 tons. 
 :::
@@ -1162,6 +1165,8 @@ vessel_nodes %>%
 -   All 20 non-Oceanus fishing vessels are all registered with company in the data.
 
 :::
+
+### 1.6.8 Understanding the vessel movements
 
 
 
@@ -1484,9 +1489,7 @@ There three instances (2,9 and 16 Feb) where Snapper Snatcher stayed at the Ghot
 In the code chunk below, st_as_sf() of sf package is used to convert vessel_movement_data data.frame into sf point data.frame by using values in XCOORD and YCOORD columns. The output is an sf data.frame called vessel_movement_sf.
 
 ```{r}
-vessel_movement_data <- read_rds("data/rds/vessel_movement_data.rds")
-
-vessel_movement_sf <- vessel_movement_data %>%
+vessel_movement_sf <- vessel_movement %>%
   st_as_sf(coords = c("XCOORD", "YCOORD"), 
            crs = 4326)
 ```
@@ -1495,14 +1498,14 @@ Next arrange() is used to sort the records according to the vessels’ name (i.e
 
 ```{r}
 vessel_movement_sf <- vessel_movement_sf %>%
-  arrange(target, time)
+  arrange(vessel, time)
 ```
 
 Lastly, st_cast() of sf package is used to convert vessel_movement_sf from point features into linestring features called vessel_trajectory.
 
 ```{r}
 vessel_trajectory <- vessel_movement_sf %>%
-  group_by(target) %>%
+  group_by(vessel) %>%
   summarize(do_union = FALSE) %>%
   st_cast("LINESTRING")
 ```
@@ -1511,7 +1514,7 @@ vessel_trajectory <- vessel_movement_sf %>%
 
 ```{r}
 vessel_trajectory_selected <- vessel_trajectory %>%
-  filter(target %in% c("snappersnatcher7be", "roachrobberdb6"))
+  filter(vessel %in% c("snappersnatcher7be", "roachrobberdb6"))
 ```
 
 Next, appropriate functions of ggplot2 is used to plot the selected vessel trajectories by using the code chunk below.
@@ -1520,7 +1523,7 @@ Next, appropriate functions of ggplot2 is used to plot the selected vessel traje
 ggplot() +
   geom_sf(data = oceanus_geography) +
   geom_sf(data = vessel_trajectory_selected, 
-          aes(color = factor(target)), 
+          aes(color = factor(vessel)), 
           size = 1) +
   theme_minimal() +
   labs(title = "Trajectories of SouthSeafood Express Vessels", 
