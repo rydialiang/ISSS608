@@ -24,6 +24,12 @@ The details of the mini challenge can be found [here](https://vast-challenge.git
 
 # 1.0 Data Preparation
 
+Reference for Data Preparations:
+
+1.  [Kickstarter 2](https://isss608-ay2023-24apr.netlify.app/vast/kickstarter2) by Prof T.S. Kam 
+
+2.  [Kickstarter 3](https://isss608-ay2023-24apr.netlify.app/vast/kickstarter3) by Prof T.S. Kam
+
 ## 1.1 Loading R Packages
 
 ```{r}
@@ -836,6 +842,8 @@ ggplot(location_ping_agg, aes(x = loc,
 -   There is abnormally high number of pings for fishing vessels at Nemo Reef. Since Nemo Reef is a Ecological Preserve, the correct safe navigation around it is through Nav D.
 
 -   Given that the fish species (Wrasse, Tuna, Birdseye, Beauvoir) in Nemo Reef, can also be found in other fishing grounds, there is likelihood of IUU here. The presence of Helenaa is the only tell-tale sign if a fishing vessel indeed fish in Nemo Reef.
+
+-   There is abornormally high number of pings for fishing vessels at Exit East. Since the activities in Exit E are international shipping and Deep Sea Fishing, it is not a designated Fishing Ground within Oceanus. Thus, we should be only expecting cargo vessels through Exit E, as observed in other exits. 
 :::
 
 ### 1.6.5 Understanding the Harbor Report by Locations
@@ -1168,6 +1176,10 @@ vessel_nodes %>%
 
 ### 1.6.8 Understanding the vessel movements
 
+**Understand Average Dwell by Location**
+```{r}
+
+```
 
 
 
@@ -1677,12 +1689,6 @@ Derive monthly transponder ping:
 ```{r}
 monthly_vessel_movement <- vessel_movement %>% 
   filter(type == "FishingVessel") %>%
-  filter(loc %in% c("Ghoti Preserve", 
-                       "Nemo Reef", 
-                       "Don Limpet Preserve",
-                       "Cod Table", 
-                       "Wrasse Beds",
-                       "Tuna Shelf")) %>% 
   mutate(month = month(time)) %>% 
   select(loc, vessel, month) %>% 
   group_by(loc, month) %>% 
@@ -1692,12 +1698,24 @@ monthly_vessel_movement <- vessel_movement %>%
 ```{r, fig.width= 10}
 monthly_vessel_movement$month <- factor(monthly_vessel_movement$month)
 monthly_vessel_movement$loc <- factor(monthly_vessel_movement$loc,
-                                             levels = c("Ghoti Preserve", 
-                                                        "Nemo Reef",
-                                                        "Don Limpet Preserve",
-                                                        "Cod Table",
-                                                        "Wrasse Beds",
-                                                        "Tuna Shelf"))
+                                             levels = c("City of Himark",
+                                      "City of Lomark",
+                                      "City of Haacklee",
+                                      "City of Paackland",
+                                      "City of South Paackland",
+                                      "City of Port Grove",
+                                      "Ghoti Preserve", 
+                                      "Nemo Reef", 
+                                      "Don Limpet Preserve",
+                                      "Cod Table", 
+                                      "Wrasse Beds",
+                                      "Tuna Shelf",
+                                      "Exit North",
+                                      "Exit South",
+                                      "Exit East",
+                                      "Exit West",
+                                      "Nav 1","Nav 2", "Nav 3", 
+                                      "Nav A", "Nav B", "Nav C", "Nav D", "Nav E"))
 
 hline.data <- monthly_vessel_movement %>% 
   group_by(loc) %>%
@@ -1744,5 +1762,71 @@ From the plot above, we can see that after SouthSeafood was caught in mid-May, t
 
 ### 4.2 What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
 
+
+
+```{r, fig.width= 10}
+monthly_vessel_movement$month <- factor(monthly_vessel_movement$month)
+monthly_vessel_movement$loc <- factor(monthly_vessel_movement$loc,
+                                             levels = c("City of Himark",
+                                      "City of Lomark",
+                                      "City of Haacklee",
+                                      "City of Paackland",
+                                      "City of South Paackland",
+                                      "City of Port Grove",
+                                      "Ghoti Preserve", 
+                                      "Nemo Reef", 
+                                      "Don Limpet Preserve",
+                                      "Cod Table", 
+                                      "Wrasse Beds",
+                                      "Tuna Shelf",
+                                      "Exit North",
+                                      "Exit South",
+                                      "Exit East",
+                                      "Exit West",
+                                      "Nav 1","Nav 2", "Nav 3", 
+                                      "Nav A", "Nav B", "Nav C", "Nav D", "Nav E"))
+
+hline.data <- monthly_vessel_movement %>% 
+  group_by(loc) %>%
+  summarise(avgvalue = mean(n))
+
+ggplot(monthly_vessel_movement, 
+       aes(x = month, 
+           y = n, 
+           group = loc, 
+           color = loc)) +
+  geom_line(size = 1) +
+  geom_point(size = 2) +
+  facet_wrap(~ loc, scales = "free_y") +  
+  theme_minimal() +
+  labs(title = "Changes in Visit Frequency by Month by Fishing Vessels",
+       x = "Month",
+       y = "No. of Visits",
+       color = "Source") +
+  geom_hline(data = hline.data,
+             aes(yintercept = avgvalue),
+             linetype = 6,
+             color = "black",
+             size = 0.5) +
+  geom_text(data = hline.data, 
+            aes(x = "4", y = avgvalue, label = "Average"), 
+            hjust = 1, vjust = 1, 
+            color = "black",
+            size = 3) +
+  geom_vline(aes(xintercept = 4),
+             linetype = 6,
+             color = "red",
+             size = 0.5) +
+  geom_text(data = hline.data, 
+            aes(x = "4", 
+                y = avgvalue, 
+                label = "SouthSeafood caught"), 
+            vjust = 1.5,
+            angle = 90,
+            color = "red",
+            size = 2) +
+  theme(legend.position = "none")
+
+```
 
 
