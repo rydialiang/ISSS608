@@ -26,7 +26,7 @@ The details of the mini challenge can be found [here](https://vast-challenge.git
 
 Reference for Data Preparations:
 
-1.  [Kickstarter 2](https://isss608-ay2023-24apr.netlify.app/vast/kickstarter2) by Prof T.S. Kam 
+1.  [Kickstarter 2](https://isss608-ay2023-24apr.netlify.app/vast/kickstarter2) by Prof T.S. Kam
 
 2.  [Kickstarter 3](https://isss608-ay2023-24apr.netlify.app/vast/kickstarter3) by Prof T.S. Kam
 
@@ -38,7 +38,7 @@ pacman::p_load(tidyverse, jsonlite, DT, lubridate,
                visNetwork, sf,
                patchwork, CGPfunctions,
                ggHoriPlot, plotly,ggridges,
-               ggdist)
+               ggdist, ggiraph)
 ```
 
 ## 1.2 Loading the Data
@@ -843,7 +843,7 @@ ggplot(location_ping_agg, aes(x = loc,
 
 -   Given that the fish species (Wrasse, Tuna, Birdseye, Beauvoir) in Nemo Reef, can also be found in other fishing grounds, there is likelihood of IUU here. The presence of Helenaa is the only tell-tale sign if a fishing vessel indeed fish in Nemo Reef.
 
--   There is abornormally high number of pings for fishing vessels at Exit East. Since the activities in Exit E are international shipping and Deep Sea Fishing, it is not a designated Fishing Ground within Oceanus. Thus, we should be only expecting cargo vessels through Exit E, as observed in other exits. 
+-   There is abornormally high number of pings for fishing vessels at Exit East. Since the activities in Exit E are international shipping and Deep Sea Fishing, it is not a designated Fishing Ground within Oceanus. Thus, we should be only expecting cargo vessels through Exit E, as observed in other exits.
 :::
 
 ### 1.6.5 Understanding the Harbor Report by Locations
@@ -939,15 +939,17 @@ p2 <- boxplot <- ggplot(cargo_nodes, aes(y = qty_tons)) +
 
 p1/p2
 ```
+
 ::: callout-note
 ### Insights from this visualisation
 
 -   There are cargoes which has negative values. This is abnormal as all cargoes qty_tons values should be at least zero .
 
--   There are a number of outliers cargoes with qty_tons above ~70 tons. 
+-   There are a number of outliers cargoes with qty_tons above \~70 tons.
 :::
 
 **Cargoes Quantity Ton by Date and City**
+
 ```{r}
 # Aggregate import record data
 import_record_agg <- import_record %>%
@@ -1038,6 +1040,7 @@ crosstalk::bscols(gg,
 :::
 
 **Tonnage Distribution**
+
 ```{r fig.width = 10}
 # Raincloud Plot for Tonnage Distribution of Fishing and Cargo Vessels
 p1 <- vessel_nodes %>% 
@@ -1078,12 +1081,13 @@ p2 <- vessel_nodes %>%
 
 p1/p2
 ```
+
 ::: callout-note
 ### Insights from this visualisation
 
--   Fishing vessels tonnage distribution is right skewed. There is high concentration of fishing vessels of < 1,000 ton.
+-   Fishing vessels tonnage distribution is right skewed. There is high concentration of fishing vessels of \< 1,000 ton.
 
--   Cargo vessels tonnage falls largely into two distinct groups: (1) ~2000 ton, and (2) ~75,000 ton. 
+-   Cargo vessels tonnage falls largely into two distinct groups: (1) \~2000 ton, and (2) \~75,000 ton.
 :::
 
 **Vessel Type and Flag Country**
@@ -1150,7 +1154,7 @@ vessel_nodes %>%
 
 **Vessels by Company**
 
-Upon inspecting the vessel_nodes data, we observe that non-Oceanus fishing vessels has registered company information, while non-Oceanus cargo vessels do not have registered company information. To confirm this is true, we remove those company that are "NA" in the bar plot. 
+Upon inspecting the vessel_nodes data, we observe that non-Oceanus fishing vessels has registered company information, while non-Oceanus cargo vessels do not have registered company information. To confirm this is true, we remove those company that are "NA" in the bar plot.
 
 ![](images/clipboard-651628543.png)
 
@@ -1165,26 +1169,22 @@ vessel_nodes %>%
   facet_grid(~type)
   
 ```
+
 ::: callout-note
 ### Insights from this visualisation
 
 -   Only one cargo vessel is registered with company. This belongs to the "Saltwater Sisters Company Marine". Using the data table created above, we found out that this cargo vessel is registered under the flag_country of Oceantterra. This company also owns a fishing vessel (bassbaiterb9f) with flag_country as Oceanus.
 
 -   All 20 non-Oceanus fishing vessels are all registered with company in the data.
-
 :::
 
 ### 1.6.8 Understanding the vessel movements
 
 **Understand Average Dwell by Location**
+
 ```{r}
 
 ```
-
-
-
-
-
 
 ## 2.0 Task 1: Flow of Commercially Caught Fish
 
@@ -1338,11 +1338,10 @@ ab_vessel_mvmt_agg <- ab_vessel_mvmt %>%
 ab_vessel_mvmt_agg
 ```
 
-
-
 ## 2.3 Examine the seasonal trends and anomalies in the port exit records
 
 ### 2.3.1 Seasonal trends in port exit records
+
 ```{r}
 import_record1 <- import_record %>% 
   mutate(year = year(cargo_delivery_date),
@@ -1416,7 +1415,6 @@ for (c in cities) {
 
 ## 2.3.1 **Understanding the types of fish that should not be in the market**
 
-
 ```{r}
 # Create an empty list to store heatmaps
 heatmaps <- list()
@@ -1427,7 +1425,7 @@ for (c in cities) {
   # Filter the data for the current city
   heatmap_data <- fish_by_port_agg %>% 
     filter(city == c) %>% 
-    filter(fish %in% c("Sockfish", "Offidiaa", "Helenaa"))
+    filter(fish %in% c("Sockfish", "Offidiaa", "Helenaa","Salmon"))
   
   # Create the heatmap for the current city
   heatmap <- create_heatmap(heatmap_data, c)
@@ -1441,7 +1439,6 @@ for (c in cities) {
   print(heatmaps[[c]])
 }
 ```
-
 
 ::: callout-note
 ### Insights from this visualisation
@@ -1552,7 +1549,7 @@ ggplot() +
 
 In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. We will use this timeline as the
 
-The final activities of SouthSeafood's vessels are on 2035-05-16 (snappersnatcher7be) and 2035-05-16 (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-16.
+The final activities of SouthSeafood's vessels are on 2035-05-16 (snappersnatcher7be) and 2035-05-14 (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-16.
 
 ## 4.1 Changes in Commercial Fishing
 
@@ -1599,7 +1596,7 @@ species_plot <-ggplot(region_fish_species_long, aes(x = Name,
 oceanus_heatmap / species_plot
 ```
 
-For recapitulation, we know that Sockfish, Offidiaa, and Helenaa are fish species that are unique to the three Preserves. From the two plots above, we can derive initial conclusion that there is an usual increase in Sockfish catch after SouthSeafood was caught in mid-May. We also see a minor increase in Helenaa between Jun to Aug, and later in Oct to Nov. The spike in Offidiaa catch begins in Sep and grows gradually to Nov.
+For recapitulation, we know that Sockfish, Offidiaa, and Helenaa are fish species that are unique to the three Preserves. From the two plots above, we can derive initial conclusion that there is an usual increase in Sockfish catch after SouthSeafood was caught in mid-May. We also see a minor increase in Helenaa between Jun to Aug, and later in Oct to Nov. The spike in Offidiaa catch begins in Sep and grows gradually to Nov. There is also appearance of Salmon from Jul onwards.
 
 Combining the information above, we can make the following two hypothesis about the changes in fishing activities in Oceanus after SouthSeafood was caught:
 
@@ -1607,17 +1604,13 @@ Combining the information above, we can make the following two hypothesis about 
 
 2.  The fishing vessels moved into Ghoti Preserves from Sep onwards for IUU fishing. Tell tale sign is the increase in Offidia catch from Sep, which is species unique to Ghoti Preserve.
 
+3.  Salmon start to appear in the cargoes in various cities. Salmon is a deep sea fish species that is not found in any of the fishing ground in Oceanus
+
 For confirmation, we take a look at the changes to OVLS Transponder Ping, comparing the total pings to various Fishing Grounds and Preserves month by month.
 
 ```{r}
 vessel_movement_long <- vessel_movement %>% 
-  filter(type == "FishingVessel") %>%
-  filter(loc %in% c("Ghoti Preserve", 
-                       "Nemo Reef", 
-                       "Don Limpet Preserve",
-                       "Cod Table", 
-                       "Wrasse Beds",
-                       "Tuna Shelf")) %>% 
+  filter(type == "FishingVessel") %>% 
   mutate(month = month(time)) %>% 
   select(loc, vessel, month) %>% 
   group_by(loc, month) %>% 
@@ -1749,20 +1742,18 @@ ggplot(monthly_vessel_movement,
              color = "red",
              size = 0.5) +
   geom_text(data = hline.data, 
-            aes(x = "4", y = avgvalue, label = "SouthSeafood caught"), 
-            hjust = 1.5, vjust = 1.5,
+            aes(x = "4", 
+                y = avgvalue, 
+                label = "SouthSeafood caught"), 
+            vjust = 1.5,
             angle = 90,
             color = "red",
-            size = 2)
+            size = 2) +
+  theme(legend.position = "none")
 
 ```
 
-From the plot above, we can see that after SouthSeafood was caught in mid-May, there is a drop in activities for all the fishing grounds and preserves immediately after mid-May, except for the increase in Don Limpet Preserve, from 1 in Mar and Jun to 2 observations in Aug.
-
-
 ### 4.2 What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
-
-
 
 ```{r, fig.width= 10}
 monthly_vessel_movement$month <- factor(monthly_vessel_movement$month)
@@ -1829,4 +1820,55 @@ ggplot(monthly_vessel_movement,
 
 ```
 
+::: callout-important
+## Conclusion from the visualisation
 
+After SSFEC arrest:
+
+-   Abnormally high frequency of visit to Exit East. Upward trend of frequency of visit from Feb to Nov. Exit East offers deep sea fishing.
+
+-   Drastic drop in frequency of visit to the City of Haacklee. Investigate into changes in fish species in the cargoes through the months going to the City of Haacklee.
+
+-   Drop in frequency if visit in both Ghoti Preserve and Nemo Reef. However, the drop in Nemo Reef in actual value is greater. Nemo reef is a good area for violation of IUU as vessels have access to fish species in Nemo Reef that are common to the three fishing grounds, except for Helenaa species. Also, Nemo Reef sits between the two fishing grounds, maske good excuse for vessels to cut across it rather than using Nav D as safe navigation around Nemo Reef.
+:::
+
+**Changes in fish species delivered to the City of Haacklee through the month**
+
+```{r}
+create_heatmap(fish_by_port_agg, "City of Haacklee")
+```
+
+```{r}
+vessel_movement$loc <- factor(vessel_movement$loc,
+                              levels = c("City of Himark",
+                                      "City of Lomark",
+                                      "City of Haacklee",
+                                      "City of Paackland",
+                                      "City of South Paackland",
+                                      "City of Port Grove",
+                                      "Ghoti Preserve", 
+                                      "Nemo Reef", 
+                                      "Don Limpet Preserve",
+                                      "Cod Table", 
+                                      "Wrasse Beds",
+                                      "Tuna Shelf",
+                                      "Exit North",
+                                      "Exit South",
+                                      "Exit East",
+                                      "Exit West",
+                                      "Nav 1","Nav 2", "Nav 3", 
+                                      "Nav A", "Nav B", "Nav C", "Nav D", "Nav E"))
+ggplot(vessel_movement, aes(x = loc, 
+                            y = dwell,
+                            fill = loc_type)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Median Dwell Time by Location", 
+       x = "Location", 
+       y = "Median Dwell Time") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1)) +
+  scale_y_continuous( limits = c(0, 500000))
+```
+
+```{}
+```
