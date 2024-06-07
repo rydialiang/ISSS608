@@ -22,6 +22,12 @@ Mini-challenge 2 focuses on analyzing ship movements and shipping records to und
 
 The details of the mini challenge can be found [here](https://vast-challenge.github.io/2024/MC2.html).
 
+## Foreword by the Author
+
+This visualisation project is created for the fulfillment of [take home exercise 3](https://isss608-ay2023-24apr.netlify.app/take-home_ex/th_ex03) as part of the course assessment for the (Visual Analytics)[https://isss608-ay2023-24apr.netlify.app/] module taught by (Prof. T.S. Kam)[https://faculty.smu.edu.sg/profile/kam-tin-seong-486].
+
+Jump straight to final product for this (Take Home Exercise 3 - Mini Challenge 2: Task 4)[https://vaa-ry.netlify.app/take-home%20exercise/take-home_ex03/take-home_ex03#task-4] here. Only Task 4 is considered as a complete set of write up. The rest of the Task 1 and 2 are still work in progress by the author at the point of submission on 9 Jun 2024.
+
 # 1.0 Data Preparation
 
 Reference for Data Preparations:
@@ -1183,8 +1189,49 @@ vessel_nodes %>%
 **Understand Average Dwell by Location**
 
 ```{r}
-
+vessel_movement$loc <- factor(vessel_movement$loc,
+                              levels = c("City of Himark",
+                                      "City of Lomark",
+                                      "City of Haacklee",
+                                      "City of Paackland",
+                                      "City of South Paackland",
+                                      "City of Port Grove",
+                                      "Ghoti Preserve", 
+                                      "Nemo Reef", 
+                                      "Don Limpet Preserve",
+                                      "Cod Table", 
+                                      "Wrasse Beds",
+                                      "Tuna Shelf",
+                                      "Exit North",
+                                      "Exit South",
+                                      "Exit East",
+                                      "Exit West",
+                                      "Nav 1","Nav 2", "Nav 3", 
+                                      "Nav A", "Nav B", "Nav C", "Nav D", "Nav E"))
+ggplot(vessel_movement, aes(x = loc, 
+                            y = dwell,
+                            fill = loc_type)) +
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Median Dwell Time by Location", 
+       x = "Location", 
+       y = "Median Dwell Time") +
+  scale_y_continuous(limits = c(0, 300000)) +
+  coord_flip()
 ```
+
+::: callout-note
+### Insights from this visualisation
+- For the cities, the outliers can be explained by the extend stay due to repair and replenishment purposes. 
+
+-   For all three ecological preserves, there are many outliers, and this is a tell-tale sign of extended stay in the preserves by fishing vessels for IUU fishing. 
+
+-   For the fishing grounds, the extended stay of fishing vessels may be explained by conducting of transshipment between small fishing vessels and bigger reefer/cargo ships, where the small fishing vessels stay at the location for fishing. There are fishing vessels that are out in the sea for months.
+
+-   For the navigation points, Exit E display signs of abnormality due to its high number of outliers compared to other navigation points that are used for international shipping (Exit North, Exit South and Exit West). Nav 1 and Nav A may also be investigated since there are high numbers of outliers, and also, they are at the fringe of the Ghoti and Don Limpet Preserves respectively. 
+
+:::
+
 
 ## 2.0 Task 1: Flow of Commercially Caught Fish
 
@@ -1547,9 +1594,7 @@ ggplot() +
 
 2.  What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
 
-In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. We will use this timeline as the
-
-The final activities of SouthSeafood's vessels are on 2035-05-16 (snappersnatcher7be) and 2035-05-14 (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-16.
+In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. The final activities of SouthSeafood's vessels are on 2035-05-14 at City of Lomark for Snapper Snatcher (snappersnatcher7be) and 2035-05-12 at City of Himark for Roach Robber (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-14. We will use this date as the cut off to define before and after SSEC was caught.
 
 ## 4.1 Changes in Commercial Fishing
 
@@ -1606,10 +1651,13 @@ Combining the information above, we can make the following two hypothesis about 
 
 3.  Salmon start to appear in the cargoes in various cities. Salmon is a deep sea fish species that is not found in any of the fishing ground in Oceanus
 
-For confirmation, we take a look at the changes to OVLS Transponder Ping, comparing the total pings to various Fishing Grounds and Preserves month by month.
+For confirmation, we take a look at the changes to OVLS Transponder Ping, comparing the total pings to various locations month by month.
+
+**Frequency of visits to the Cities**
 
 ```{r}
 vessel_movement_long <- vessel_movement %>% 
+  filter(loc_type == "city") %>% 
   filter(type == "FishingVessel") %>% 
   mutate(month = month(time)) %>% 
   select(loc, vessel, month) %>% 
@@ -1618,12 +1666,99 @@ vessel_movement_long <- vessel_movement %>%
 ```
 
 ```{r}
-vessel_movement_long %>% 
+a <- vessel_movement_long %>% 
   mutate(month = as.factor(month)) %>% 
   newggslopegraph(month,n, loc,
-                Title = "Changes in Visit Frequency",
-                SubTitle = "across Feb to Nov 2035",
-                Caption = "Prepared by: Liang Xiuhao")
+                Title = "Changes in Visit Frequency of Fishing Vessels",
+                SubTitle = "Cities",
+                Caption = "Feb-Nov.Before and After SSEC caught in May") 
+
+
+a <- a + 
+  geom_vline(xintercept = 4, 
+                    linetype = 2, 
+                    color = "red") +
+  geom_text(aes(x = 4, y = 150, label = "SouthSeafood caught"),
+            color = "red",
+            hjust = 1.1,
+            size = 3)
+  theme_minimal() +
+  theme(legend.position = "none")
+a
+```
+
+::: callout-note
+## Insights from this visualisation
+
+-   For the City of Himark, there is a hike in visit frequency till the time
+:::
+
+```{r}
+vessel_movement_long <- vessel_movement %>% 
+  filter(loc_type == "buoy") %>% 
+  filter(type == "FishingVessel") %>% 
+  mutate(month = month(time)) %>% 
+  select(loc, vessel, month) %>% 
+  group_by(loc, month) %>% 
+  summarize(n = n()) 
+```
+
+```{r}
+b <- vessel_movement_long %>% 
+  mutate(month = as.factor(month)) %>% 
+  newggslopegraph(month,n, loc,
+                Title = "Changes in Visit Frequency of Fishing Vessels",
+                SubTitle = "Navigation Points",
+                Caption = "Feb-Nov.Before and After SSEC caught in May") 
+
+
+b <- b + 
+  geom_vline(xintercept = 4, 
+                    linetype = 2, 
+                    color = "red") +
+  geom_text(aes(x = 4, y = 150, label = "SouthSeafood caught"),
+            color = "red",
+            hjust = 1.1,
+            vjust = -8,
+            size = 3)
+  theme_minimal() +
+  theme(legend.position = "none")
+b
+```
+
+```{r}
+vessel_movement_long <- vessel_movement %>% 
+  filter(loc_type %in% c("Fishing Ground", "Ecological Preserve")) %>% 
+  filter(type == "FishingVessel") %>% 
+  mutate(month = month(time)) %>% 
+  select(loc, vessel, month) %>% 
+  group_by(loc, month) %>% 
+  summarize(n = n()) 
+```
+
+```{r}
+c <- vessel_movement_long %>% 
+  mutate(month = as.factor(month)) %>% 
+  newggslopegraph(month,n, loc,
+                Title = "Changes in Visit Frequency of Fishing Vessels",
+                SubTitle = "Fishing Grounds and Ecological Preserves",
+                Caption = "Feb-Nov.Before and After SSEC caught in May") 
+
+c <- c + 
+  geom_vline(xintercept = 4, 
+                    linetype = 2, 
+                    color = "red") +
+  geom_text(aes(x = 4, y = 150, label = "SouthSeafood caught"),
+            color = "red",
+            hjust = 1.1,
+            vjust = -8,
+            size = 3)
+  theme_minimal() +
+  theme(legend.position = "none")
+c
+```
+
+```{}
 ```
 
 In the line graph below, we observe that the overall fishing vessels activities in the fishing ground and preserves dropped.
@@ -1870,5 +2005,24 @@ ggplot(vessel_movement, aes(x = loc,
   scale_y_continuous( limits = c(0, 500000))
 ```
 
-```{}
+```{r}
+vessel_movement %>% 
+  filter(type =="FishingVessel") %>% 
+  filter(loc %in% c("Exit North",
+                    "Exit South",
+                    "Exit East",
+                    "Exit West",
+                    "Nav 1","Nav 2", "Nav 3", 
+                    "Nav A", "Nav B", "Nav C", "Nav D", "Nav E")) %>% 
+  ggplot(aes(x = loc, 
+       y = dwell,
+       fill = loc_type)) +                            
+  geom_boxplot() +
+  theme_minimal() +
+  labs(title = "Median Dwell Time by Location", 
+       x = "Location", 
+       y = "Median Dwell Time") +
+  theme(axis.text.x = element_text(angle = 45, 
+                                   hjust = 1)) 
+
 ```
