@@ -388,7 +388,7 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
     <div>
     <div class="quarto-title-meta-heading">Modified</div>
     <div class="quarto-title-meta-contents">
-      <p class="date-modified">June 7, 2024</p>
+      <p class="date-modified">June 10, 2024</p>
     </div>
   </div>
     
@@ -408,8 +408,8 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 </section>
 <section id="foreword-by-the-author" class="level2">
 <h2 class="anchored" data-anchor-id="foreword-by-the-author">Foreword by the Author</h2>
-<p>This visualisation project is created for the fulfillment of <a href="https://isss608-ay2023-24apr.netlify.app/take-home_ex/th_ex03">take home exercise 3</a> as part of the course assessment for the (Visual Analytics)[https://isss608-ay2023-24apr.netlify.app/] module taught by (Prof.&nbsp;T.S. Kam)[https://faculty.smu.edu.sg/profile/kam-tin-seong-486].</p>
-<p>Jump straight to final product for this (Take Home Exercise 3 - Mini Challenge 2: Task 4)[https://vaa-ry.netlify.app/take-home%20exercise/take-home_ex03/take-home_ex03#task-4] here. Only Task 4 is considered as a complete set of write up. The rest of the Task 1 and 2 are still work in progress by the author at the point of submission on 9 Jun 2024.</p>
+<p>This visualisation project is created for the fulfillment of <a href="https://isss608-ay2023-24apr.netlify.app/take-home_ex/th_ex03">take home exercise 3</a> as part of the course assessment for the <a href="https://isss608-ay2023-24apr.netlify.app/">Visual Analytics</a> module taught by <a href="https://faculty.smu.edu.sg/profile/kam-tin-seong-486">Prof.&nbsp;T.S. Kam</a>.</p>
+<p>Jump straight to final product for this <a href="https://vaa-ry.netlify.app/take-home%20exercise/take-home_ex03/take-home_ex03#task-4">Take Home Exercise 3 - Mini Challenge 2: Task 4</a> here. Only Task 4 is considered as a complete set of write up. The rest of the Task 1 and 2 are still work in progress by the author at the point of submission on 9 Jun 2024.</p>
 </section>
 </section>
 <section id="data-preparation" class="level1">
@@ -2723,7 +2723,7 @@ Insights from this visualisation
 <li><p>How did fishing activity change after SouthSeafood Express Corp was caught?</p></li>
 <li><p>What new behaviors in the Oceanus commercial fishing community are most suspicious and why?</p></li>
 </ol>
-<p>In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. The final activities of SouthSeafood’s vessels are on 2035-05-14 at City of Lomark for Snapper Snatcher (snappersnatcher7be) and 2035-05-12 at City of Himark for Roach Robber (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-14. We will use this date as the cut off to define before and after SSEC was caught.</p>
+<p><strong>The Answer</strong> In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. The final activities of SouthSeafood’s vessels are on 2035-05-14 at City of Lomark for Snapper Snatcher (snappersnatcher7be) and 2035-05-12 at City of Himark for Roach Robber (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-14. We will use this date as the cut off to define before and after SSEC was caught.</p>
 </section>
 <section id="changes-in-commercial-fishing" class="level2">
 <h2 class="anchored" data-anchor-id="changes-in-commercial-fishing">4.1 Changes in Commercial Fishing</h2>
@@ -3145,7 +3145,7 @@ Insights from this visualisation
 </div>
 <div class="callout-body-container callout-body">
 <ul>
-<li>For the City of Himark, there is a hike in visit frequency till the time</li>
+<li>For the City of Himark, there is a hike in visit frequency till the time SSEC got caught in May. Then the frequency decline all the way till Nov.</li>
 </ul>
 </div>
 </div>
@@ -3876,9 +3876,9 @@ Insights from this visualisation
 <span id="cb112-33"><a href="#cb112-33" aria-hidden="true" tabindex="-1"></a>             <span class="at">yintercept =</span> <span class="fu">as.numeric</span>(average), </span>
 <span id="cb112-34"><a href="#cb112-34" aria-hidden="true" tabindex="-1"></a>             <span class="at">color=</span><span class="st">"black"</span>,</span>
 <span id="cb112-35"><a href="#cb112-35" aria-hidden="true" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="dv">6</span>) <span class="sc">+</span></span>
-<span id="cb112-36"><a href="#cb112-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">13366</span>,</span>
+<span id="cb112-36"><a href="#cb112-36" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_point</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">13315</span>,</span>
 <span id="cb112-37"><a href="#cb112-37" aria-hidden="true" tabindex="-1"></a>             <span class="at">size =</span> <span class="dv">4</span>, <span class="at">color =</span> <span class="st">"red"</span>) <span class="sc">+</span></span>
-<span id="cb112-38"><a href="#cb112-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">13366</span>, <span class="at">label =</span> <span class="st">"SouthSeafood caught"</span>),</span>
+<span id="cb112-38"><a href="#cb112-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_text</span>(<span class="fu">aes</span>(<span class="at">x =</span> <span class="dv">5</span>, <span class="at">y =</span> <span class="dv">13315</span>, <span class="at">label =</span> <span class="st">"SouthSeafood caught"</span>),</span>
 <span id="cb112-39"><a href="#cb112-39" aria-hidden="true" tabindex="-1"></a>            <span class="at">color =</span> <span class="st">"red"</span>,</span>
 <span id="cb112-40"><a href="#cb112-40" aria-hidden="true" tabindex="-1"></a>            <span class="at">hjust =</span> <span class="sc">-</span><span class="fl">0.2</span>,</span>
 <span id="cb112-41"><a href="#cb112-41" aria-hidden="true" tabindex="-1"></a>            <span class="at">size =</span> <span class="dv">3</span>) <span class="sc">+</span></span>
@@ -4087,6 +4087,7 @@ Conclusion from the visualisation
 </div>
 </div>
 </div>
+<p><strong>Understanding the dwell time</strong></p>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
@@ -4128,27 +4129,62 @@ Conclusion from the visualisation
 </div>
 </div>
 </div>
+<div class="callout callout-style-default callout-important callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Conclusion from the visualisation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>For the cities, the outliers can be explained by the extend stay due to repair and replenishment purposes.</p></li>
+<li><p>For all three ecological preserves, there are many outliers, and this is a tell-tale sign of extended stay in the preserves by fishing vessels for IUU fishing.</p></li>
+<li><p>For the fishing grounds, the extended stay of fishing vessels may be explained by conducting of transshipment between small fishing vessels and bigger reefer/cargo ships, where the small fishing vessels stay at the location for fishing. There are fishing vessels that are out in the sea for months.</p></li>
+<li><p>For the navigation points, Exit E display signs of abnormality due to its high number of outliers compared to other navigation points that are used for international shipping (Exit North, Exit South and Exit West). Nav 1 and Nav A may also be investigated since there are high numbers of outliers, and also, they are at the fringe of the Ghoti and Don Limpet Preserves respectively.</p></li>
+</ul>
+</div>
+</div>
 <div class="cell">
 <details class="code-fold">
 <summary>Show the code</summary>
-<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a>vessel_movement <span class="sc">%&gt;%</span> </span>
-<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(type <span class="sc">==</span><span class="st">"FishingVessel"</span>) <span class="sc">%&gt;%</span> </span>
-<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(loc <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Exit North"</span>,</span>
-<span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Exit South"</span>,</span>
-<span id="cb118-5"><a href="#cb118-5" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Exit East"</span>,</span>
-<span id="cb118-6"><a href="#cb118-6" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Exit West"</span>,</span>
-<span id="cb118-7"><a href="#cb118-7" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Nav 1"</span>,<span class="st">"Nav 2"</span>, <span class="st">"Nav 3"</span>, </span>
-<span id="cb118-8"><a href="#cb118-8" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Nav A"</span>, <span class="st">"Nav B"</span>, <span class="st">"Nav C"</span>, <span class="st">"Nav D"</span>, <span class="st">"Nav E"</span>)) <span class="sc">%&gt;%</span> </span>
-<span id="cb118-9"><a href="#cb118-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> loc, </span>
-<span id="cb118-10"><a href="#cb118-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> dwell,</span>
-<span id="cb118-11"><a href="#cb118-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> loc_type)) <span class="sc">+</span>                            </span>
-<span id="cb118-12"><a href="#cb118-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
-<span id="cb118-13"><a href="#cb118-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
-<span id="cb118-14"><a href="#cb118-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Dwell Time by Location"</span>, </span>
-<span id="cb118-15"><a href="#cb118-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Location"</span>, </span>
-<span id="cb118-16"><a href="#cb118-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Median Dwell Time"</span>) <span class="sc">+</span></span>
-<span id="cb118-17"><a href="#cb118-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, </span>
-<span id="cb118-18"><a href="#cb118-18" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">hjust =</span> <span class="dv">1</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="sourceCode cell-code" id="cb118"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb118-1"><a href="#cb118-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to change according to city </span></span>
+<span id="cb118-2"><a href="#cb118-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb118-3"><a href="#cb118-3" aria-hidden="true" tabindex="-1"></a>city_before <span class="ot">&lt;-</span> vessel_movement <span class="sc">%&gt;%</span> </span>
+<span id="cb118-4"><a href="#cb118-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time <span class="sc">&lt;=</span> <span class="fu">as.Date</span>(<span class="st">"2035-05-14"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb118-5"><a href="#cb118-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(loc <span class="sc">==</span> <span class="st">"City of Haacklee"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb118-6"><a href="#cb118-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> loc, </span>
+<span id="cb118-7"><a href="#cb118-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> dwell,</span>
+<span id="cb118-8"><a href="#cb118-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> loc)) <span class="sc">+</span></span>
+<span id="cb118-9"><a href="#cb118-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb118-10"><a href="#cb118-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb118-11"><a href="#cb118-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Dwell Time by Location"</span>, </span>
+<span id="cb118-12"><a href="#cb118-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Before SSEC caught"</span>,</span>
+<span id="cb118-13"><a href="#cb118-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Location"</span>, </span>
+<span id="cb118-14"><a href="#cb118-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Median Dwell Time"</span>) <span class="sc">+</span></span>
+<span id="cb118-15"><a href="#cb118-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb118-16"><a href="#cb118-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb118-17"><a href="#cb118-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>( <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">500000</span>)) </span>
+<span id="cb118-18"><a href="#cb118-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb118-19"><a href="#cb118-19" aria-hidden="true" tabindex="-1"></a>city_after <span class="ot">&lt;-</span> vessel_movement <span class="sc">%&gt;%</span> </span>
+<span id="cb118-20"><a href="#cb118-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time <span class="sc">&gt;</span> <span class="fu">as.Date</span>(<span class="st">"2035-05-14"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb118-21"><a href="#cb118-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(loc <span class="sc">==</span> <span class="st">"City of Haacklee"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb118-22"><a href="#cb118-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> loc, </span>
+<span id="cb118-23"><a href="#cb118-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> dwell,</span>
+<span id="cb118-24"><a href="#cb118-24" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> loc)) <span class="sc">+</span></span>
+<span id="cb118-25"><a href="#cb118-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb118-26"><a href="#cb118-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb118-27"><a href="#cb118-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Dwell Time by Location"</span>, </span>
+<span id="cb118-28"><a href="#cb118-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"After SSEC caught"</span>,</span>
+<span id="cb118-29"><a href="#cb118-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Location"</span>, </span>
+<span id="cb118-30"><a href="#cb118-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Median Dwell Time"</span>) <span class="sc">+</span></span>
+<span id="cb118-31"><a href="#cb118-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb118-32"><a href="#cb118-32" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb118-33"><a href="#cb118-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>( <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">500000</span>))</span>
+<span id="cb118-34"><a href="#cb118-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb118-35"><a href="#cb118-35" aria-hidden="true" tabindex="-1"></a>city_before <span class="sc">+</span> city_after</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
 </details>
 <div class="cell-output-display">
 <div>
@@ -4156,6 +4192,115 @@ Conclusion from the visualisation
 <p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-97-1.png" class="img-fluid figure-img" width="672"></p>
 </figure>
 </div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Insights from this visualisation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li>As we observe previously that there is a sharp drop in visit for the City of Haacklee, we also observe a drop in the median dwell time, and also much more data points that are outliers.</li>
+</ul>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb119"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb119-1"><a href="#cb119-1" aria-hidden="true" tabindex="-1"></a>vessel_movement <span class="sc">%&gt;%</span> </span>
+<span id="cb119-2"><a href="#cb119-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(type <span class="sc">==</span><span class="st">"FishingVessel"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb119-3"><a href="#cb119-3" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(loc <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"Exit North"</span>,</span>
+<span id="cb119-4"><a href="#cb119-4" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Exit South"</span>,</span>
+<span id="cb119-5"><a href="#cb119-5" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Exit East"</span>,</span>
+<span id="cb119-6"><a href="#cb119-6" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Exit West"</span>,</span>
+<span id="cb119-7"><a href="#cb119-7" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Nav 1"</span>,<span class="st">"Nav 2"</span>, <span class="st">"Nav 3"</span>, </span>
+<span id="cb119-8"><a href="#cb119-8" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Nav A"</span>, <span class="st">"Nav B"</span>, <span class="st">"Nav C"</span>, <span class="st">"Nav D"</span>, <span class="st">"Nav E"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb119-9"><a href="#cb119-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> loc, </span>
+<span id="cb119-10"><a href="#cb119-10" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> dwell,</span>
+<span id="cb119-11"><a href="#cb119-11" aria-hidden="true" tabindex="-1"></a>       <span class="at">fill =</span> loc_type)) <span class="sc">+</span>                            </span>
+<span id="cb119-12"><a href="#cb119-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>() <span class="sc">+</span></span>
+<span id="cb119-13"><a href="#cb119-13" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb119-14"><a href="#cb119-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Dwell Time by Location"</span>,</span>
+<span id="cb119-15"><a href="#cb119-15" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Comparing across the Navigation Points"</span>,</span>
+<span id="cb119-16"><a href="#cb119-16" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Location"</span>, </span>
+<span id="cb119-17"><a href="#cb119-17" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Median Dwell Time"</span>) <span class="sc">+</span></span>
+<span id="cb119-18"><a href="#cb119-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, </span>
+<span id="cb119-19"><a href="#cb119-19" aria-hidden="true" tabindex="-1"></a>                                   <span class="at">hjust =</span> <span class="dv">1</span>)) </span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-98-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="cell">
+<details class="code-fold">
+<summary>Show the code</summary>
+<div class="sourceCode cell-code" id="cb120"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb120-1"><a href="#cb120-1" aria-hidden="true" tabindex="-1"></a><span class="co"># to change according to navigation point </span></span>
+<span id="cb120-2"><a href="#cb120-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb120-3"><a href="#cb120-3" aria-hidden="true" tabindex="-1"></a>nav_before <span class="ot">&lt;-</span> vessel_movement <span class="sc">%&gt;%</span> </span>
+<span id="cb120-4"><a href="#cb120-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time <span class="sc">&lt;=</span> <span class="fu">as.Date</span>(<span class="st">"2035-05-14"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb120-5"><a href="#cb120-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(loc <span class="sc">==</span> <span class="st">"Exit East"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb120-6"><a href="#cb120-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> loc, </span>
+<span id="cb120-7"><a href="#cb120-7" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> dwell,</span>
+<span id="cb120-8"><a href="#cb120-8" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> loc)) <span class="sc">+</span></span>
+<span id="cb120-9"><a href="#cb120-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb120-10"><a href="#cb120-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb120-11"><a href="#cb120-11" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Dwell Time by Location"</span>, </span>
+<span id="cb120-12"><a href="#cb120-12" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"Before SSEC caught"</span>,</span>
+<span id="cb120-13"><a href="#cb120-13" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Location"</span>, </span>
+<span id="cb120-14"><a href="#cb120-14" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Median Dwell Time"</span>) <span class="sc">+</span></span>
+<span id="cb120-15"><a href="#cb120-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb120-16"><a href="#cb120-16" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb120-17"><a href="#cb120-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>( <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">25000</span>))</span>
+<span id="cb120-18"><a href="#cb120-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb120-19"><a href="#cb120-19" aria-hidden="true" tabindex="-1"></a>nav_after <span class="ot">&lt;-</span> vessel_movement <span class="sc">%&gt;%</span> </span>
+<span id="cb120-20"><a href="#cb120-20" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(time <span class="sc">&gt;</span> <span class="fu">as.Date</span>(<span class="st">"2035-05-14"</span>)) <span class="sc">%&gt;%</span> </span>
+<span id="cb120-21"><a href="#cb120-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(loc <span class="sc">==</span> <span class="st">"Exit East"</span>) <span class="sc">%&gt;%</span> </span>
+<span id="cb120-22"><a href="#cb120-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> loc, </span>
+<span id="cb120-23"><a href="#cb120-23" aria-hidden="true" tabindex="-1"></a>             <span class="at">y =</span> dwell,</span>
+<span id="cb120-24"><a href="#cb120-24" aria-hidden="true" tabindex="-1"></a>             <span class="at">fill =</span> loc)) <span class="sc">+</span></span>
+<span id="cb120-25"><a href="#cb120-25" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_boxplot</span>(<span class="at">width =</span> <span class="fl">0.2</span>) <span class="sc">+</span></span>
+<span id="cb120-26"><a href="#cb120-26" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span></span>
+<span id="cb120-27"><a href="#cb120-27" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">title =</span> <span class="st">"Median Dwell Time by Location"</span>, </span>
+<span id="cb120-28"><a href="#cb120-28" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="st">"After SSEC caught"</span>,</span>
+<span id="cb120-29"><a href="#cb120-29" aria-hidden="true" tabindex="-1"></a>       <span class="at">x =</span> <span class="st">"Location"</span>, </span>
+<span id="cb120-30"><a href="#cb120-30" aria-hidden="true" tabindex="-1"></a>       <span class="at">y =</span> <span class="st">"Median Dwell Time"</span>) <span class="sc">+</span></span>
+<span id="cb120-31"><a href="#cb120-31" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">axis.text.x =</span> <span class="fu">element_text</span>(<span class="at">angle =</span> <span class="dv">45</span>, <span class="at">hjust =</span> <span class="dv">1</span>),</span>
+<span id="cb120-32"><a href="#cb120-32" aria-hidden="true" tabindex="-1"></a>        <span class="at">legend.position =</span> <span class="st">"none"</span>) <span class="sc">+</span></span>
+<span id="cb120-33"><a href="#cb120-33" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>( <span class="at">limits =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="dv">25000</span>))</span>
+<span id="cb120-34"><a href="#cb120-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb120-35"><a href="#cb120-35" aria-hidden="true" tabindex="-1"></a>nav_before <span class="sc">+</span> nav_after</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</details>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="Take-home_Ex03_files/figure-html/unnamed-chunk-99-1.png" class="img-fluid figure-img" width="672"></p>
+</figure>
+</div>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Insights from this visualisation
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<ul>
+<li><p>We notice that there is no significant change in activities in Exit East after SSEC got caught. However, this location remains highly suspicious for IUU as Exit East are meant for navigation purposes and vessels not meant to have overly long period in this area not designated for fishing.</p></li>
+<li><p>This location offers opportunity for deep sea fishing, which may be unregulated (IUU), since we observe many instances of outliers (long dwell)</p></li>
+</ul>
 </div>
 </div>
 

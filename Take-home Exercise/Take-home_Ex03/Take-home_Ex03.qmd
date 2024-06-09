@@ -24,9 +24,9 @@ The details of the mini challenge can be found [here](https://vast-challenge.git
 
 ## Foreword by the Author
 
-This visualisation project is created for the fulfillment of [take home exercise 3](https://isss608-ay2023-24apr.netlify.app/take-home_ex/th_ex03) as part of the course assessment for the (Visual Analytics)[https://isss608-ay2023-24apr.netlify.app/] module taught by (Prof. T.S. Kam)[https://faculty.smu.edu.sg/profile/kam-tin-seong-486].
+This visualisation project is created for the fulfillment of [take home exercise 3](https://isss608-ay2023-24apr.netlify.app/take-home_ex/th_ex03) as part of the course assessment for the [Visual Analytics](https://isss608-ay2023-24apr.netlify.app/) module taught by [Prof. T.S. Kam](https://faculty.smu.edu.sg/profile/kam-tin-seong-486).
 
-Jump straight to final product for this (Take Home Exercise 3 - Mini Challenge 2: Task 4)[https://vaa-ry.netlify.app/take-home%20exercise/take-home_ex03/take-home_ex03#task-4] here. Only Task 4 is considered as a complete set of write up. The rest of the Task 1 and 2 are still work in progress by the author at the point of submission on 9 Jun 2024.
+Jump straight to final product for this [Take Home Exercise 3 - Mini Challenge 2: Task 4](https://vaa-ry.netlify.app/take-home%20exercise/take-home_ex03/take-home_ex03#task-4) here. Only Task 4 is considered as a complete set of write up. The rest of the Task 1 and 2 are still work in progress by the author at the point of submission on 9 Jun 2024.
 
 # 1.0 Data Preparation
 
@@ -1029,7 +1029,6 @@ p1/p2/p3
   
 ```
 
-
 ::: callout-note
 ### Insights from this visualisation
 
@@ -1080,9 +1079,6 @@ ggplot(import_record_agg,
 
 -   Qty_tons peak in Oct and Nov period, expecially for City of Paackland.
 :::
-
-
-
 
 ### 1.6.7 Understanding the Vessels
 
@@ -1299,16 +1295,15 @@ ggplot(vessel_movement, aes(x = loc,
 
 ::: callout-note
 ### Insights from this visualisation
-- For the cities, the outliers can be explained by the extend stay due to repair and replenishment purposes. 
 
--   For all three ecological preserves, there are many outliers, and this is a tell-tale sign of extended stay in the preserves by fishing vessels for IUU fishing. 
+-   For the cities, the outliers can be explained by the extend stay due to repair and replenishment purposes.
+
+-   For all three ecological preserves, there are many outliers, and this is a tell-tale sign of extended stay in the preserves by fishing vessels for IUU fishing.
 
 -   For the fishing grounds, the extended stay of fishing vessels may be explained by conducting of transshipment between small fishing vessels and bigger reefer/cargo ships, where the small fishing vessels stay at the location for fishing. There are fishing vessels that are out in the sea for months.
 
--   For the navigation points, Exit E display signs of abnormality due to its high number of outliers compared to other navigation points that are used for international shipping (Exit North, Exit South and Exit West). Nav 1 and Nav A may also be investigated since there are high numbers of outliers, and also, they are at the fringe of the Ghoti and Don Limpet Preserves respectively. 
-
+-   For the navigation points, Exit E display signs of abnormality due to its high number of outliers compared to other navigation points that are used for international shipping (Exit North, Exit South and Exit West). Nav 1 and Nav A may also be investigated since there are high numbers of outliers, and also, they are at the fringe of the Ghoti and Don Limpet Preserves respectively.
 :::
-
 
 ## 2.0 Task 1: Flow of Commercially Caught Fish
 
@@ -1671,7 +1666,7 @@ ggplot() +
 
 2.  What new behaviors in the Oceanus commercial fishing community are most suspicious and why?
 
-In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. The final activities of SouthSeafood's vessels are on 2035-05-14 at City of Lomark for Snapper Snatcher (snappersnatcher7be) and 2035-05-12 at City of Himark for Roach Robber (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-14. We will use this date as the cut off to define before and after SSEC was caught.
+**The Answer** In order to understand the change in fishing activities, we first have to determine the date where SouthSeafood Express Corp was caught. The final activities of SouthSeafood's vessels are on 2035-05-14 at City of Lomark for Snapper Snatcher (snappersnatcher7be) and 2035-05-12 at City of Himark for Roach Robber (roachrobberdb6) according to the transponder pings. Hence, we can conclude that the SouthSeafood is caught for illegal fishing, and had ceased operating its fishing vessels since 2035-05-14. We will use this date as the cut off to define before and after SSEC was caught.
 
 ## 4.1 Changes in Commercial Fishing
 
@@ -1767,7 +1762,7 @@ a
 ::: callout-note
 ## Insights from this visualisation
 
--   For the City of Himark, there is a hike in visit frequency till the time
+-   For the City of Himark, there is a hike in visit frequency till the time SSEC got caught in May. Then the frequency decline all the way till Nov.
 :::
 
 ```{r}
@@ -1835,7 +1830,7 @@ c <- c +
 c
 ```
 
-```{}
+```         
 ```
 
 In the line graph below, we observe that the overall fishing vessels activities in the fishing ground and preserves dropped.
@@ -1876,9 +1871,9 @@ vessel_movement %>%
              yintercept = as.numeric(average), 
              color="black",
              linetype = 6) +
-  geom_point(x = 5, y = 13366,
+  geom_point(x = 5, y = 13315,
              size = 4, color = "red") +
-  geom_text(aes(x = 5, y = 13366, label = "SouthSeafood caught"),
+  geom_text(aes(x = 5, y = 13315, label = "SouthSeafood caught"),
             color = "red",
             hjust = -0.2,
             size = 3) +
@@ -2050,6 +2045,8 @@ After SSFEC arrest:
 create_heatmap(fish_by_port_agg, "City of Haacklee")
 ```
 
+**Understanding the dwell time**
+
 ```{r}
 vessel_movement$loc <- factor(vessel_movement$loc,
                               levels = c("City of Himark",
@@ -2082,6 +2079,62 @@ ggplot(vessel_movement, aes(x = loc,
   scale_y_continuous( limits = c(0, 500000))
 ```
 
+::: callout-important
+## Conclusion from the visualisation
+
+-   For the cities, the outliers can be explained by the extend stay due to repair and replenishment purposes.
+
+-   For all three ecological preserves, there are many outliers, and this is a tell-tale sign of extended stay in the preserves by fishing vessels for IUU fishing.
+
+-   For the fishing grounds, the extended stay of fishing vessels may be explained by conducting of transshipment between small fishing vessels and bigger reefer/cargo ships, where the small fishing vessels stay at the location for fishing. There are fishing vessels that are out in the sea for months.
+
+-   For the navigation points, Exit E display signs of abnormality due to its high number of outliers compared to other navigation points that are used for international shipping (Exit North, Exit South and Exit West). Nav 1 and Nav A may also be investigated since there are high numbers of outliers, and also, they are at the fringe of the Ghoti and Don Limpet Preserves respectively.
+:::
+
+```{r}
+# to change according to city 
+
+city_before <- vessel_movement %>% 
+  filter(time <= as.Date("2035-05-14")) %>% 
+  filter(loc == "City of Haacklee") %>% 
+  ggplot(aes(x = loc, 
+             y = dwell,
+             fill = loc)) +
+  geom_boxplot(width = 0.2) +
+  theme_minimal() +
+  labs(title = "Median Dwell Time by Location", 
+       subtitle = "Before SSEC caught",
+       x = "Location", 
+       y = "Median Dwell Time") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  scale_y_continuous( limits = c(0, 500000)) 
+
+city_after <- vessel_movement %>% 
+  filter(time > as.Date("2035-05-14")) %>% 
+  filter(loc == "City of Haacklee") %>% 
+  ggplot(aes(x = loc, 
+             y = dwell,
+             fill = loc)) +
+  geom_boxplot(width = 0.2) +
+  theme_minimal() +
+  labs(title = "Median Dwell Time by Location", 
+       subtitle = "After SSEC caught",
+       x = "Location", 
+       y = "Median Dwell Time") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  scale_y_continuous( limits = c(0, 500000))
+
+city_before + city_after
+```
+::: callout-note
+## Insights from this visualisation
+
+-   As we observe previously that there is a sharp drop in visit for the City of Haacklee, we also observe a drop in the median dwell time, and also much more data points that are outliers.
+
+:::
+
 ```{r}
 vessel_movement %>% 
   filter(type =="FishingVessel") %>% 
@@ -2096,10 +2149,63 @@ vessel_movement %>%
        fill = loc_type)) +                            
   geom_boxplot() +
   theme_minimal() +
-  labs(title = "Median Dwell Time by Location", 
+  labs(title = "Median Dwell Time by Location",
+       subtitle = "Comparing across the Navigation Points",
        x = "Location", 
        y = "Median Dwell Time") +
   theme(axis.text.x = element_text(angle = 45, 
                                    hjust = 1)) 
 
+
+
 ```
+```{r}
+# to change according to navigation point 
+
+nav_before <- vessel_movement %>% 
+  filter(time <= as.Date("2035-05-14")) %>% 
+  filter(loc == "Exit East") %>% 
+  ggplot(aes(x = loc, 
+             y = dwell,
+             fill = loc)) +
+  geom_boxplot(width = 0.2) +
+  theme_minimal() +
+  labs(title = "Median Dwell Time by Location", 
+       subtitle = "Before SSEC caught",
+       x = "Location", 
+       y = "Median Dwell Time") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  scale_y_continuous( limits = c(0, 25000))
+
+nav_after <- vessel_movement %>% 
+  filter(time > as.Date("2035-05-14")) %>% 
+  filter(loc == "Exit East") %>% 
+  ggplot(aes(x = loc, 
+             y = dwell,
+             fill = loc)) +
+  geom_boxplot(width = 0.2) +
+  theme_minimal() +
+  labs(title = "Median Dwell Time by Location", 
+       subtitle = "After SSEC caught",
+       x = "Location", 
+       y = "Median Dwell Time") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1),
+        legend.position = "none") +
+  scale_y_continuous( limits = c(0, 25000))
+
+nav_before + nav_after
+```
+
+::: callout-note
+## Insights from this visualisation
+
+-   We notice that there is no significant change in activities in Exit East after SSEC got caught. However, this location remains highly suspicious for IUU as Exit East are meant for navigation purposes and vessels not meant to have overly long period in this area not designated for fishing. 
+
+-   This location offers opportunity for deep sea fishing, which may be unregulated (IUU), since we observe many instances of outliers (long dwell)
+
+:::
+
+
+
+
