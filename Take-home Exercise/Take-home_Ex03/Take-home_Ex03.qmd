@@ -2128,11 +2128,11 @@ city_after <- vessel_movement %>%
 
 city_before + city_after
 ```
+
 ::: callout-note
 ## Insights from this visualisation
 
 -   As we observe previously that there is a sharp drop in visit for the City of Haacklee, we also observe a drop in the median dwell time, and also much more data points that are outliers.
-
 :::
 
 ```{r}
@@ -2159,6 +2159,7 @@ vessel_movement %>%
 
 
 ```
+
 ```{r}
 # to change according to navigation point 
 
@@ -2200,12 +2201,7 @@ nav_before + nav_after
 ::: callout-note
 ## Insights from this visualisation
 
--   We notice that there is no significant change in activities in Exit East after SSEC got caught. However, this location remains highly suspicious for IUU as Exit East are meant for navigation purposes and vessels not meant to have overly long period in this area not designated for fishing. 
+-   We notice that there is no significant change in activities in Exit East after SSEC got caught. However, this location remains highly suspicious for IUU as Exit East are meant for navigation purposes and vessels not meant to have overly long period in this area not designated for fishing.
 
 -   This location offers opportunity for deep sea fishing, which may be unregulated (IUU), since we observe many instances of outliers (long dwell)
-
 :::
-
-
-
-
