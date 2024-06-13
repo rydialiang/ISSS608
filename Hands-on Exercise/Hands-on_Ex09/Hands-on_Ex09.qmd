@@ -1383,6 +1383,7 @@ This slide shows you how to install a R package which is not available in cran.
 1.  If this is the first time you install a package from github, you should install *devtools* package by using the code below or else you can skip this step.
 
 ```{r}
+#| eval = FALSE
 install.packages("devtools")
 ```
 
@@ -1390,7 +1391,7 @@ install.packages("devtools")
 
 ```{r}
 library(devtools)
-install_github("timelyportfolio/d3treeR")
+# install_github("timelyportfolio/d3treeR")
 ```
 
 3.  Now you are ready to launch *d3treeR* package
