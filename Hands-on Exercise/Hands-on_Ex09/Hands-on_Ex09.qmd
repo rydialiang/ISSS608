@@ -538,6 +538,9 @@ corrplot(wine.cor,
          addrect = 3)
 ```
 
+
+Introduction to "[scatterPlotMatrix](https://cran.r-project.org/web/packages/scatterPlotMatrix/vignettes/introduction-to-scatterplotmatrix.html)"
+
 # **7 Reference**
 
 Michael Friendly (2002). “Corrgrams: Exploratory displays for correlation matrices”. *The American Statistician*, 56, 316–324.
@@ -1074,7 +1077,7 @@ In the code chunk below, *read_csv()* of **readr** is used to import realis2018.
 realis2018 <- read_csv("data/realis2018.csv")
 ```
 
-## The output tibble data.frame is called *realis2018*.
+The output tibble data.frame is called *realis2018*.
 
 ### **16.3.2 Data Wrangling and Manipulation**
 
