@@ -1,0 +1,61 @@
+---
+title: "Hands On Exercise 10"
+author: "Liang Xiuhao"
+date: "Jun 18, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+---
+
+# **31  Information Dashboard Design: R methods**
+
+## **31.1 Overview**
+
+By the end of this hands-on exercise, you will be able to:
+
+-   create bullet chart by using ggplot2,
+
+-   create sparklines by using ggplot2 ,
+
+-   build industry standard dashboard by using R Shiny.
+
+## **31.2 Getting started**
+
+For the purpose of this hands-on exercise, the following R packages will be used.
+
+```{r}
+pacman::p_load(lubridate, ggthemes, reactable,
+reactablefmtr, gt, gtExtras, tidyverse)
+```
+
+-   [tidyverse](https://www.tidyverse.org/) provides a collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data. It is not a single package but a collection of modern R packages including but not limited to [readr](https://readr.tidyverse.org/), [tidyr](https://tidyr.tidyverse.org/), [dplyr](https://dplyr.tidyverse.org/), [ggplot](https://ggplot2.tidyverse.org/), [tibble](https://tibble.tidyverse.org/), [stringr](https://stringr.tidyverse.org/), [forcats](https://forcats.tidyverse.org/) and [purrr](https://purrr.tidyverse.org/).
+
+-   [lubridate](https://r4va.netlify.app/chap31) provides functions to work with dates and times more efficiently.
+
+-   [ggthemes](https://r4va.netlify.app/chap31) is an extension of ggplot2. It provides additional [themes](https://yutannihilation.github.io/allYourFigureAreBelongToUs/ggthemes/) beyond the basic themes of ggplot2.
+
+-   [gtExtras](https://jthomasmock.github.io/gtExtras/) provides some additional helper functions to assist in creating beautiful tables with [gt](https://gt.rstudio.com/), an R package specially designed for anyone to make wonderful-looking tables using the R programming language.
+
+-   [reactable](https://glin.github.io/reactable/) provides functions to create interactive data tables for R, based on the [React Table](https://github.com/tanstack/table/tree/v7) library and made with [reactR](https://github.com/react-R/reactR).
+
+-   [reactablefmtr](https://kcuilla.github.io/reactablefmtr/) provides various features to streamline and enhance the styling of interactive reactable tables with easy-to-use and highly-customizable functions and themes.
+
+## **31.3 Importing Microsoft Access database**
+
+### **31.3.1 The data set**
+
+For the purpose of this study, a personal database in Microsoft Access mdb format called *Coffee Chain* will be used.
+
+### **31.3.2 Importing database into R**
+
+In the code chunk below, `odbcConnectAccess()` of [**RODBC**](https://cran.r-project.org/web/packages/RODBC/) package is used used to import a database query table into R.
+
+```{}
+```

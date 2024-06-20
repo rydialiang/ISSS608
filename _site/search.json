@@ -215,5 +215,33 @@
     "title": "Hands On Exercise 9",
     "section": "16.6 Designing Interactive Treemap using d3treeR",
     "text": "16.6 Designing Interactive Treemap using d3treeR\n\n16.6.1 Installing d3treeR package\nThis slide shows you how to install a R package which is not available in cran.\n\nIf this is the first time you install a package from github, you should install devtools package by using the code below or else you can skip this step.\n\n\n\nShow the code\ninstall.packages(\"devtools\")\n\n\n\nNext, you will load the devtools library and install the package found in github by using the codes below\n\n\n\nShow the code\nlibrary(devtools)\n# binstall_github(\"timelyportfolio/d3treeR\")\n\n\n\nNow you are ready to launch d3treeR package\n\n\n\nShow the code\nlibrary(d3treeR)\n\n\n\n\n16.6.2 Designing An Interactive Treemap\nThe codes below perform two processes.\n\ntreemap() is used to build a treemap by using selected variables in condominium data.frame. The treemap created is save as object called tm.\n\n\n\nShow the code\ntm &lt;- treemap(realis2018_summarised,\n        index=c(\"Planning Region\", \"Planning Area\"),\n        vSize=\"Total Unit Sold\",\n        vColor=\"Median Unit Price ($ psm)\",\n        type=\"value\",\n        title=\"Private Residential Property Sold, 2017\",\n        title.legend = \"Median Unit Price (S$ per sq. m)\"\n        )\n\n\n\n\n\n\n\n\n\n\nThen d3tree() is used to build an interactive treemap.\n\n\n\nShow the code\nd3tree(tm,rootname = \"Singapore\" )"
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.html",
+    "href": "Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.html",
+    "title": "Hands On Exercise 10",
+    "section": "",
+    "text": "By the end of this hands-on exercise, you will be able to:\n\ncreate bullet chart by using ggplot2,\ncreate sparklines by using ggplot2 ,\nbuild industry standard dashboard by using R Shiny.\n\n\n\n\nFor the purpose of this hands-on exercise, the following R packages will be used.\n\n\nShow the code\npacman::p_load(lubridate, ggthemes, reactable,\nreactablefmtr, gt, gtExtras, tidyverse)\n\n\n\ntidyverse provides a collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data. It is not a single package but a collection of modern R packages including but not limited to readr, tidyr, dplyr, ggplot, tibble, stringr, forcats and purrr.\nlubridate provides functions to work with dates and times more efficiently.\nggthemes is an extension of ggplot2. It provides additional themes beyond the basic themes of ggplot2.\ngtExtras provides some additional helper functions to assist in creating beautiful tables with gt, an R package specially designed for anyone to make wonderful-looking tables using the R programming language.\nreactable provides functions to create interactive data tables for R, based on the React Table library and made with reactR.\nreactablefmtr provides various features to streamline and enhance the styling of interactive reactable tables with easy-to-use and highly-customizable functions and themes.\n\n\n\n\n\n\nFor the purpose of this study, a personal database in Microsoft Access mdb format called Coffee Chain will be used.\n\n\n\nIn the code chunk below, odbcConnectAccess() of RODBC package is used used to import a database query table into R."
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.html#overview",
+    "href": "Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.html#overview",
+    "title": "Hands On Exercise 10",
+    "section": "",
+    "text": "By the end of this hands-on exercise, you will be able to:\n\ncreate bullet chart by using ggplot2,\ncreate sparklines by using ggplot2 ,\nbuild industry standard dashboard by using R Shiny."
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.html#getting-started",
+    "href": "Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.html#getting-started",
+    "title": "Hands On Exercise 10",
+    "section": "",
+    "text": "For the purpose of this hands-on exercise, the following R packages will be used.\n\n\nShow the code\npacman::p_load(lubridate, ggthemes, reactable,\nreactablefmtr, gt, gtExtras, tidyverse)\n\n\n\ntidyverse provides a collection of functions for performing data science task such as importing, tidying, wrangling data and visualising data. It is not a single package but a collection of modern R packages including but not limited to readr, tidyr, dplyr, ggplot, tibble, stringr, forcats and purrr.\nlubridate provides functions to work with dates and times more efficiently.\nggthemes is an extension of ggplot2. It provides additional themes beyond the basic themes of ggplot2.\ngtExtras provides some additional helper functions to assist in creating beautiful tables with gt, an R package specially designed for anyone to make wonderful-looking tables using the R programming language.\nreactable provides functions to create interactive data tables for R, based on the React Table library and made with reactR.\nreactablefmtr provides various features to streamline and enhance the styling of interactive reactable tables with easy-to-use and highly-customizable functions and themes."
+  },
+  {
+    "objectID": "Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.html#importing-microsoft-access-database",
+    "href": "Hands-on Exercise/Hands-on_Ex10/Hands-on_Ex10.html#importing-microsoft-access-database",
+    "title": "Hands On Exercise 10",
+    "section": "",
+    "text": "For the purpose of this study, a personal database in Microsoft Access mdb format called Coffee Chain will be used.\n\n\n\nIn the code chunk below, odbcConnectAccess() of RODBC package is used used to import a database query table into R."
   }
 ]

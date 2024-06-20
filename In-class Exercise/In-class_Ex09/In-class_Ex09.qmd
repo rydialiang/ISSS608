@@ -1,0 +1,101 @@
+---
+title: "In-class Exercise 9"
+author: "Liang Xiuhao"
+date: "Jun 12, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+---
+
+```{r}
+pacman::p_load(scatterPlotMatrix,
+               parallelPlot,
+               cluster, factoextra,
+               tidyverse)
+```
+
+```{r}
+wine <- read_csv("data/wine_quality.csv")
+```
+
+```{r}
+ggplot(data = wine,
+       aes(x = type)) +
+  geom_bar()
+```
+
+```{r}
+whitewine <- wine %>% 
+  filter(type =="white") %>% 
+  select(c(1:11))
+```
+
+scatterPlotMatrix is a html matrix. 500 by 500 is based on number of pixel.
+
+```{r}
+scatterPlotMatrix(whitewine,
+                  corrPlotType = "Text",
+                  distribType = 1,
+                  width = 500,
+                  height = 500)
+```
+
+Note: 1. use scatterPlotMatrixOutput and renderScatterPlotMatrix for implementation.
+
+Documentation [here](https://cran.r-project.org/web/packages/scatterPlotMatrix/scatterPlotMatrix.pdf)
+
+```{r}
+set.seed(1234)
+gap_stat <- 
+```
+
+Use gap stats to find optimal number of clusters
+
+```{r}
+fviz_gap_stat(gap_stat) 
+```
+
+Note: 1. Use nstart = 25, usual for clustering algorithm.
+
+2.  Use set seed for consistency.
+
+3.  `cluster` package has more features than base R.
+
+```{r}
+set.seed(123)
+kmeans4 <- kmeans(whitewine, 4, nstart = 25)
+print(kmeans4)
+```
+
+```{r}
+fviz_cluster(kmeans4, data = whitewine)
+```
+
+```{r}
+whitewine <- whitewine %>% 
+  mutate(Cluster = kmeans4$cluster)
+```
+
+Note: Cluster value is integer. We use the following code to change it to factor.
+
+```{r}
+whitewine$Cluster <- 
+  as_factor(whitewine$Cluster)
+```
+
+```{r}
+whitewine %>% 
+  parallelPlot(refColumnDim = "Cluster",
+               width = 300,
+               height = 250,
+               rotateTitle = TRUE)
+```
+
+Note: 1. parallelPlotOutput() and renderParallelPlot() when deploying in Shiny.

@@ -538,7 +538,6 @@ corrplot(wine.cor,
          addrect = 3)
 ```
 
-
 Introduction to "[scatterPlotMatrix](https://cran.r-project.org/web/packages/scatterPlotMatrix/vignettes/introduction-to-scatterplotmatrix.html)"
 
 # **7 Reference**
