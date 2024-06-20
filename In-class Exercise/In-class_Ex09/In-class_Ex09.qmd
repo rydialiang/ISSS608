@@ -51,16 +51,7 @@ Note: 1. use scatterPlotMatrixOutput and renderScatterPlotMatrix for implementat
 
 Documentation [here](https://cran.r-project.org/web/packages/scatterPlotMatrix/scatterPlotMatrix.pdf)
 
-```{r}
-set.seed(1234)
-gap_stat <- 
-```
 
-Use gap stats to find optimal number of clusters
-
-```{r}
-fviz_gap_stat(gap_stat) 
-```
 
 Note: 1. Use nstart = 25, usual for clustering algorithm.
 
