@@ -1503,6 +1503,12 @@ fish_by_port_agg <- import_record1 %>%
 ```
 
 ```{r}
+write_rds(fish_by_port_agg, 
+  "data/rds/fish_by_port_agg.rds")
+```
+
+
+```{r}
 # Create an empty list to store heatmaps
 heatmaps <- list()
 
