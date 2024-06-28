@@ -21,6 +21,7 @@ execute:
 pacman::p_load(lubridate, ggthemes, reactable,
 reactablefmtr, gt, gtExtras, tidyverse, svglite)
 ```
+# Tab 1
 
 ## column
 
@@ -87,3 +88,5 @@ ggplot(productProfit, aes(Product, current)) +
                 size = 1) +
   coord_flip()
 ```
+
+# Tab 2
