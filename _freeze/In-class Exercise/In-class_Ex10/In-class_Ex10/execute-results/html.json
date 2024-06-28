@@ -1,0 +1,17 @@
+{
+  "hash": "10e7716c7e73d54abcd1a1d5a40f3129",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"In-Class Exercise 10: Quarto Dashboard\"\nformat: \n  dashboard: \n    orientation: columns\n    logo: \"insert logo\"\n    nav-buttons:\n        - icon: linkedin\n          href: \"insert linkedin link\"\n        - icon: github\n          href: \"insert github link\"\nexecute:\n  eval: true\n  echo: false\n  warning: false\n  message: false\n  freeze: true\n---\n\n::: {.cell}\n\n:::\n\n\n## column\n\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n::: {.cell}\n\n:::\n\n\n## column\n\n\n::: {.cell title='Sales by Products'}\n::: {.cell-output-display}\n![](In-class_Ex10_files/figure-html/unnamed-chunk-5-1.png){width=768}\n:::\n:::\n\n::: {.cell title='Sales by Profit'}\n::: {.cell-output-display}\n![](In-class_Ex10_files/figure-html/unnamed-chunk-6-1.png){width=768}\n:::\n:::",
+    "supporting": [
+      "In-class_Ex10_files"
+    ],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

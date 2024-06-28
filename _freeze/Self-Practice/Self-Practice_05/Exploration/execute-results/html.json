@@ -1,0 +1,15 @@
+{
+  "hash": "81f86a68afa0c3f49953666dac22bef8",
+  "result": {
+    "engine": "knitr",
+    "markdown": "---\ntitle: \"Data Exploration\"\nauthor: \"Rydia\"\ndate: \"May 13, 2024\"\ndate-modified: \"last-modified\"\nexecute:\n  eval: true\n  echo: true\n  warning: false\n  freeze: true\nformat: \n  html:\n    code-fold: true\n    code-summary: \"Show the code\"\n---\n\n::: {.cell}\n\n```{.r .cell-code}\npacman::p_load(tidyverse,\n               jsonlite)\n```\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\ndata <- fromJSON(\"data/data.json\")\n```\n:::\n\n::: {.cell}\n\n```{.r .cell-code}\nrecords <- data$result$records\n```\n:::\n",
+    "supporting": [],
+    "filters": [
+      "rmarkdown/pagebreak.lua"
+    ],
+    "includes": {},
+    "engineDependencies": {},
+    "preserve": {},
+    "postProcess": true
+  }
+}

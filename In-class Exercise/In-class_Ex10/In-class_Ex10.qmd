@@ -1,0 +1,89 @@
+---
+title: "In-Class Exercise 10: Quarto Dashboard"
+format: 
+  dashboard: 
+    orientation: columns
+    logo: "insert logo"
+    nav-buttons:
+        - icon: linkedin
+          href: "insert linkedin link"
+        - icon: github
+          href: "insert github link"
+execute:
+  eval: true
+  echo: false
+  warning: false
+  message: false
+  freeze: true
+---
+
+```{r}
+pacman::p_load(lubridate, ggthemes, reactable,
+reactablefmtr, gt, gtExtras, tidyverse, svglite)
+```
+
+## column
+
+```{r}
+coffeechain <- read_rds("data/CoffeeChain.rds")
+```
+```{r}
+productSales <- coffeechain %>%
+  group_by(`Product`) %>%
+  summarise(`target` = sum(`Budget Sales`),
+            `current` = sum(`Sales`)) %>%
+  ungroup()
+```
+```{r}
+productProfit <- coffeechain %>%
+  group_by(`Product`) %>%
+  summarise(`target` = sum(`Budget Profit`),
+            `current` = sum(`Profit`)) %>%
+  ungroup()
+```
+
+## column
+
+```{r}
+#| title: Sales by Products
+ggplot(productSales, aes(Product, current)) + 
+  geom_col(aes(Product, max(target) * 1.01),
+           fill="grey85", width=0.85) +
+  geom_col(aes(Product, target * 0.75),
+           fill="grey60", width=0.85) +
+  geom_col(aes(Product, target * 0.5),
+           fill="grey50", width=0.85) +
+  geom_col(aes(Product, current), 
+           width=0.35,
+           fill = "black") + 
+  geom_errorbar(aes(y = target,
+                    x = Product, 
+                    ymin = target,
+                    ymax= target), 
+                width = .4,
+                colour = "red",
+                size = 1) +
+  coord_flip()
+```
+
+```{r}
+#| title: Sales by Profit
+ggplot(productProfit, aes(Product, current)) + 
+  geom_col(aes(Product, max(target) * 1.01),
+           fill="grey85", width=0.85) +
+  geom_col(aes(Product, target * 0.75),
+           fill="grey60", width=0.85) +
+  geom_col(aes(Product, target * 0.5),
+           fill="grey50", width=0.85) +
+  geom_col(aes(Product, current), 
+           width=0.35,
+           fill = "black") + 
+  geom_errorbar(aes(y = target,
+                    x = Product, 
+                    ymin = target,
+                    ymax= target), 
+                width = .4,
+                colour = "red",
+                size = 1) +
+  coord_flip()
+```

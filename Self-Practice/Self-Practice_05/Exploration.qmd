@@ -1,0 +1,31 @@
+---
+title: "Data Exploration"
+author: "Rydia"
+date: "May 13, 2024"
+date-modified: "last-modified"
+execute:
+  eval: true
+  echo: true
+  warning: false
+  freeze: true
+format: 
+  html:
+    code-fold: true
+    code-summary: "Show the code"
+---
+
+```{r}
+pacman::p_load(tidyverse,
+               jsonlite)
+```
+
+
+```{r}
+data <- fromJSON("data/data.json")
+```
+
+```{r}
+records <- data$result$records
+```
+
+
