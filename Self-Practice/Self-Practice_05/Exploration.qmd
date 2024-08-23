@@ -19,7 +19,6 @@ pacman::p_load(tidyverse,
                jsonlite)
 ```
 
-
 ```{r}
 data <- fromJSON("data/data.json")
 ```
@@ -27,5 +26,3 @@ data <- fromJSON("data/data.json")
 ```{r}
 records <- data$result$records
 ```
-
-
